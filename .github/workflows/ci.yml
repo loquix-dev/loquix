@@ -40,7 +40,7 @@ jobs:
         run: pnpm format:check
 
       - name: Install Playwright browsers
-        run: cd packages/core && npx playwright install --with-deps chromium webkit
+        run: pnpm --filter @loquix/core exec playwright install --with-deps chromium webkit
 
       - name: Build core
         run: pnpm --filter @loquix/core build
