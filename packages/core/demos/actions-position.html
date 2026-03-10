@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loquix — Actions Position Test</title>
+  <link rel="stylesheet" href="../src/tokens/variables.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { height: auto; overflow-y: visible; }
+    body { min-height: 100vh; }
+    body {
+      font-family: var(--loquix-font-family);
+      background: #f1f5f9;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+
+    p.subtitle {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-bottom: 32px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      max-width: 1400px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .card h2 {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #7c3aed;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      color: #1e293b;
+      margin-bottom: 16px;
+    }
+
+    .card code {
+      background: #f4f4f8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8125rem;
+      color: #7c3aed;
+    }
+
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Force actions always visible for the test page */
+    loquix-message-item::part(actions) {
+      /* Can't pierce shadow DOM with ::part for opacity unfortunately */
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-style: italic;
+    }
+  </style>
+  <script type="module" src="../src/index.ts"></script>
+  <script type="module">
+    // Force all actions visible for testing
+    function forceActionsVisible() {
+      document.querySelectorAll('loquix-message-item').forEach(item => {
+        const actions = item.shadowRoot?.querySelector('.actions');
+        if (actions) {
+          actions.style.opacity = '1';
+          actions.style.pointerEvents = 'auto';
+        }
+      });
+    }
+
+    // Run after components have rendered
+    setTimeout(forceActionsVisible, 300);
+    setTimeout(forceActionsVisible, 800);
+  </script>
+</head>
+<body>
+  <h1>Actions Toolbar Position Test</h1>
+  <p class="subtitle">All 4 placement options shown for both assistant and user messages. Actions are forced visible (normally appear on hover).</p>
+
+  <div class="grid">
+
+    <!-- ────────────────────────────────────── -->
+    <!-- BOTTOM-START -->
+    <!-- ────────────────────────────────────── -->
+    <div class="card">
+      <h2>Assistant</h2>
+      <h3><code>actions-position="bottom-start"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="assistant"
+          status="complete"
+          model="Claude"
+          message-id="bs-a1"
+          actions-position="bottom-start"
+        >
+          <loquix-message-content>This is an assistant message with the actions toolbar positioned at <strong>bottom-start</strong> — below the bubble, aligned to the left edge.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Actions appear below the bubble, left-aligned</p>
+    </div>
+
+    <div class="card">
+      <h2>User</h2>
+      <h3><code>actions-position="bottom-start"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="bs-u1"
+          actions-position="bottom-start"
+        >
+          <loquix-message-content>User message with actions at bottom-start. The toolbar appears below the bubble, left-aligned.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Actions appear below the bubble, left-aligned (start of message area)</p>
+    </div>
+
+    <!-- ────────────────────────────────────── -->
+    <!-- BOTTOM-END -->
+    <!-- ────────────────────────────────────── -->
+    <div class="card">
+      <h2>Assistant</h2>
+      <h3><code>actions-position="bottom-end"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="assistant"
+          status="complete"
+          model="Claude"
+          message-id="be-a1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>Assistant message with actions at <strong>bottom-end</strong> — below the bubble, aligned to the right edge.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Actions appear below the bubble, right-aligned</p>
+    </div>
+
+    <div class="card">
+      <h2>User</h2>
+      <h3><code>actions-position="bottom-end"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="be-u1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>User message with actions at bottom-end. The toolbar appears below the bubble, right-aligned.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Actions appear below the bubble, right-aligned (end of message area)</p>
+    </div>
+
+    <!-- ────────────────────────────────────── -->
+    <!-- INLINE-START -->
+    <!-- ────────────────────────────────────── -->
+    <div class="card">
+      <h2>Assistant</h2>
+      <h3><code>actions-position="inline-start"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="assistant"
+          status="complete"
+          model="Claude"
+          message-id="is-a1"
+          actions-position="inline-start"
+        >
+          <loquix-message-content>Assistant message with actions at <strong>inline-start</strong> — to the left of the bubble, aligned to the bottom.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Actions appear to the left of the bubble, bottom-aligned</p>
+    </div>
+
+    <div class="card">
+      <h2>User</h2>
+      <h3><code>actions-position="inline-start"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="is-u1"
+          actions-position="inline-start"
+        >
+          <loquix-message-content>User message with actions at inline-start. The toolbar appears to the left of the bubble.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Actions appear to the left of the bubble, bottom-aligned</p>
+    </div>
+
+    <!-- ────────────────────────────────────── -->
+    <!-- INLINE-END -->
+    <!-- ────────────────────────────────────── -->
+    <div class="card">
+      <h2>Assistant</h2>
+      <h3><code>actions-position="inline-end"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="assistant"
+          status="complete"
+          model="Claude"
+          message-id="ie-a1"
+          actions-position="inline-end"
+        >
+          <loquix-message-content>Assistant message with actions at <strong>inline-end</strong> — to the right of the bubble, aligned to the bottom.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Actions appear to the right of the bubble, bottom-aligned</p>
+    </div>
+
+    <div class="card">
+      <h2>User</h2>
+      <h3><code>actions-position="inline-end"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="ie-u1"
+          actions-position="inline-end"
+        >
+          <loquix-message-content>User message with actions at inline-end. The toolbar appears to the right of the bubble.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Actions appear to the right of the bubble, bottom-aligned</p>
+    </div>
+
+  </div>
+</body>
+</html>

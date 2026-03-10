@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loquix — Chat Composer Demo</title>
+  <link rel="stylesheet" href="../src/tokens/variables.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--loquix-font-family, system-ui, -apple-system, sans-serif);
+      padding: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      color: #1a1a1a;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; }
+    h2 {
+      font-size: 1.1rem;
+      margin: 32px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .subtitle { color: rgba(0,0,0,0.5); font-size: 0.875rem; margin-bottom: 24px; }
+    .section { margin-bottom: 24px; }
+    .card {
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafa;
+    }
+    .hint { font-size: 0.8rem; color: rgba(0,0,0,0.5); margin-bottom: 8px; }
+
+    /* Dark wrapper to show contained variant like Claude/ChatGPT */
+    .dark-wrap {
+      background: #212121;
+      border-radius: 12px;
+      padding: 24px 16px;
+    }
+    .dark-wrap loquix-chat-composer {
+      --loquix-composer-bg: transparent;
+      --loquix-composer-container-bg: #303030;
+      --loquix-composer-container-border-color: #424242;
+      --loquix-composer-container-focus-border-color: #616161;
+      --loquix-input-color: #e0e0e0;
+      --loquix-input-placeholder-color: #757575;
+      --loquix-input-focus-ring-color: transparent;
+    }
+
+    /* Toolbar action buttons for demo */
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-size: 1.1rem;
+      opacity: 0.6;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    .action-btn:hover { opacity: 1; background: rgba(128,128,128,0.15); }
+    .dark-wrap .action-btn { color: #aaa; }
+    .dark-wrap .action-btn:hover { color: #e0e0e0; }
+
+    .model-select {
+      padding: 4px 8px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: inherit;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      opacity: 0.6;
+      cursor: pointer;
+    }
+    .model-select:hover { opacity: 1; background: rgba(128,128,128,0.15); }
+    .dark-wrap .model-select { color: #aaa; }
+
+    .toolbar-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8125rem;
+      opacity: 0.7;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .toolbar-item:hover { opacity: 1; background: rgba(128,128,128,0.1); }
+
+    #event-log {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 120px;
+      overflow-y: auto;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.75rem;
+      padding: 8px 12px;
+      border-top: 2px solid #7c3aed;
+    }
+    #event-log .entry { padding: 2px 0; }
+    #event-log .type { color: #f38ba8; }
+    #event-log .data { color: #a6e3a1; }
+    body { padding-bottom: 140px; }
+  </style>
+  <script type="module" src="../src/index.ts"></script>
+  <script type="module">
+    const log = document.getElementById('event-log');
+    function logEvent(e) {
+      const entry = document.createElement('div');
+      entry.className = 'entry';
+      const detail = JSON.stringify(e.detail, null, 0);
+      entry.innerHTML = `<span class="type">${e.type}</span> <span class="data">${detail}</span>`;
+      log.prepend(entry);
+    }
+    ['loquix-submit', 'loquix-stop', 'loquix-change', 'loquix-select-change'].forEach(name =>
+      document.addEventListener(name, logEvent)
+    );
+  </script>
+</head>
+<body>
+  <h1>Chat Composer</h1>
+  <p class="subtitle">Input variants — default and contained (Claude/ChatGPT style)</p>
+
+  <!-- 1. Default variant -->
+  <h2>Default Variant</h2>
+  <div class="section">
+    <p class="hint">variant="default" — classic layout with input + send button side by side</p>
+    <div class="card">
+      <loquix-chat-composer placeholder="Type a message..."></loquix-chat-composer>
+    </div>
+  </div>
+
+  <!-- 2. Default variant (streaming) -->
+  <h2>Default Variant (Streaming)</h2>
+  <div class="section">
+    <p class="hint">streaming — shows stop button instead of send</p>
+    <div class="card">
+      <loquix-chat-composer placeholder="Type a message..." streaming></loquix-chat-composer>
+    </div>
+  </div>
+
+  <!-- 3. Contained variant — light -->
+  <h2>Contained Variant (Light)</h2>
+  <div class="section">
+    <p class="hint">variant="contained" — textarea inside bordered container, actions bar below</p>
+    <div class="card">
+      <loquix-chat-composer variant="contained" placeholder="Ask anything">
+        <button slot="actions-left" class="action-btn" title="Attach file">📎</button>
+        <button slot="actions-left" class="action-btn" title="Web search">🌐</button>
+        <select slot="actions-left" class="model-select">
+          <option>Claude 4.5 Sonnet</option>
+          <option>Claude 4 Opus</option>
+        </select>
+      </loquix-chat-composer>
+    </div>
+  </div>
+
+  <!-- 4. Contained variant — dark (ChatGPT/Claude style) -->
+  <h2>Contained Variant (Dark)</h2>
+  <div class="section">
+    <p class="hint">Dark theme with custom tokens — mimics Claude/ChatGPT feel</p>
+    <div class="dark-wrap">
+      <loquix-chat-composer variant="contained" placeholder="Ask anything">
+        <button slot="actions-left" class="action-btn" title="Attach file">📎</button>
+        <button slot="actions-left" class="action-btn" title="Web search">🌐</button>
+        <button slot="actions-left" class="action-btn" title="Code">💻</button>
+        <select slot="actions-left" class="model-select">
+          <option>Claude 4.5 Sonnet</option>
+          <option>Claude 4 Opus</option>
+        </select>
+      </loquix-chat-composer>
+    </div>
+  </div>
+
+  <!-- 5. Contained variant — streaming -->
+  <h2>Contained Variant (Streaming)</h2>
+  <div class="section">
+    <div class="dark-wrap">
+      <loquix-chat-composer variant="contained" placeholder="Ask anything" streaming>
+        <button slot="actions-left" class="action-btn" title="Attach file">📎</button>
+      </loquix-chat-composer>
+    </div>
+  </div>
+
+  <!-- 6. Composer Toolbar -->
+  <h2>Composer Toolbar</h2>
+  <div class="section">
+    <p class="hint">loquix-composer-toolbar — standalone toolbar placed below the composer</p>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <loquix-chat-composer variant="contained" placeholder="Ask anything">
+        <button slot="actions-left" class="action-btn" title="Attach file">📎</button>
+        <select slot="actions-left" class="model-select">
+          <option>GPT-5.3-Codex</option>
+          <option>Claude 4.5 Sonnet</option>
+        </select>
+        <select slot="actions-left" class="model-select">
+          <option>Extra High</option>
+          <option>High</option>
+          <option>Medium</option>
+        </select>
+      </loquix-chat-composer>
+      <loquix-composer-toolbar border="top">
+        <span slot="actions-left" class="toolbar-item">📁 Local</span>
+        <span slot="actions-left" class="toolbar-item">🔒 Default permissions</span>
+        <span slot="actions-right" class="toolbar-item">🔀 main</span>
+      </loquix-composer-toolbar>
+    </div>
+  </div>
+
+  <!-- 7. Composer Toolbar — dark -->
+  <h2>Composer Toolbar (Dark)</h2>
+  <div class="section">
+    <div class="dark-wrap" style="padding: 0; overflow: hidden; border-radius: 12px;">
+      <loquix-chat-composer variant="contained" placeholder="Ask anything">
+        <button slot="actions-left" class="action-btn" title="Attach file">📎</button>
+        <select slot="actions-left" class="model-select">
+          <option>GPT-5.3-Codex</option>
+        </select>
+        <select slot="actions-left" class="model-select">
+          <option>Extra High</option>
+        </select>
+      </loquix-chat-composer>
+      <loquix-composer-toolbar border="top" style="--loquix-composer-toolbar-border-color: #333;">
+        <span slot="actions-left" class="toolbar-item" style="color: #888;">📁 Local</span>
+        <span slot="actions-left" class="toolbar-item" style="color: #888;">🔒 Default permissions</span>
+        <span slot="actions-right" class="toolbar-item" style="color: #888;">🔀 main</span>
+      </loquix-composer-toolbar>
+    </div>
+  </div>
+
+  <!-- 8. Toolbar above + below -->
+  <h2>Toolbar Above &amp; Below</h2>
+  <div class="section">
+    <p class="hint">loquix-composer-toolbar сверху и снизу от composer</p>
+    <div class="dark-wrap" style="padding: 0; overflow: hidden; border-radius: 12px;">
+      <loquix-composer-toolbar border="bottom" style="--loquix-composer-toolbar-border-color: #333;">
+        <span slot="actions-left" class="toolbar-item" style="color: #888;">🧠 Agent mode</span>
+        <span slot="actions-left" class="toolbar-item" style="color: #888;">📂 Project: loquix</span>
+        <span slot="actions-right" class="toolbar-item" style="color: #888;">⚙️ Settings</span>
+      </loquix-composer-toolbar>
+      <loquix-chat-composer variant="contained" placeholder="Ask anything">
+        <button slot="actions-left" class="action-btn" title="Attach file">📎</button>
+        <button slot="actions-left" class="action-btn" title="Web search">🌐</button>
+        <select slot="actions-left" class="model-select">
+          <option>Claude 4.5 Sonnet</option>
+        </select>
+      </loquix-chat-composer>
+      <loquix-composer-toolbar border="top" style="--loquix-composer-toolbar-border-color: #333;">
+        <span slot="actions-left" class="toolbar-item" style="color: #888;">📁 Local</span>
+        <span slot="actions-left" class="toolbar-item" style="color: #888;">🔒 Default permissions</span>
+        <span slot="actions-right" class="toolbar-item" style="color: #888;">🔀 main</span>
+      </loquix-composer-toolbar>
+    </div>
+  </div>
+
+  <!-- 9. Dropdown Select -->
+  <h2>Dropdown Select</h2>
+  <div class="section">
+    <p class="hint">loquix-dropdown-select — три примера: модель, бранчи, environment</p>
+    <div class="dark-wrap" style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; padding: 24px 16px;">
+      <!-- Model selector -->
+      <loquix-dropdown-select
+        id="model-select"
+        value="opus"
+        placeholder="Select model"
+        style="color: #ccc;"
+      ></loquix-dropdown-select>
+
+      <!-- Branch selector with search -->
+      <loquix-dropdown-select
+        id="branch-select"
+        value="main"
+        searchable
+        search-placeholder="Search branches"
+        style="color: #ccc;"
+      >
+        <button slot="footer" class="action-btn" style="width: 100%; border-radius: 8px; font-size: 0.8125rem; color: #aaa; justify-content: flex-start; padding: 8px 10px; gap: 8px;"
+          onclick="this.closest('loquix-dropdown-select').hide(); this.dispatchEvent(new CustomEvent('loquix-select-change', { detail: { value: 'create-branch', action: 'create-branch' }, bubbles: true, composed: true }))">
+          ＋ Create new branch...
+        </button>
+      </loquix-dropdown-select>
+
+      <!-- Environment selector -->
+      <loquix-dropdown-select
+        id="env-select"
+        value="local"
+        style="color: #ccc;"
+      ></loquix-dropdown-select>
+    </div>
+  </div>
+
+  <!-- Event Log -->
+  <div id="event-log"></div>
+
+  <script type="module">
+    // Model selector options
+    document.getElementById('model-select').options = [
+      { value: 'opus', label: 'Opus 4.6', description: 'Most capable for ambitious work', icon: '🟣', hint: 'Opus consumes usage limits faster than other models' },
+      { value: 'sonnet', label: 'Sonnet 4.6', description: 'Most efficient for everyday tasks', icon: '🔵' },
+      { value: 'haiku', label: 'Haiku 4.5', description: 'Fastest for quick answers', icon: '🟢' },
+    ];
+
+    // Branch selector options
+    document.getElementById('branch-select').options = [
+      { value: 'main', label: 'main', description: 'Uncommited: 1 file', icon: '🔀', group: 'Branches', badge: '+1 -1' },
+      { value: 'codex', label: 'codex/vector-field-search-updates', icon: '🔀', group: 'Branches' },
+      { value: 'stable', label: 'stable', icon: '🔀', group: 'Branches' },
+    ];
+
+    // Environment selector options
+    document.getElementById('env-select').options = [
+      { value: 'local', label: 'Local project', icon: '📁', group: 'Continue in' },
+      { value: 'codex-web', label: 'Connect Codex web', icon: '🌐', group: 'Continue in', external: true },
+      { value: 'cloud', label: 'Send to cloud', icon: '☁️', group: 'Continue in', external: true },
+      { value: 'sep', label: '', type: 'separator' },
+      {
+        value: 'rate-limits',
+        label: 'Rate limits remaining',
+        icon: '⏱️',
+        children: [
+          { value: 'rl-opus', label: 'Opus 4.6', description: '45 / 80 remaining', icon: '🟣' },
+          { value: 'rl-sonnet', label: 'Sonnet 4.6', description: '120 / 200 remaining', icon: '🔵' },
+          { value: 'rl-haiku', label: 'Haiku 4.5', description: 'Unlimited', icon: '🟢' },
+        ],
+      },
+    ];
+  </script>
+</body>
+</html>

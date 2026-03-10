@@ -1,0 +1,84 @@
+/**
+ * Loquix Design Tokens
+ * All CSS Custom Properties use the --loquix- prefix.
+ * Override these to customize the look and feel.
+ */
+:root {
+  /* === AI Identity === */
+  --loquix-ai-color: #7c3aed;
+  --loquix-ai-color-subtle: #ede9fe;
+  --loquix-user-color: #2563eb;
+  --loquix-user-color-subtle: #dbeafe;
+
+  /* === Layout === */
+  --loquix-max-width: 768px;
+  --loquix-composer-max-width: 768px;
+  --loquix-message-gap: 1rem;
+  --loquix-avatar-size: 32px;
+  --loquix-border-radius: 12px;
+
+  /* === Composer / Input === */
+  --loquix-input-border-radius: 16px;
+  --loquix-input-border-color: #d1d5db;
+  --loquix-input-focus-color: #7c3aed;
+  --loquix-input-bg: #ffffff;
+  --loquix-input-text-color: #111827;
+  --loquix-input-placeholder-color: #9ca3af;
+
+  /* === States === */
+  --loquix-streaming-color: #7c3aed;
+  --loquix-error-color: #dc2626;
+  --loquix-success-color: #16a34a;
+  --loquix-warning-color: #d97706;
+
+  /* === Typography === */
+  --loquix-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --loquix-code-font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --loquix-message-font-size: 0.9375rem;
+  --loquix-message-line-height: 1.6;
+
+  /* === Trust / Disclosure === */
+  --loquix-disclosure-bg: #f3f4f6;
+  --loquix-disclosure-text-color: #4b5563;
+  --loquix-caveat-text-color: #6b7280;
+  --loquix-caveat-bg: #fefce8;
+  --loquix-citation-color: #7c3aed;
+
+  /* === Thought / Stream of Thought === */
+  --loquix-thought-bg: #f9fafb;
+  --loquix-thought-border-color: #e5e7eb;
+  --loquix-thought-text-color: #6b7280;
+
+  /* === Transitions === */
+  --loquix-transition-duration: 200ms;
+  --loquix-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* === Surfaces === */
+  --loquix-surface-bg: #ffffff;
+  --loquix-surface-secondary-bg: #f9fafb;
+  --loquix-text-color: #111827;
+  --loquix-text-secondary-color: #6b7280;
+  --loquix-border-color: #e5e7eb;
+
+  /* === Message Bubbles === */
+  --loquix-user-bubble-bg: var(--loquix-user-color-subtle);
+  --loquix-user-bubble-text: var(--loquix-text-color);
+  --loquix-ai-bubble-bg: var(--loquix-surface-secondary-bg);
+  --loquix-ai-bubble-text: var(--loquix-text-color);
+
+  /* === Shadows === */
+  --loquix-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --loquix-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --loquix-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  /* === Semantic Aliases (dark-theme-friendly) === */
+  --loquix-surface-color: var(--loquix-surface-bg);
+  --loquix-focus-color: var(--loquix-input-focus-color);
+  --loquix-text-muted: var(--loquix-text-secondary-color);
+
+  /* === Overlay / Subtle Tones === */
+  --loquix-overlay-subtle: rgba(0, 0, 0, 0.03);
+  --loquix-overlay-light: rgba(0, 0, 0, 0.06);
+  --loquix-overlay-medium: rgba(0, 0, 0, 0.12);
+  --loquix-border-subtle: rgba(0, 0, 0, 0.08);
+}

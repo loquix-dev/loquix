@@ -1,0 +1,6 @@
+dist
+cdn
+node_modules
+pnpm-lock.yaml
+coverage
+custom-elements.json

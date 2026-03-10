@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loquix — Onboarding Demo</title>
+  <link rel="stylesheet" href="../src/tokens/variables.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--loquix-font-family, system-ui, -apple-system, sans-serif);
+      padding: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      color: #1a1a1a;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; }
+    h2 {
+      font-size: 1.1rem;
+      margin: 32px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .section { margin-bottom: 24px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+    .card {
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafa;
+    }
+    button.demo-btn {
+      padding: 8px 16px;
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.875rem;
+    }
+    button.demo-btn:hover { background: #f5f5f5; }
+    #event-log {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 160px;
+      overflow-y: auto;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.75rem;
+      padding: 8px 12px;
+      border-top: 2px solid #7c3aed;
+    }
+    #event-log .entry { padding: 2px 0; }
+    #event-log .type { color: #f38ba8; }
+    #event-log .data { color: #a6e3a1; }
+    .subtitle { color: rgba(0,0,0,0.5); font-size: 0.875rem; margin-bottom: 24px; }
+    /* Give body padding at bottom for the event log */
+    body { padding-bottom: 180px; }
+  </style>
+  <script type="module" src="../src/index.ts"></script>
+  <script type="module">
+    // === Event logging ===
+    const log = document.getElementById('event-log');
+    function logEvent(e) {
+      const entry = document.createElement('div');
+      entry.className = 'entry';
+      const detail = JSON.stringify(e.detail, null, 0);
+      entry.innerHTML = `<span class="type">${e.type}</span> <span class="data">${detail}</span>`;
+      log.prepend(entry);
+    }
+
+    [
+      'loquix-suggestion-select',
+      'loquix-template-select',
+      'loquix-template-picker-open',
+      'loquix-template-picker-close',
+      'loquix-gallery-select',
+      'loquix-nudge-dismiss',
+      'loquix-nudge-action',
+    ].forEach(name => document.addEventListener(name, logEvent));
+
+    // === Template picker open button ===
+    document.getElementById('open-picker-btn')?.addEventListener('click', () => {
+      document.querySelector('loquix-template-picker')?.show();
+    });
+
+    // === Populate JS-property components ===
+    const suggestions = [
+      { id: 's1', text: 'Write a poem', icon: '✍️', description: 'Generate creative poetry on any topic' },
+      { id: 's2', text: 'Explain quantum physics', icon: '⚛️', description: 'Break down complex concepts simply' },
+      { id: 's3', text: 'Debug my code', icon: '🐛' },
+      { id: 's4', text: 'Plan a trip to Japan', icon: '🗾' },
+      { id: 's5', text: 'Summarize this article', icon: '📄' },
+      { id: 's6', text: 'Create a meal plan', icon: '🥗' },
+    ];
+
+    const templates = [
+      { id: 't1', title: 'Blog Post', description: 'Write an engaging blog article with intro, body, and conclusion', icon: '📝', category: 'Writing', prompt: 'Write a blog post about...' },
+      { id: 't2', title: 'Code Review', description: 'Review code for bugs, performance, and best practices', icon: '🔍', category: 'Development', prompt: 'Review this code...' },
+      { id: 't3', title: 'Email Reply', description: 'Draft a professional reply to an email', icon: '✉️', category: 'Writing', prompt: 'Draft a reply to...' },
+      { id: 't4', title: 'Unit Tests', description: 'Generate comprehensive unit tests for a function', icon: '🧪', category: 'Development', prompt: 'Write unit tests for...' },
+      { id: 't5', title: 'Meeting Summary', description: 'Summarize key decisions and action items from meeting notes', icon: '📋', category: 'Productivity', prompt: 'Summarize these meeting notes...' },
+      { id: 't6', title: 'API Design', description: 'Design a RESTful API with endpoints and schemas', icon: '🔗', category: 'Development', prompt: 'Design an API for...' },
+    ];
+
+    const galleryItems = [
+      { id: 'g1', title: 'Brainstorm names', description: 'Generate creative name ideas for a product or project', icon: '💡', category: 'Creative', prompt: 'Help me brainstorm names for...' },
+      { id: 'g2', title: 'Compare technologies', description: 'Side-by-side comparison of tools and frameworks', icon: '⚖️', category: 'Research', prompt: 'Compare X vs Y...' },
+      { id: 'g3', title: 'Explain like I\'m 5', description: 'Simplify a complex topic for easy understanding', icon: '🧒', category: 'Learning', prompt: 'Explain like I\'m 5...' },
+      { id: 'g4', title: 'Write a user story', description: 'Create agile user stories with acceptance criteria', icon: '📖', category: 'Productivity', prompt: 'Write a user story for...' },
+      { id: 'g5', title: 'Create a regex', description: 'Build and explain a regular expression', icon: '🔤', category: 'Development', prompt: 'Create a regex that matches...' },
+      { id: 'g6', title: 'Design a logo', description: 'Describe a logo concept with colors and shapes', icon: '🎨', category: 'Creative', prompt: 'Design a logo concept for...' },
+    ];
+
+    // Set JS properties after DOM loads
+    requestAnimationFrame(() => {
+      // Welcome screen
+      const welcome = document.querySelector('#welcome-demo loquix-welcome-screen');
+      if (welcome) welcome.suggestions = suggestions.slice(0, 4);
+
+      // Suggestion chips variants
+      document.querySelectorAll('#chips-demo loquix-suggestion-chips').forEach((el, i) => {
+        el.suggestions = i === 2 ? suggestions : suggestions.slice(0, 4);
+      });
+
+      // Follow-up suggestions
+      document.querySelectorAll('#followup-demo loquix-follow-up-suggestions').forEach(el => {
+        el.suggestions = suggestions.slice(0, 3);
+      });
+
+      // Template picker
+      const picker = document.querySelector('loquix-template-picker');
+      if (picker) picker.templates = templates;
+
+      // Template cards
+      document.querySelectorAll('#template-card-demo loquix-template-card').forEach((el, i) => {
+        el.template = templates[i] || templates[0];
+      });
+
+      // Example gallery
+      const gallery = document.querySelector('#gallery-demo loquix-example-gallery');
+      if (gallery) gallery.items = galleryItems;
+    });
+  </script>
+</head>
+<body>
+  <h1>Onboarding</h1>
+  <p class="subtitle">Phase 2 components — helping users get started with AI chat</p>
+
+  <!-- 1. Welcome Screen -->
+  <h2>Welcome Screen</h2>
+  <div class="section" id="welcome-demo">
+    <div class="card" style="min-height: 300px; display: flex; align-items: center; justify-content: center;">
+      <loquix-welcome-screen
+        heading="What can I help you with?"
+        subheading="I can write, code, brainstorm, and more. Try one of these to get started."
+        suggestion-variant="chip"
+      >
+        <span slot="logo" style="font-size: 2.5rem;">🤖</span>
+      </loquix-welcome-screen>
+    </div>
+  </div>
+
+  <!-- 2. Suggestion Chips (all variants) -->
+  <h2>Suggestion Chips</h2>
+  <div class="section" id="chips-demo">
+    <p style="font-size: 0.8rem; color: rgba(0,0,0,0.5); margin-bottom: 8px;">variant="chip" (default)</p>
+    <loquix-suggestion-chips variant="chip"></loquix-suggestion-chips>
+
+    <p style="font-size: 0.8rem; color: rgba(0,0,0,0.5); margin: 16px 0 8px;">variant="pill"</p>
+    <loquix-suggestion-chips variant="pill"></loquix-suggestion-chips>
+
+    <p style="font-size: 0.8rem; color: rgba(0,0,0,0.5); margin: 16px 0 8px;">variant="card" (with max-visible="4")</p>
+    <loquix-suggestion-chips variant="card" max-visible="4"></loquix-suggestion-chips>
+  </div>
+
+  <!-- 3. Follow-up Suggestions -->
+  <h2>Follow-up Suggestions</h2>
+  <div class="section" id="followup-demo">
+    <div class="row">
+      <div class="card" style="flex: 1; min-width: 250px;">
+        <p style="font-size: 0.8rem; color: rgba(0,0,0,0.5); margin-bottom: 8px;">variant="inline"</p>
+        <loquix-follow-up-suggestions variant="inline" message-id="msg-1"></loquix-follow-up-suggestions>
+      </div>
+      <div class="card" style="flex: 1; min-width: 250px;">
+        <p style="font-size: 0.8rem; color: rgba(0,0,0,0.5); margin-bottom: 8px;">variant="stacked"</p>
+        <loquix-follow-up-suggestions variant="stacked" message-id="msg-2"></loquix-follow-up-suggestions>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Nudge Banners -->
+  <h2>Nudge Banners</h2>
+  <div class="section" id="nudge-demo">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <loquix-nudge-banner variant="tip" nudge-id="tip-1" icon="💡" action-label="Learn more">
+        You can use Cmd+Enter to send messages faster.
+      </loquix-nudge-banner>
+      <loquix-nudge-banner variant="info" nudge-id="info-1" icon="ℹ️">
+        This conversation is powered by Claude 3.5 Sonnet.
+      </loquix-nudge-banner>
+      <loquix-nudge-banner variant="warning" nudge-id="warn-1" icon="⚠️" action-label="Review">
+        Your API key will expire in 3 days.
+      </loquix-nudge-banner>
+    </div>
+  </div>
+
+  <!-- 5. Template Cards -->
+  <h2>Template Cards</h2>
+  <div class="section" id="template-card-demo">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+      <loquix-template-card></loquix-template-card>
+      <loquix-template-card></loquix-template-card>
+      <loquix-template-card selected></loquix-template-card>
+    </div>
+  </div>
+
+  <!-- 6. Template Picker -->
+  <h2>Template Picker</h2>
+  <div class="section">
+    <button class="demo-btn" id="open-picker-btn">Open Template Picker</button>
+    <loquix-template-picker heading="Choose a template" searchable close-on-outside-click></loquix-template-picker>
+  </div>
+
+  <!-- 7. Example Gallery -->
+  <h2>Example Gallery</h2>
+  <div class="section" id="gallery-demo">
+    <loquix-example-gallery heading="Try an example" variant="grid" columns="3"></loquix-example-gallery>
+  </div>
+
+  <!-- Event Log -->
+  <div id="event-log"></div>
+</body>
+</html>

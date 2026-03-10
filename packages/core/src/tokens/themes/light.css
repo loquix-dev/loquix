@@ -1,0 +1,19 @@
+/**
+ * Loquix Light Theme (default)
+ * These values match the defaults in variables.css.
+ * Use this file to explicitly apply the light theme.
+ */
+[data-theme='light'],
+.loquix-theme-light {
+  --loquix-surface-bg: #ffffff;
+  --loquix-surface-secondary-bg: #f9fafb;
+  --loquix-text-color: #111827;
+  --loquix-text-secondary-color: #6b7280;
+  --loquix-border-color: #e5e7eb;
+  --loquix-input-bg: #ffffff;
+  --loquix-input-border-color: #d1d5db;
+  --loquix-disclosure-bg: #f3f4f6;
+  --loquix-thought-bg: #f9fafb;
+  --loquix-thought-border-color: #e5e7eb;
+  --loquix-caveat-bg: #fefce8;
+}

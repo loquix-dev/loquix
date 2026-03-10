@@ -1,0 +1,19 @@
+{
+  "name": "docs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "devDependencies": {
+    "@loquix/core": "workspace:*",
+    "@storybook/addon-essentials": "^8.6.0",
+    "@storybook/addon-a11y": "^8.6.0",
+    "@storybook/web-components": "^8.6.0",
+    "@storybook/web-components-vite": "^8.6.0",
+    "storybook": "^8.6.0",
+    "lit": "^3.2.0"
+  }
+}

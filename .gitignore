@@ -1,0 +1,13 @@
+node_modules/
+dist/
+cdn/
+.DS_Store
+*.tsbuildinfo
+.turbo/
+coverage/
+storybook-static/
+# custom-elements.json is generated but committed (ships in npm package)
+*.log
+.env
+.env.local
+yarn.lock

@@ -1,0 +1,41 @@
+{
+  "name": "loquix",
+  "private": true,
+  "description": "UX/UI components for AI/LLM chat interfaces",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "type": "module",
+  "packageManager": "pnpm@10.30.3",
+  "scripts": {
+    "dev": "pnpm --filter @loquix/core dev",
+    "build": "pnpm --filter @loquix/core build && pnpm --filter @loquix/react build",
+    "test": "pnpm --filter @loquix/core test",
+    "lint": "eslint .",
+    "test:coverage": "pnpm --filter @loquix/core test:coverage",
+    "format": "prettier --write \"**/*.{ts,css,json,md}\"",
+    "storybook": "pnpm --filter docs storybook",
+    "build:storybook": "pnpm --filter docs build-storybook",
+    "build:cdn": "pnpm --filter @loquix/core build:cdn",
+    "format:check": "prettier --check \"**/*.{ts,css,json,md}\"",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish",
+    "cem": "pnpm --filter @loquix/core cem"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "rs-module-lexer"
+    ]
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.30.0",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.3",
+    "eslint-plugin-lit": "^2.2.1",
+    "typescript-eslint": "^8.57.0"
+  }
+}

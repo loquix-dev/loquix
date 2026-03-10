@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loquix — Action Edit Demo</title>
+  <link rel="stylesheet" href="../src/tokens/variables.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { height: auto; overflow-y: visible; }
+    body {
+      min-height: 100vh;
+      font-family: var(--loquix-font-family);
+      background: #f1f5f9;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+
+    p.subtitle {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-bottom: 32px;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      max-width: 800px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .card h2 {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #7c3aed;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      color: #1e293b;
+      margin-bottom: 16px;
+    }
+
+    .card code {
+      background: #f4f4f8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8125rem;
+      color: #7c3aed;
+    }
+
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .event-log {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      max-height: 120px;
+      overflow-y: auto;
+      color: #475569;
+    }
+
+    .event-log:empty::after {
+      content: 'Events will appear here...';
+      color: #94a3b8;
+    }
+
+    .event-log .event-line {
+      padding: 2px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .event-line .event-name {
+      color: #7c3aed;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      padding: 6px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: white;
+      color: #475569;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 150ms;
+    }
+
+    .controls button:hover {
+      border-color: #7c3aed;
+      color: #7c3aed;
+    }
+
+    /* Standalone component demos */
+    .standalone-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .standalone-row label {
+      font-size: 0.75rem;
+      color: #64748b;
+      min-width: 120px;
+    }
+
+    /* ChatGPT-style demo */
+    .chatgpt-demo {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .chatgpt-demo .messages {
+      padding: 16px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .chatgpt-composer-area {
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    .chatgpt-editing-banner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #ede9fe;
+      color: #7c3aed;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border-bottom: 1px solid #ddd6fe;
+    }
+
+    .chatgpt-editing-banner[hidden] {
+      display: none;
+    }
+
+    .chatgpt-banner-cancel {
+      margin-left: auto;
+      padding: 2px 10px;
+      border: 1px solid #c4b5fd;
+      border-radius: 4px;
+      background: transparent;
+      color: #7c3aed;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+
+    .chatgpt-banner-cancel:hover {
+      background: #ddd6fe;
+    }
+
+    .section-divider {
+      grid-column: 1 / -1;
+      border: none;
+      border-top: 2px solid #e2e8f0;
+      margin: 8px 0;
+    }
+
+    .section-title {
+      grid-column: 1 / -1;
+      font-size: 1.125rem;
+      color: #1e293b;
+      padding-bottom: 4px;
+    }
+  </style>
+  <script type="module" src="../src/index.ts"></script>
+  <script type="module">
+    // ── Helpers ──
+
+    function forceActionsVisible() {
+      document.querySelectorAll('loquix-message-item').forEach(item => {
+        const actions = item.shadowRoot?.querySelector('.actions');
+        if (actions) {
+          actions.style.opacity = '1';
+          actions.style.pointerEvents = 'auto';
+        }
+      });
+    }
+
+    setTimeout(forceActionsVisible, 300);
+    setTimeout(forceActionsVisible, 800);
+
+    // ── Event logging ──
+
+    function logEvent(logId, e) {
+      const log = document.getElementById(logId);
+      if (!log) return;
+      const line = document.createElement('div');
+      line.className = 'event-line';
+      const detail = e.detail || {};
+      const detailStr = Object.entries(detail)
+        .map(([k, v]) => {
+          const val = typeof v === 'string' && v.length > 40
+            ? v.substring(0, 40) + '...'
+            : v;
+          return `${k}: ${JSON.stringify(val)}`;
+        })
+        .join(', ');
+      line.innerHTML = `<span class="event-name">${e.type}</span> { ${detailStr} }`;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // ── Card 1: Basic inline editing ──
+
+    document.getElementById('card-basic')?.addEventListener('loquix-edit-start', e => logEvent('log-basic', e));
+    document.getElementById('card-basic')?.addEventListener('loquix-edit-submit', e => logEvent('log-basic', e));
+    document.getElementById('card-basic')?.addEventListener('loquix-edit-cancel', e => logEvent('log-basic', e));
+
+    // ── Card 2: Composer mode ──
+
+    document.getElementById('card-composer')?.addEventListener('loquix-edit-start', e => {
+      logEvent('log-composer', e);
+    });
+    document.getElementById('card-composer')?.addEventListener('loquix-edit-cancel', e => {
+      logEvent('log-composer', e);
+    });
+    document.getElementById('card-composer')?.addEventListener('loquix-edit-submit', e => {
+      logEvent('log-composer', e);
+    });
+
+    // ── Card 3: Long content ──
+
+    document.getElementById('card-long')?.addEventListener('loquix-edit-start', e => logEvent('log-long', e));
+    document.getElementById('card-long')?.addEventListener('loquix-edit-submit', e => logEvent('log-long', e));
+    document.getElementById('card-long')?.addEventListener('loquix-edit-cancel', e => logEvent('log-long', e));
+
+    // ── Card 4: Programmatic API ──
+
+    document.getElementById('btn-start-edit')?.addEventListener('click', () => {
+      const msg = document.getElementById('msg-prog');
+      // Set _editing state on the message-item
+      const editEl = msg?.shadowRoot?.querySelector('loquix-action-edit');
+      if (!editEl) {
+        // Trigger via the actions toolbar
+        const actions = msg?.shadowRoot?.querySelector('loquix-message-actions');
+        const edit = actions?.shadowRoot?.querySelector('loquix-action-edit');
+        edit?.startEditing();
+      }
+    });
+
+    document.getElementById('btn-cancel-edit')?.addEventListener('click', () => {
+      const msg = document.getElementById('msg-prog');
+      const editInBubble = msg?.shadowRoot?.querySelector('loquix-action-edit');
+      if (editInBubble) {
+        editInBubble.cancelEditing();
+      }
+    });
+
+    document.getElementById('btn-complete-edit')?.addEventListener('click', () => {
+      const msg = document.getElementById('msg-prog');
+      const editInBubble = msg?.shadowRoot?.querySelector('loquix-action-edit');
+      if (editInBubble) {
+        editInBubble.completeEdit('Programmatically completed edit!');
+      }
+    });
+
+    document.getElementById('card-prog')?.addEventListener('loquix-edit-start', e => logEvent('log-prog', e));
+    document.getElementById('card-prog')?.addEventListener('loquix-edit-submit', e => logEvent('log-prog', e));
+    document.getElementById('card-prog')?.addEventListener('loquix-edit-cancel', e => logEvent('log-prog', e));
+
+    // ── Card 5: Custom labels ──
+
+    document.getElementById('card-labels')?.addEventListener('loquix-edit-start', e => logEvent('log-labels', e));
+    document.getElementById('card-labels')?.addEventListener('loquix-edit-submit', e => logEvent('log-labels', e));
+    document.getElementById('card-labels')?.addEventListener('loquix-edit-cancel', e => logEvent('log-labels', e));
+
+    // ── Card 6: Multiple messages ──
+
+    document.getElementById('card-multi')?.addEventListener('loquix-edit-start', e => logEvent('log-multi', e));
+    document.getElementById('card-multi')?.addEventListener('loquix-edit-submit', e => logEvent('log-multi', e));
+    document.getElementById('card-multi')?.addEventListener('loquix-edit-cancel', e => logEvent('log-multi', e));
+
+    // ── Card: Standalone component ──
+
+    document.getElementById('card-standalone')?.addEventListener('loquix-edit-start', e => logEvent('log-standalone', e));
+    document.getElementById('card-standalone')?.addEventListener('loquix-edit-submit', e => logEvent('log-standalone', e));
+    document.getElementById('card-standalone')?.addEventListener('loquix-edit-cancel', e => logEvent('log-standalone', e));
+
+    // ── Card: Keyboard shortcuts ──
+
+    document.getElementById('card-keyboard')?.addEventListener('loquix-edit-start', e => logEvent('log-keyboard', e));
+    document.getElementById('card-keyboard')?.addEventListener('loquix-edit-submit', e => logEvent('log-keyboard', e));
+    document.getElementById('card-keyboard')?.addEventListener('loquix-edit-cancel', e => logEvent('log-keyboard', e));
+
+    // ── Card: CSS Custom Properties ──
+
+    document.getElementById('card-css')?.addEventListener('loquix-edit-start', e => logEvent('log-css', e));
+    document.getElementById('card-css')?.addEventListener('loquix-edit-submit', e => logEvent('log-css', e));
+    document.getElementById('card-css')?.addEventListener('loquix-edit-cancel', e => logEvent('log-css', e));
+
+    // ── Card: Disabled ──
+
+    document.getElementById('card-disabled')?.addEventListener('loquix-edit-start', e => logEvent('log-disabled', e));
+
+    // ── Card: ChatGPT-style composer editing ──
+
+    (() => {
+      const card = document.getElementById('card-chatgpt');
+      const banner = document.getElementById('chatgpt-banner');
+      const bannerText = document.getElementById('chatgpt-banner-text');
+      const bannerCancel = document.getElementById('chatgpt-banner-cancel');
+      const composer = document.getElementById('chatgpt-composer');
+      let editingMessageId = null;
+      let editingTrigger = null;
+      let originalContent = '';
+
+      // When user clicks edit → transfer text to composer
+      card?.addEventListener('loquix-edit-start', (e) => {
+        const { messageId, content } = e.detail;
+        editingMessageId = messageId;
+        originalContent = content;
+
+        // Find the trigger element to call completeEdit / cancelEditing later
+        const msgItem = card.querySelector(`loquix-message-item[message-id="${messageId}"]`);
+        editingTrigger = msgItem?.querySelector('loquix-action-edit');
+
+        // Set composer value
+        const input = composer?.shadowRoot?.querySelector('loquix-prompt-input');
+        if (input) input.value = content;
+
+        // Show editing banner
+        banner.hidden = false;
+        bannerText.textContent = `Editing message "${content.substring(0, 30)}${content.length > 30 ? '…' : ''}"`;
+
+        // Focus the input
+        const textarea = input?.shadowRoot?.querySelector('textarea');
+        textarea?.focus();
+
+        logEvent('log-chatgpt', e);
+      });
+
+      // Cancel via banner button
+      bannerCancel?.addEventListener('click', () => {
+        if (editingTrigger) {
+          editingTrigger.cancelEditing();
+        }
+        banner.hidden = true;
+        const input = composer?.shadowRoot?.querySelector('loquix-prompt-input');
+        if (input) input.value = '';
+        editingMessageId = null;
+        editingTrigger = null;
+      });
+
+      // Submit from composer → complete edit
+      composer?.addEventListener('loquix-submit', (e) => {
+        if (!editingMessageId || !editingTrigger) return;
+        e.stopPropagation(); // prevent normal send
+
+        const newContent = e.detail.content;
+        editingTrigger.completeEdit(newContent);
+        banner.hidden = true;
+
+        // Update message content in the DOM
+        const msgItem = card.querySelector(`loquix-message-item[message-id="${editingMessageId}"]`);
+        const msgContent = msgItem?.querySelector('loquix-message-content');
+        if (msgContent) msgContent.textContent = newContent;
+
+        editingMessageId = null;
+        editingTrigger = null;
+      });
+
+      // Log edit-submit and edit-cancel events
+      card?.addEventListener('loquix-edit-submit', e => logEvent('log-chatgpt', e));
+      card?.addEventListener('loquix-edit-cancel', e => {
+        banner.hidden = true;
+        const input = composer?.shadowRoot?.querySelector('loquix-prompt-input');
+        if (input) input.value = '';
+        editingMessageId = null;
+        editingTrigger = null;
+        logEvent('log-chatgpt', e);
+      });
+    })();
+
+    // Re-force actions visible after any re-render
+    setInterval(forceActionsVisible, 1500);
+  </script>
+</head>
+<body>
+  <h1>Action Edit Component Demo</h1>
+  <p class="subtitle">Demonstrates <code>&lt;loquix-action-edit&gt;</code> in various configurations. Actions are forced visible. Click the pencil icon to start editing.</p>
+
+  <div class="grid">
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- SECTION: Standalone Component -->
+    <!-- ════════════════════════════════════════ -->
+    <h3 class="section-title">Standalone Component</h3>
+
+    <div class="card wide" id="card-standalone">
+      <h2>Standalone</h2>
+      <h3>Component used outside of <code>&lt;loquix-message-item&gt;</code></h3>
+
+      <div class="standalone-row">
+        <label>Trigger (default):</label>
+        <loquix-action-edit message-id="standalone-1"></loquix-action-edit>
+      </div>
+
+      <div class="standalone-row">
+        <label>Inline editing:</label>
+        <loquix-action-edit
+          editing
+          mode="inline"
+          message-id="standalone-2"
+          content="This text is pre-loaded for editing."
+        ></loquix-action-edit>
+      </div>
+
+      <div class="standalone-row">
+        <label>Composer badge:</label>
+        <loquix-action-edit
+          editing
+          mode="composer"
+          message-id="standalone-3"
+          content="Some content being edited in composer..."
+        ></loquix-action-edit>
+      </div>
+
+      <div class="standalone-row">
+        <label>Disabled trigger:</label>
+        <loquix-action-edit disabled message-id="standalone-4"></loquix-action-edit>
+      </div>
+
+      <div class="standalone-row">
+        <label>Custom icon slot:</label>
+        <loquix-action-edit message-id="standalone-5">
+          <svg slot="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+        </loquix-action-edit>
+      </div>
+
+      <div class="event-log" id="log-standalone"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- SECTION: Integrated with message-item -->
+    <!-- ════════════════════════════════════════ -->
+    <hr class="section-divider" />
+    <h3 class="section-title">Integrated with loquix-message-item</h3>
+
+    <!-- ── Card 1: Basic Inline ── -->
+    <div class="card" id="card-basic">
+      <h2>Inline Mode</h2>
+      <h3>Basic inline editing (default)</h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="basic-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>Hello, can you help me with a React question? I want to understand how useEffect cleanup works.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Click the pencil icon, edit text, then Save or Cancel. Cmd/Ctrl+Enter to submit, Escape to cancel.</p>
+      <div class="event-log" id="log-basic"></div>
+    </div>
+
+    <!-- ── Card 2: Composer Mode ── -->
+    <div class="card" id="card-composer">
+      <h2>Composer Mode</h2>
+      <h3><code>mode="composer"</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="composer-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>What's the difference between useMemo and useCallback?</loquix-message-content>
+          <loquix-message-actions slot="actions" message-role="user" position="always">
+            <loquix-action-edit mode="composer"></loquix-action-edit>
+          </loquix-message-actions>
+        </loquix-message-item>
+      </div>
+      <p class="note">Click pencil: shows "Editing..." badge instead of textarea. The host app would transfer text to the main composer.</p>
+      <div class="controls">
+        <button onclick="
+          const msg = this.closest('.card').querySelector('loquix-message-item');
+          const edit = msg.querySelector('loquix-action-edit');
+          if (edit?.editing) edit.completeEdit('Edited via composer!');
+        ">Simulate Composer Submit</button>
+        <button onclick="
+          const msg = this.closest('.card').querySelector('loquix-message-item');
+          const edit = msg.querySelector('loquix-action-edit');
+          if (edit?.editing) edit.cancelEditing();
+        ">Simulate Composer Cancel</button>
+      </div>
+      <div class="event-log" id="log-composer"></div>
+    </div>
+
+    <!-- ── Card 3: Long Content + Collapse ── -->
+    <div class="card" id="card-long">
+      <h2>Long Content</h2>
+      <h3>Editing a collapsed message</h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="long-1"
+          actions-position="bottom-end"
+          collapse-height="80"
+        >
+          <loquix-message-content>This is a very long message that should trigger the collapse behavior. When the user clicks edit, the collapse should be removed and the full text should appear in the textarea. The textarea should auto-resize to fit all the content. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Message is collapsed at 80px. Editing disables collapse and shows full content in textarea.</p>
+      <div class="event-log" id="log-long"></div>
+    </div>
+
+    <!-- ── Card 4: Programmatic API ── -->
+    <div class="card" id="card-prog">
+      <h2>Programmatic API</h2>
+      <h3>Control editing via JS methods</h3>
+      <div class="messages">
+        <loquix-message-item
+          id="msg-prog"
+          role="user"
+          status="complete"
+          message-id="prog-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>This message can be edited programmatically using the component's public API methods.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <div class="controls">
+        <button id="btn-start-edit">startEditing()</button>
+        <button id="btn-cancel-edit">cancelEditing()</button>
+        <button id="btn-complete-edit">completeEdit("...")</button>
+      </div>
+      <p class="note">Use buttons above to control editing state via JS API. Check the event log below.</p>
+      <div class="event-log" id="log-prog"></div>
+    </div>
+
+    <!-- ── Card 5: Custom Labels ── -->
+    <div class="card" id="card-labels">
+      <h2>Custom Labels</h2>
+      <h3><code>submit-label</code> / <code>cancel-label</code></h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="labels-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>Can you translate this to French?</loquix-message-content>
+          <loquix-message-actions slot="actions" message-role="user" position="always">
+            <loquix-action-edit
+              submit-label="Update"
+              cancel-label="Discard"
+              placeholder="Edit your message..."
+            ></loquix-action-edit>
+          </loquix-message-actions>
+        </loquix-message-item>
+      </div>
+      <p class="note">Custom button labels: "Update" and "Discard" instead of defaults. Placeholder text in textarea.</p>
+      <div class="event-log" id="log-labels"></div>
+    </div>
+
+    <!-- ── Card 6: Multiple Messages ── -->
+    <div class="card" id="card-multi">
+      <h2>Multiple Messages</h2>
+      <h3>Only one message editable at a time</h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="multi-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>First user message - try editing this one.</loquix-message-content>
+        </loquix-message-item>
+
+        <loquix-message-item
+          role="assistant"
+          status="complete"
+          model="Claude"
+          message-id="multi-2"
+          actions-position="bottom-start"
+        >
+          <loquix-message-content>Here is the assistant response. Notice that assistant messages don't have an edit button.</loquix-message-content>
+        </loquix-message-item>
+
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="multi-3"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>Second user message - each message has its own edit button and editing state.</loquix-message-content>
+        </loquix-message-item>
+
+        <loquix-message-item
+          role="assistant"
+          status="complete"
+          model="Claude"
+          message-id="multi-4"
+          actions-position="bottom-start"
+        >
+          <loquix-message-content>Another assistant response with copy, regenerate, and feedback buttons.</loquix-message-content>
+        </loquix-message-item>
+
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="multi-5"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>Third user message. Each edit is independent.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Each user message has its own edit button. Assistant messages show copy/regenerate/feedback instead. Events include messageId for identification.</p>
+      <div class="event-log" id="log-multi"></div>
+    </div>
+
+    <!-- ── Card 7: Keyboard Shortcuts ── -->
+    <div class="card" id="card-keyboard">
+      <h2>Keyboard Shortcuts</h2>
+      <h3>Cmd/Ctrl+Enter and Escape</h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="keyboard-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>Start editing, then try Cmd+Enter to submit or Escape to cancel.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">After clicking edit: <strong>Cmd/Ctrl+Enter</strong> = submit (if text changed), <strong>Escape</strong> = cancel. The textarea receives focus automatically.</p>
+      <div class="event-log" id="log-keyboard"></div>
+    </div>
+
+    <!-- ── Card 8: CSS Custom Properties ── -->
+    <div class="card" id="card-css">
+      <h2>CSS Theming</h2>
+      <h3>Custom CSS variables</h3>
+      <div class="messages" style="
+        --loquix-edit-border-color: #059669;
+        --loquix-edit-icon-color: #059669;
+        --loquix-edit-icon-color-hover: #047857;
+        --loquix-edit-textarea-bg: #ecfdf5;
+        --loquix-edit-highlight-color: #059669;
+        --loquix-message-user-bg: #d1fae5;
+        --loquix-ai-color: #059669;
+      ">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="css-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>This message uses green-themed CSS custom properties for the edit component.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Green theme via CSS vars: --loquix-edit-border-color, --loquix-edit-icon-color, --loquix-edit-textarea-bg, --loquix-edit-highlight-color</p>
+      <div class="event-log" id="log-css"></div>
+    </div>
+
+    <!-- ── Card 9: Disabled State ── -->
+    <div class="card" id="card-disabled">
+      <h2>Disabled</h2>
+      <h3><code>disabled</code> attribute</h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="disabled-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>This message has a disabled edit button - cannot be edited.</loquix-message-content>
+          <loquix-message-actions slot="actions" message-role="user" position="always">
+            <loquix-action-edit disabled></loquix-action-edit>
+          </loquix-message-actions>
+        </loquix-message-item>
+      </div>
+      <p class="note">The pencil icon is grayed out and unclickable. Useful when editing is restricted (e.g., message too old, AI is streaming).</p>
+      <div class="event-log" id="log-disabled"></div>
+    </div>
+
+    <!-- ── Card 10: Submit Validation ── -->
+    <div class="card" id="card-validation">
+      <h2>Submit Validation</h2>
+      <h3>Button disabled when text unchanged or empty</h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="validation-1"
+          actions-position="bottom-end"
+        >
+          <loquix-message-content>Try editing: Save button is disabled until you change the text. Clear all text to see it stay disabled.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Save & Submit is disabled when: (1) text is empty, or (2) text matches original content (trimmed). Prevents no-op edits.</p>
+    </div>
+
+    <!-- ── Card 11: Custom Editing Indicator ── -->
+    <div class="card">
+      <h2>Custom Indicator Slot</h2>
+      <h3>Composer mode with custom <code>editing-indicator</code> slot</h3>
+      <div class="standalone-row">
+        <label>Default badge:</label>
+        <loquix-action-edit
+          editing
+          mode="composer"
+          message-id="indicator-1"
+        ></loquix-action-edit>
+      </div>
+      <div class="standalone-row">
+        <label>Custom indicator:</label>
+        <loquix-action-edit
+          editing
+          mode="composer"
+          message-id="indicator-2"
+        >
+          <span slot="editing-indicator" style="
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+          ">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+            </svg>
+            Editing in composer...
+          </span>
+        </loquix-action-edit>
+      </div>
+      <p class="note">The <code>editing-indicator</code> slot lets you customize the badge shown in composer mode.</p>
+    </div>
+
+    <!-- ── Card 12: ChatGPT-style Composer Editing ── -->
+    <div class="card" id="card-chatgpt">
+      <h2>ChatGPT-style</h2>
+      <h3>Edit in composer with editing indicator</h3>
+      <div class="chatgpt-demo">
+        <div class="messages" id="chatgpt-messages">
+          <loquix-message-item
+            role="user"
+            status="complete"
+            message-id="chatgpt-1"
+            actions-position="bottom-end"
+          >
+            <loquix-message-content>What are the best practices for React performance optimization?</loquix-message-content>
+            <loquix-message-actions slot="actions" message-role="user" position="always">
+              <loquix-action-edit mode="composer"></loquix-action-edit>
+            </loquix-message-actions>
+          </loquix-message-item>
+
+          <loquix-message-item
+            role="assistant"
+            status="complete"
+            model="Claude"
+            message-id="chatgpt-2"
+            actions-position="bottom-start"
+          >
+            <loquix-message-content>Here are some key React performance optimization strategies: use React.memo for expensive components, leverage useMemo and useCallback hooks, implement code splitting with React.lazy, and virtualize long lists.</loquix-message-content>
+          </loquix-message-item>
+
+          <loquix-message-item
+            role="user"
+            status="complete"
+            message-id="chatgpt-3"
+            actions-position="bottom-end"
+          >
+            <loquix-message-content>Can you show me an example of useMemo?</loquix-message-content>
+            <loquix-message-actions slot="actions" message-role="user" position="always">
+              <loquix-action-edit mode="composer"></loquix-action-edit>
+            </loquix-message-actions>
+          </loquix-message-item>
+        </div>
+
+        <div class="chatgpt-composer-area">
+          <div class="chatgpt-editing-banner" id="chatgpt-banner" hidden>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+              <path d="m15 5 4 4"></path>
+            </svg>
+            <span id="chatgpt-banner-text">Editing message</span>
+            <button class="chatgpt-banner-cancel" id="chatgpt-banner-cancel">Cancel</button>
+          </div>
+          <loquix-chat-composer
+            id="chatgpt-composer"
+            placeholder="Type a message..."
+          ></loquix-chat-composer>
+        </div>
+      </div>
+      <p class="note">Click pencil on any user message → text moves to composer → "Editing message" banner appears. Submit or Cancel to finish.</p>
+      <div class="event-log" id="log-chatgpt"></div>
+    </div>
+
+    <!-- ── Card 13: Actions Positions ── -->
+    <div class="card">
+      <h2>Action Positions</h2>
+      <h3>Edit with different <code>actions-position</code> values</h3>
+      <div class="messages">
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="pos-1"
+          actions-position="bottom-start"
+        >
+          <loquix-message-content>bottom-start: edit button appears bottom-left.</loquix-message-content>
+        </loquix-message-item>
+
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="pos-2"
+          actions-position="inline-start"
+        >
+          <loquix-message-content>inline-start: edit button to the left of the bubble.</loquix-message-content>
+        </loquix-message-item>
+
+        <loquix-message-item
+          role="user"
+          status="complete"
+          message-id="pos-3"
+          actions-position="inline-end"
+        >
+          <loquix-message-content>inline-end: edit button to the right of the bubble.</loquix-message-content>
+        </loquix-message-item>
+      </div>
+      <p class="note">Edit trigger appears in different positions. All open inline editing inside the bubble regardless of trigger position.</p>
+    </div>
+
+  </div>
+</body>
+</html>

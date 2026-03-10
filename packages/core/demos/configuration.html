@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loquix — Configuration Demo (Phase 3)</title>
+  <link rel="stylesheet" href="../src/tokens/variables.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--loquix-font-family, system-ui, -apple-system, sans-serif);
+      padding: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      color: #1a1a1a;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; }
+    h2 {
+      font-size: 1.1rem;
+      margin: 32px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .subtitle { color: rgba(0,0,0,0.5); font-size: 0.875rem; margin-bottom: 24px; }
+    .section { margin-bottom: 24px; }
+    .card {
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafa;
+    }
+    .hint { font-size: 0.8rem; color: rgba(0,0,0,0.5); margin-bottom: 8px; }
+    .row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    /* Dark wrapper */
+    .dark-wrap {
+      background: #212121;
+      border-radius: 12px;
+      padding: 24px 16px;
+      color: #e0e0e0;
+    }
+
+    /* Event log */
+    #event-log {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 120px;
+      overflow-y: auto;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.75rem;
+      padding: 8px 12px;
+      border-top: 2px solid #7c3aed;
+    }
+    #event-log .entry { padding: 2px 0; }
+    #event-log .type { color: #f38ba8; }
+    #event-log .data { color: #a6e3a1; }
+    body { padding-bottom: 140px; }
+  </style>
+  <script type="module" src="../src/index.ts"></script>
+  <script type="module">
+    const log = document.getElementById('event-log');
+    function logEvent(e) {
+      const entry = document.createElement('div');
+      entry.className = 'entry';
+      const detail = JSON.stringify(e.detail, null, 0);
+      entry.innerHTML = `<span class="type">${e.type}</span> <span class="data">${detail}</span>`;
+      log.prepend(entry);
+    }
+    [
+      'loquix-mode-change',
+      'loquix-model-change',
+      'loquix-attachment-add',
+      'loquix-attachment-remove',
+      'loquix-attachment-retry',
+      'loquix-parameter-change',
+      'loquix-parameter-commit',
+      'loquix-preset-change',
+      'loquix-filter-change',
+    ].forEach(name => document.addEventListener(name, logEvent));
+  </script>
+</head>
+<body>
+  <h1>Configuration (Phase 3)</h1>
+  <p class="subtitle">Components for configuring AI behavior — modes, models, attachments, parameters, filters</p>
+
+  <!-- 1. Mode Selector — Tabs -->
+  <h2>Mode Selector (Tabs)</h2>
+  <div class="section">
+    <p class="hint">variant="tabs" — horizontal tab buttons</p>
+    <div class="card">
+      <loquix-mode-selector id="mode-tabs" value="chat" show-description></loquix-mode-selector>
+    </div>
+  </div>
+
+  <!-- 1b. Mode Selector — Tabs Stacked -->
+  <h2>Mode Selector (Tabs, Stacked)</h2>
+  <div class="section">
+    <p class="hint">stacked — description below label instead of inline</p>
+    <div class="card">
+      <loquix-mode-selector id="mode-tabs-stacked" value="chat" show-description stacked></loquix-mode-selector>
+    </div>
+  </div>
+
+  <!-- 2. Mode Selector — Pills -->
+  <h2>Mode Selector (Pills)</h2>
+  <div class="section">
+    <p class="hint">variant="pills" — rounded pill buttons with border</p>
+    <div class="card">
+      <loquix-mode-selector id="mode-pills" variant="pills" value="chat"></loquix-mode-selector>
+    </div>
+  </div>
+
+  <!-- 3. Mode Selector — Toggle -->
+  <h2>Mode Selector (Toggle)</h2>
+  <div class="section">
+    <p class="hint">variant="toggle" — segmented control for 2 modes</p>
+    <div class="card">
+      <loquix-mode-selector id="mode-toggle" variant="toggle" value="chat"></loquix-mode-selector>
+    </div>
+  </div>
+
+  <!-- 4. Mode Selector — Dropdown -->
+  <h2>Mode Selector (Dropdown)</h2>
+  <div class="section">
+    <p class="hint">variant="dropdown" — dropdown with Floating UI positioning</p>
+    <div class="dark-wrap">
+      <loquix-mode-selector id="mode-dropdown" variant="dropdown" value="chat"></loquix-mode-selector>
+    </div>
+  </div>
+
+  <!-- 5. Model Selector -->
+  <h2>Model Selector</h2>
+  <div class="section">
+    <p class="hint">Flat list with tier badges</p>
+    <div class="dark-wrap" style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
+      <loquix-model-selector id="model-flat" value="claude-4" style="color: #ccc;"></loquix-model-selector>
+      <loquix-model-selector id="model-grouped" value="claude-4" show-cost show-capabilities searchable grouped style="color: #ccc;"></loquix-model-selector>
+    </div>
+  </div>
+
+  <!-- 6. Attachment Chips -->
+  <h2>Attachment Chips</h2>
+  <div class="section">
+    <p class="hint">All 5 visual states: complete, uploading (with progress), uploading (connecting), pending, error</p>
+    <div class="card row">
+      <loquix-attachment-chip filename="design.png" filetype="png" size="245000" status="complete"></loquix-attachment-chip>
+      <loquix-attachment-chip filename="report.pdf" filetype="pdf" size="1240000" status="uploading" progress="65"></loquix-attachment-chip>
+      <loquix-attachment-chip filename="video.mp4" filetype="mp4" size="48000000" status="uploading" progress="0"></loquix-attachment-chip>
+      <loquix-attachment-chip filename="data.csv" filetype="csv" size="89200" status="pending" purpose="source"></loquix-attachment-chip>
+      <loquix-attachment-chip id="chip-error" filename="broken.zip" filetype="zip" size="5000000" status="error" error="File exceeds maximum size of 4 MB"></loquix-attachment-chip>
+    </div>
+  </div>
+
+  <!-- 6b. Attachment Chips — Truncation & Retry Demo -->
+  <h2>Attachment Chips (Truncation + Retry)</h2>
+  <div class="section">
+    <p class="hint">max-filename-length truncates long names; click ↻ on error chip to simulate re-upload</p>
+    <div class="card row">
+      <loquix-attachment-chip filename="my-super-long-screenshot-2026-03-04-at-15.42.png" filetype="png" size="3200000" status="complete" max-filename-length="24"></loquix-attachment-chip>
+      <loquix-attachment-chip filename="quarterly-financial-report-Q1-2026-final-v3.pdf" filetype="pdf" size="8900000" status="complete" max-filename-length="30"></loquix-attachment-chip>
+      <loquix-attachment-chip id="chip-retry-demo" filename="large-dataset-export-2026.csv" filetype="csv" size="12400000" status="error" error="Network timeout — upload failed after 30s" max-filename-length="22"></loquix-attachment-chip>
+      <loquix-attachment-chip filename="cannot-retry.log" filetype="txt" size="500" status="error" error="Unsupported file type" no-retry></loquix-attachment-chip>
+    </div>
+  </div>
+
+  <!-- 6c. Attachment Chips — Custom Previews -->
+  <h2>Attachment Chips (Custom Previews)</h2>
+  <div class="section">
+    <p class="hint">preview="url" for image thumbnails; &lt;slot name="icon"&gt; for fully custom content</p>
+    <div class="card row">
+      <loquix-attachment-chip
+        filename="vacation-photo.jpg"
+        filetype="jpg"
+        size="4200000"
+        status="complete"
+        preview="https://picsum.photos/seed/vacation/80/80"
+      ></loquix-attachment-chip>
+      <loquix-attachment-chip
+        filename="product-mockup.png"
+        filetype="png"
+        size="1870000"
+        status="complete"
+        preview="https://picsum.photos/seed/product/80/80"
+      ></loquix-attachment-chip>
+      <loquix-attachment-chip
+        filename="avatar.webp"
+        filetype="webp"
+        size="32000"
+        status="uploading"
+        progress="42"
+        preview="https://picsum.photos/seed/avatar/80/80"
+      ></loquix-attachment-chip>
+      <loquix-attachment-chip
+        filename="custom-icon.pdf"
+        filetype="pdf"
+        size="980000"
+        status="complete"
+      >
+        <span slot="icon" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#dc2626;color:#fff;border-radius:4px;font-size:10px;font-weight:700;">PDF</span>
+      </loquix-attachment-chip>
+    </div>
+  </div>
+
+  <!-- 7. Attachment Panel -->
+  <h2>Attachment Panel</h2>
+  <div class="section">
+    <p class="hint">Drag & drop file panel with attachment chips</p>
+    <div class="card">
+      <loquix-attachment-panel id="attachment-panel" accepted-types="image/*,.pdf,.txt,.csv" max-files="5" multiple></loquix-attachment-panel>
+    </div>
+  </div>
+
+  <!-- 8. Parameter Panel -->
+  <h2>Parameter Panel</h2>
+  <div class="section">
+    <p class="hint">AI parameter tuning with presets, sliders, toggles, number inputs, and select</p>
+    <div class="card" style="max-width: 480px;">
+      <loquix-parameter-panel id="param-panel" active-preset="balanced"></loquix-parameter-panel>
+    </div>
+  </div>
+
+  <!-- 9. Parameter Panel — Compact Dark -->
+  <h2>Parameter Panel (Compact, Dark)</h2>
+  <div class="section">
+    <div class="dark-wrap" style="max-width: 480px;">
+      <loquix-parameter-panel id="param-panel-dark" compact active-preset="balanced"
+        style="--loquix-param-panel-bg: #303030;
+               --loquix-param-label-color: #e0e0e0;
+               --loquix-param-description-color: #888;
+               --loquix-param-value-color: #a78bfa;
+               --loquix-param-range-track-bg: #424242;
+               --loquix-param-toggle-bg: #424242;
+               --loquix-param-input-bg: #383838;
+               --loquix-param-input-border-color: #555;
+               --loquix-param-preset-bg: #383838;
+               --loquix-param-preset-color: #aaa;
+               --loquix-param-preset-border-color: #555;
+               --loquix-param-preset-hover-bg: #444;
+               --loquix-param-preset-active-bg: rgba(124, 58, 237, 0.2);
+               --loquix-param-preset-active-color: #a78bfa;
+               --loquix-param-preset-active-border-color: #7c3aed;
+      "></loquix-parameter-panel>
+    </div>
+  </div>
+
+  <!-- 10. Filter Bar -->
+  <h2>Filter Bar</h2>
+  <div class="section">
+    <p class="hint">Toggle source filters + negative prompt input</p>
+    <div class="card">
+      <loquix-filter-bar id="filter-bar" show-negative-prompt></loquix-filter-bar>
+    </div>
+  </div>
+
+  <!-- Event Log -->
+  <div id="event-log"></div>
+
+  <script type="module">
+    // === Demo data ===
+
+    const modes = [
+      { value: 'chat', label: 'Chat', icon: '💬', description: 'General conversation' },
+      { value: 'research', label: 'Research', icon: '🔍', description: 'Deep analysis and research' },
+      { value: 'build', label: 'Build', icon: '🔨', description: 'Code generation and debugging' },
+      { value: 'create', label: 'Create', icon: '🎨', description: 'Creative writing and design' },
+    ];
+
+    const models = [
+      { value: 'gpt-4o', label: 'GPT-4o', icon: '🟢', tier: 'pro', cost: '$0.03/1k', capabilities: ['vision', 'code', 'reasoning'], group: 'OpenAI', description: 'Most capable multimodal model' },
+      { value: 'gpt-4o-mini', label: 'GPT-4o Mini', icon: '🟢', tier: 'standard', cost: '$0.005/1k', capabilities: ['code'], group: 'OpenAI', description: 'Fast and affordable' },
+      { value: 'claude-4', label: 'Claude 4 Opus', icon: '🟣', tier: 'pro', cost: '$0.025/1k', capabilities: ['reasoning', 'code', 'analysis'], group: 'Anthropic', description: 'Most capable for ambitious work' },
+      { value: 'claude-3.5-sonnet', label: 'Claude 3.5 Sonnet', icon: '🟣', tier: 'standard', cost: '$0.015/1k', capabilities: ['code', 'analysis'], group: 'Anthropic', description: 'Best balance of speed and quality' },
+      { value: 'gemini-2', label: 'Gemini 2 Flash', icon: '🔵', tier: 'free', cost: 'Free', capabilities: ['vision', 'code'], group: 'Google', description: 'Free multimodal model' },
+    ];
+
+    const parameters = [
+      { id: 'temperature', label: 'Temperature', type: 'range', min: 0, max: 2, step: 0.01, default: 0.7, description: 'Controls randomness. Lower is more deterministic.' },
+      { id: 'max_tokens', label: 'Max Tokens', type: 'number', min: 1, max: 128000, step: 100, default: 4096, description: 'Maximum response length in tokens.' },
+      { id: 'top_p', label: 'Top P', type: 'range', min: 0, max: 1, step: 0.01, default: 1, description: 'Nucleus sampling threshold.' },
+      { id: 'stream', label: 'Stream', type: 'toggle', default: true, description: 'Stream responses token by token.' },
+      { id: 'frequency_penalty', label: 'Frequency Penalty', type: 'range', min: -2, max: 2, step: 0.01, default: 0, description: 'Penalize repeated tokens in output.', advanced: true },
+      { id: 'response_format', label: 'Response Format', type: 'select', default: 'text', options: [{ value: 'text', label: 'Text' }, { value: 'json', label: 'JSON' }, { value: 'markdown', label: 'Markdown' }], description: 'Output format of the response.', advanced: true },
+    ];
+
+    const presets = [
+      { id: 'creative', label: '🎨 Creative', description: 'High randomness', values: { temperature: 1.2, top_p: 0.95, frequency_penalty: 0.5, stream: true, max_tokens: 4096, response_format: 'text' } },
+      { id: 'balanced', label: '⚖️ Balanced', description: 'Default settings', values: { temperature: 0.7, top_p: 1, frequency_penalty: 0, stream: true, max_tokens: 4096, response_format: 'text' } },
+      { id: 'precise', label: '🎯 Precise', description: 'Low randomness', values: { temperature: 0.2, top_p: 0.5, frequency_penalty: 0, stream: true, max_tokens: 4096, response_format: 'text' } },
+    ];
+
+    const filters = [
+      { id: 'web', label: 'Web', icon: '🌐', group: 'Sources' },
+      { id: 'docs', label: 'Documents', icon: '📄', group: 'Sources' },
+      { id: 'code', label: 'Code', icon: '💻', group: 'Sources' },
+      { id: 'images', label: 'Images', icon: '🖼️', group: 'Sources' },
+      { id: 'recent', label: 'Recent', icon: '🕐', group: 'Time' },
+      { id: 'verified', label: 'Verified', icon: '✅', group: 'Quality' },
+    ];
+
+    const sampleAttachments = [
+      { id: 'a1', filename: 'screenshot.png', filetype: 'png', size: 342000, status: 'complete', progress: 100 },
+      { id: 'a2', filename: 'notes.txt', filetype: 'txt', size: 1280, status: 'complete', progress: 100, purpose: 'source' },
+    ];
+
+    // === Wire data to components ===
+
+    // Wait for all custom elements to be defined before assigning data
+    await Promise.all([
+      customElements.whenDefined('loquix-mode-selector'),
+      customElements.whenDefined('loquix-model-selector'),
+      customElements.whenDefined('loquix-attachment-panel'),
+      customElements.whenDefined('loquix-parameter-panel'),
+      customElements.whenDefined('loquix-filter-bar'),
+    ]);
+
+    // Mode selectors
+    ['mode-tabs', 'mode-tabs-stacked', 'mode-pills', 'mode-toggle', 'mode-dropdown'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.modes = modes;
+    });
+
+    // Model selectors
+    const modelFlat = document.getElementById('model-flat');
+    if (modelFlat) modelFlat.models = models;
+
+    const modelGrouped = document.getElementById('model-grouped');
+    if (modelGrouped) modelGrouped.models = models;
+
+    // Attachment panel
+    const attachPanel = document.getElementById('attachment-panel');
+    if (attachPanel) attachPanel.attachments = sampleAttachments;
+
+    // Parameter panels
+    ['param-panel', 'param-panel-dark'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.parameters = parameters;
+        el.presets = presets;
+        el.values = { ...presets[1].values }; // Balanced preset values
+      }
+    });
+
+    // Filter bar
+    const filterBar = document.getElementById('filter-bar');
+    if (filterBar) {
+      filterBar.filters = filters;
+      filterBar.values = ['web', 'docs']; // Pre-select Web and Documents
+    }
+
+    // === Retry simulation ===
+    function simulateUpload(chip) {
+      chip.status = 'uploading';
+      chip.progress = 0;
+      chip.error = '';
+      let p = 0;
+      const interval = setInterval(() => {
+        p += Math.floor(Math.random() * 12) + 3;
+        if (p >= 100) p = 100;
+        chip.progress = p;
+        if (p >= 100) {
+          clearInterval(interval);
+          setTimeout(() => { chip.status = 'complete'; }, 400);
+        }
+      }, 180);
+    }
+
+    // Listen for retry on both error chips
+    document.addEventListener('loquix-attachment-retry', (e) => {
+      const chip = e.target;
+      if (chip) simulateUpload(chip);
+    });
+  </script>
+</body>
+</html>

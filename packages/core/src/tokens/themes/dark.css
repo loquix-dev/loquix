@@ -1,0 +1,166 @@
+/**
+ * Loquix Dark Theme
+ */
+[data-theme='dark'],
+.loquix-theme-dark {
+  --loquix-surface-bg: #111827;
+  --loquix-surface-secondary-bg: #1f2937;
+  --loquix-text-color: #f9fafb;
+  --loquix-text-secondary-color: #9ca3af;
+  --loquix-border-color: #374151;
+  --loquix-input-bg: #1f2937;
+  --loquix-input-border-color: #4b5563;
+  --loquix-input-text-color: #f9fafb;
+  --loquix-input-placeholder-color: #6b7280;
+  --loquix-disclosure-bg: #1f2937;
+  --loquix-disclosure-text-color: #9ca3af;
+  --loquix-caveat-text-color: #9ca3af;
+  --loquix-caveat-bg: #292524;
+  --loquix-thought-bg: #1f2937;
+  --loquix-thought-border-color: #374151;
+  --loquix-thought-text-color: #9ca3af;
+  --loquix-ai-color-subtle: #2e1065;
+  --loquix-user-color-subtle: #1e3a5f;
+  --loquix-user-bubble-bg: var(--loquix-user-color-subtle);
+  --loquix-message-user-bg: var(--loquix-user-bubble-bg);
+  --loquix-ai-bubble-bg: var(--loquix-surface-secondary-bg);
+  --loquix-user-bubble-text: var(--loquix-text-color);
+  --loquix-ai-bubble-text: var(--loquix-text-color);
+
+  /* === Semantic Alias Redeclarations === */
+  --loquix-surface-color: var(--loquix-surface-bg);
+  --loquix-focus-color: var(--loquix-input-focus-color);
+  --loquix-text-muted: var(--loquix-text-secondary-color);
+
+  /* States */
+  --loquix-streaming-color: #a78bfa;
+  --loquix-error-color: #f87171;
+  --loquix-success-color: #4ade80;
+  --loquix-warning-color: #fbbf24;
+
+  /* Shadows */
+  --loquix-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --loquix-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --loquix-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+  /* Input focus */
+  --loquix-input-focus-color: #a78bfa;
+
+  /* Citations */
+  --loquix-citation-color: #a78bfa;
+
+  /* === Overlay / Subtle Tones === */
+  --loquix-overlay-subtle: rgba(255, 255, 255, 0.04);
+  --loquix-overlay-light: rgba(255, 255, 255, 0.08);
+  --loquix-overlay-medium: rgba(255, 255, 255, 0.12);
+  --loquix-border-subtle: rgba(255, 255, 255, 0.1);
+
+  /* === Message Attachments === */
+  --loquix-message-attachments-card-bg: rgba(255, 255, 255, 0.05);
+  --loquix-message-attachments-card-border-color: rgba(255, 255, 255, 0.1);
+  --loquix-message-attachments-card-hover-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  --loquix-message-attachments-remove-bg: rgba(255, 255, 255, 0.2);
+  --loquix-message-attachments-remove-hover-bg: rgba(255, 255, 255, 0.35);
+
+  /* === Suggestion Chips === */
+  --loquix-chip-border-color: rgba(255, 255, 255, 0.15);
+  --loquix-chip-hover-bg: rgba(255, 255, 255, 0.06);
+  --loquix-chip-hover-border-color: rgba(255, 255, 255, 0.25);
+  --loquix-chip-active-bg: rgba(255, 255, 255, 0.1);
+  --loquix-chip-description-color: rgba(255, 255, 255, 0.6);
+
+  /* === Attachment Chip === */
+  --loquix-attachment-chip-border-color: rgba(255, 255, 255, 0.1);
+  --loquix-attachment-chip-bg: rgba(255, 255, 255, 0.06);
+  --loquix-attachment-chip-meta-color: rgba(255, 255, 255, 0.55);
+  --loquix-attachment-chip-status-color: rgba(255, 255, 255, 0.55);
+  --loquix-attachment-chip-shimmer-bg: rgba(255, 255, 255, 0.12);
+
+  /* === Nudge Banner (per-variant) === */
+  --loquix-nudge-info-bg: rgba(96, 165, 250, 0.12);
+  --loquix-nudge-info-color: #93c5fd;
+  --loquix-nudge-info-border-color: rgba(96, 165, 250, 0.25);
+  --loquix-nudge-tip-bg: rgba(167, 139, 250, 0.12);
+  --loquix-nudge-tip-color: #c4b5fd;
+  --loquix-nudge-tip-border-color: rgba(167, 139, 250, 0.25);
+  --loquix-nudge-warning-bg: rgba(251, 191, 36, 0.12);
+  --loquix-nudge-warning-color: #fcd34d;
+  --loquix-nudge-warning-border-color: rgba(251, 191, 36, 0.25);
+
+  /* === Template Card === */
+  --loquix-template-card-bg: #1f2937;
+  --loquix-template-card-border-color: rgba(255, 255, 255, 0.1);
+  --loquix-template-card-hover-border-color: rgba(255, 255, 255, 0.2);
+  --loquix-template-card-selected-bg: rgba(167, 139, 250, 0.15);
+  --loquix-template-card-desc-color: rgba(255, 255, 255, 0.55);
+
+  /* === Template Picker === */
+  --loquix-picker-bg: #1f2937;
+  --loquix-picker-border-color: rgba(255, 255, 255, 0.1);
+  --loquix-picker-search-bg: rgba(255, 255, 255, 0.06);
+
+  /* === Example Gallery === */
+  --loquix-gallery-item-bg: #1f2937;
+  --loquix-gallery-item-border-color: rgba(255, 255, 255, 0.1);
+  --loquix-gallery-item-hover-border-color: rgba(255, 255, 255, 0.2);
+  --loquix-gallery-item-desc-color: rgba(255, 255, 255, 0.55);
+
+  /* === Welcome Screen === */
+  --loquix-welcome-subheading-color: rgba(255, 255, 255, 0.6);
+
+  /* === Filter Bar === */
+  --loquix-filter-hover-bg: rgba(255, 255, 255, 0.06);
+  --loquix-filter-divider-color: rgba(255, 255, 255, 0.1);
+  --loquix-filter-active-color: #c4b5fd;
+
+  /* === Prompt Input === */
+  --loquix-input-disabled-bg: #374151;
+
+  /* === Parameter Panel === */
+  --loquix-param-range-thumb-border-color: #374151;
+  --loquix-param-toggle-thumb-bg: #e5e7eb;
+  --loquix-param-value-color: #a78bfa;
+  --loquix-param-preset-active-color: #c4b5fd;
+  --loquix-param-preset-border-color: rgba(255, 255, 255, 0.1);
+  --loquix-param-preset-hover-bg: rgba(255, 255, 255, 0.04);
+
+  /* === Mode Selector === */
+  --loquix-mode-toggle-active-bg: #374151;
+  --loquix-mode-tab-hover-bg: rgba(255, 255, 255, 0.06);
+  --loquix-mode-tab-active-color: #c4b5fd;
+  --loquix-mode-tab-description-color: rgba(255, 255, 255, 0.6);
+  --loquix-mode-pill-border-color: rgba(255, 255, 255, 0.1);
+
+  /* === Attachment Panel === */
+  --loquix-attachment-trigger-border-color: rgba(255, 255, 255, 0.15);
+  --loquix-attachment-trigger-hover-bg: rgba(255, 255, 255, 0.06);
+  --loquix-attachment-trigger-hover-border-color: rgba(255, 255, 255, 0.25);
+
+  /* === Follow-up Suggestions === */
+  --loquix-followup-label-color: rgba(255, 255, 255, 0.6);
+
+  /* === Action Edit === */
+  --loquix-edit-textarea-bg: #1f2937;
+  --loquix-text-muted-color: #9ca3af;
+
+  /* === Generation Controls === */
+  --loquix-gen-button-bg: #1f2937;
+  --loquix-gen-stop-bg: #dc2626;
+
+  /* === Message Avatar === */
+  --loquix-avatar-color: #c4b5fd;
+
+  /* === Message Item === */
+  --loquix-message-show-more-color: #c4b5fd;
+  --loquix-message-show-more-bg: transparent;
+  --loquix-message-retry-hover-bg: rgba(252, 165, 165, 0.15);
+  --loquix-message-error-text-color: #fca5a5;
+  --loquix-message-error-border-color: var(--loquix-error-color);
+
+  /* === Message List === */
+  --loquix-scrollbar-thumb: #4b5563;
+
+  /* === Scroll Anchor === */
+  --loquix-scroll-anchor-bg: var(--loquix-surface-secondary-bg);
+  --loquix-scroll-anchor-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
