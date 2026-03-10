@@ -9,7 +9,9 @@ const styles = css`
   /* === Content wrapper (holds slotted children) === */
 
   .content {
-    transition: filter 0.2s ease-out, opacity 0.2s ease-out;
+    transition:
+      filter 0.2s ease-out,
+      opacity 0.2s ease-out;
   }
 
   :host([drag-over]) .content {
@@ -35,7 +37,9 @@ const styles = css`
     color: var(--loquix-drop-zone-color, var(--loquix-ai-color, #7c3aed));
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.2s ease-out, backdrop-filter 0.2s ease-out;
+    transition:
+      opacity 0.2s ease-out,
+      backdrop-filter 0.2s ease-out;
   }
 
   :host([drag-over]) .overlay {

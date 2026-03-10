@@ -68,10 +68,11 @@ export const Disabled: Story = {
 };
 
 export const AllVariants: Story = {
-  render: () => html` <div style="display:flex;flex-direction:column;gap:16px;width:400px">
-    <loquix-prompt-input variant="chat" placeholder="Chat variant"></loquix-prompt-input>
-    <loquix-prompt-input variant="inline" placeholder="Inline variant"></loquix-prompt-input>
-    <loquix-prompt-input variant="command" placeholder="Command variant"></loquix-prompt-input>
-    <loquix-prompt-input variant="panel" placeholder="Panel variant"></loquix-prompt-input>
-  </div>`,
+  render: () =>
+    html` <div style="display:flex;flex-direction:column;gap:16px;width:400px">
+      <loquix-prompt-input variant="chat" placeholder="Chat variant"></loquix-prompt-input>
+      <loquix-prompt-input variant="inline" placeholder="Inline variant"></loquix-prompt-input>
+      <loquix-prompt-input variant="command" placeholder="Command variant"></loquix-prompt-input>
+      <loquix-prompt-input variant="panel" placeholder="Panel variant"></loquix-prompt-input>
+    </div>`,
 };

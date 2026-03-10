@@ -15,18 +15,20 @@ type Story = StoryObj;
 
 export const Default: Story = {
   args: { border: 'none' },
-  render: args => html` <div style="width:500px">
-    <loquix-composer-toolbar border=${args.border}>
-      <span>Toolbar content goes here</span>
-    </loquix-composer-toolbar>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-composer-toolbar border=${args.border}>
+        <span>Toolbar content goes here</span>
+      </loquix-composer-toolbar>
+    </div>`,
 };
 
 export const WithBorder: Story = {
   args: { border: 'bottom' },
-  render: args => html` <div style="width:500px">
-    <loquix-composer-toolbar border=${args.border}>
-      <span>Toolbar with bottom border</span>
-    </loquix-composer-toolbar>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-composer-toolbar border=${args.border}>
+        <span>Toolbar with bottom border</span>
+      </loquix-composer-toolbar>
+    </div>`,
 };

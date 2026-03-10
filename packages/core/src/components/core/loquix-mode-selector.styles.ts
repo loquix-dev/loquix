@@ -42,7 +42,9 @@ const styles = css`
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
     line-height: 1.4;
   }
 
@@ -154,7 +156,10 @@ const styles = css`
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease;
     line-height: 1.4;
   }
 
@@ -207,7 +212,9 @@ const styles = css`
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s ease, opacity 0.15s ease;
+    transition:
+      background 0.15s ease,
+      opacity 0.15s ease;
     line-height: 1.4;
   }
 

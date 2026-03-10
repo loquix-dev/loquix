@@ -12,7 +12,9 @@ const styles = css`
     position: relative;
     border-radius: var(--loquix-attachment-panel-border-radius, 12px);
     background: var(--loquix-attachment-panel-bg, transparent);
-    transition: border-color 0.15s ease, background 0.15s ease;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease;
   }
 
   .panel--drag-over {
@@ -43,7 +45,9 @@ const styles = css`
     font-family: inherit;
     font-size: 0.8125rem;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
     margin: var(--loquix-attachment-panel-padding, 8px);
   }
 

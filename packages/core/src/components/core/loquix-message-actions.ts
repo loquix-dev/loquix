@@ -86,8 +86,8 @@ export class LoquixMessageActions extends LitElement {
     const defaults = isUser
       ? this._renderUserDefaults()
       : isAssistant
-      ? this._renderAssistantDefaults()
-      : this._renderSystemDefaults();
+        ? this._renderAssistantDefaults()
+        : this._renderSystemDefaults();
 
     return html`
       <div

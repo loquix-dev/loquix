@@ -29,14 +29,15 @@ export const Centered: Story = {
     subheading: 'Choose a suggestion or type your own message',
     layout: 'centered',
   },
-  render: args => html` <div style="width:600px;height:400px">
-    <loquix-welcome-screen
-      heading=${args.heading}
-      subheading=${args.subheading}
-      layout=${args.layout}
-      .suggestions=${suggestions}
-    ></loquix-welcome-screen>
-  </div>`,
+  render: args =>
+    html` <div style="width:600px;height:400px">
+      <loquix-welcome-screen
+        heading=${args.heading}
+        subheading=${args.subheading}
+        layout=${args.layout}
+        .suggestions=${suggestions}
+      ></loquix-welcome-screen>
+    </div>`,
 };
 
 export const Split: Story = {
@@ -45,19 +46,21 @@ export const Split: Story = {
     subheading: 'What would you like to work on?',
     layout: 'split',
   },
-  render: args => html` <div style="width:700px;height:400px">
-    <loquix-welcome-screen
-      heading=${args.heading}
-      subheading=${args.subheading}
-      layout=${args.layout}
-      .suggestions=${suggestions}
-    ></loquix-welcome-screen>
-  </div>`,
+  render: args =>
+    html` <div style="width:700px;height:400px">
+      <loquix-welcome-screen
+        heading=${args.heading}
+        subheading=${args.subheading}
+        layout=${args.layout}
+        .suggestions=${suggestions}
+      ></loquix-welcome-screen>
+    </div>`,
 };
 
 export const NoSuggestions: Story = {
   args: { heading: 'Start a conversation', layout: 'centered' },
-  render: args => html` <div style="width:600px;height:300px">
-    <loquix-welcome-screen heading=${args.heading} layout=${args.layout}></loquix-welcome-screen>
-  </div>`,
+  render: args =>
+    html` <div style="width:600px;height:300px">
+      <loquix-welcome-screen heading=${args.heading} layout=${args.layout}></loquix-welcome-screen>
+    </div>`,
 };

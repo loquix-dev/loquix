@@ -58,9 +58,10 @@ export const Streaming: Story = {
 };
 
 export const AllSizes: Story = {
-  render: () => html` <div style="display:flex;gap:12px;align-items:center">
-    <loquix-message-avatar size="sm"></loquix-message-avatar>
-    <loquix-message-avatar size="md"></loquix-message-avatar>
-    <loquix-message-avatar size="lg"></loquix-message-avatar>
-  </div>`,
+  render: () =>
+    html` <div style="display:flex;gap:12px;align-items:center">
+      <loquix-message-avatar size="sm"></loquix-message-avatar>
+      <loquix-message-avatar size="md"></loquix-message-avatar>
+      <loquix-message-avatar size="lg"></loquix-message-avatar>
+    </div>`,
 };

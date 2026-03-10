@@ -43,11 +43,12 @@ export const Paused: Story = {
 };
 
 export const AllStates: Story = {
-  render: () => html` <div style="display:flex;flex-direction:column;gap:12px">
-    <loquix-generation-controls state="idle"></loquix-generation-controls>
-    <loquix-generation-controls state="running" show-pause></loquix-generation-controls>
-    <loquix-generation-controls state="paused"></loquix-generation-controls>
-    <loquix-generation-controls state="complete"></loquix-generation-controls>
-    <loquix-generation-controls state="error"></loquix-generation-controls>
-  </div>`,
+  render: () =>
+    html` <div style="display:flex;flex-direction:column;gap:12px">
+      <loquix-generation-controls state="idle"></loquix-generation-controls>
+      <loquix-generation-controls state="running" show-pause></loquix-generation-controls>
+      <loquix-generation-controls state="paused"></loquix-generation-controls>
+      <loquix-generation-controls state="complete"></loquix-generation-controls>
+      <loquix-generation-controls state="error"></loquix-generation-controls>
+    </div>`,
 };

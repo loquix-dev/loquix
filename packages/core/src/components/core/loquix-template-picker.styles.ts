@@ -56,7 +56,9 @@ export default css`
     color: inherit;
     cursor: pointer;
     opacity: 0.5;
-    transition: opacity 0.15s ease, background 0.15s ease;
+    transition:
+      opacity 0.15s ease,
+      background 0.15s ease;
   }
 
   .close-btn:hover {
@@ -126,7 +128,9 @@ export default css`
     font-size: 0.8125rem;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
   }
 
   .category-btn:hover:not(.category-btn--active) {

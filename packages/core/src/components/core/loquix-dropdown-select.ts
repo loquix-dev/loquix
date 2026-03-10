@@ -547,8 +547,8 @@ export class LoquixDropdownSelect extends LitElement {
           ${showSubmenuArrow
             ? this._arrowSvg()
             : opt.type !== 'action'
-            ? this._checkSvg()
-            : nothing}
+              ? this._checkSvg()
+              : nothing}
         </div>
       </button>
     `;

@@ -34,7 +34,9 @@ export default css`
     font-size: 0.8125rem;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
   }
 
   .category-btn:hover:not(.category-btn--active) {
@@ -96,7 +98,9 @@ export default css`
     border-radius: var(--loquix-gallery-item-border-radius, 10px);
     background: var(--loquix-gallery-item-bg, #fff);
     cursor: pointer;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
     text-align: left;
     font-family: inherit;
     color: inherit;

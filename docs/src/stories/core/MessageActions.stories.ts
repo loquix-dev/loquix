@@ -44,9 +44,10 @@ export const Vertical: Story = {
 };
 
 export const CustomSlotted: Story = {
-  render: () => html` <loquix-message-actions position="always">
-    <loquix-action-copy></loquix-action-copy>
-    <loquix-action-feedback sentiment="positive"></loquix-action-feedback>
-    <loquix-action-feedback sentiment="negative"></loquix-action-feedback>
-  </loquix-message-actions>`,
+  render: () =>
+    html` <loquix-message-actions position="always">
+      <loquix-action-copy></loquix-action-copy>
+      <loquix-action-feedback sentiment="positive"></loquix-action-feedback>
+      <loquix-action-feedback sentiment="negative"></loquix-action-feedback>
+    </loquix-message-actions>`,
 };

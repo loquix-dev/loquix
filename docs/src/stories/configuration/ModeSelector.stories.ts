@@ -58,13 +58,14 @@ export const Toggle: Story = {
 
 export const Dropdown: Story = {
   args: { variant: 'dropdown', value: 'chat' },
-  render: args => html` <div style="padding-top:200px">
-    <loquix-mode-selector
-      variant=${args.variant}
-      value=${args.value}
-      .modes=${modes}
-    ></loquix-mode-selector>
-  </div>`,
+  render: args =>
+    html` <div style="padding-top:200px">
+      <loquix-mode-selector
+        variant=${args.variant}
+        value=${args.value}
+        .modes=${modes}
+      ></loquix-mode-selector>
+    </div>`,
 };
 
 export const WithDescriptions: Story = {

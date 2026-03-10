@@ -58,7 +58,8 @@ const styles = css`
     cursor: pointer;
     background: var(--loquix-send-button-bg, var(--loquix-ai-color, #7c3aed));
     color: var(--loquix-send-button-color, #ffffff);
-    transition: opacity var(--loquix-transition-duration, 200ms)
+    transition:
+      opacity var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
       transform var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
@@ -110,7 +111,9 @@ const styles = css`
     border-radius: var(--loquix-composer-container-border-radius, 16px);
     background: var(--loquix-composer-container-bg, var(--loquix-surface-color, #ffffff));
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
   }
 
   .composer--contained .container:focus-within {

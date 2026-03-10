@@ -86,32 +86,33 @@ export const WithPurpose: Story = {
 };
 
 export const AllStatuses: Story = {
-  render: () => html` <div style="display:flex;flex-direction:column;gap:8px">
-    <loquix-attachment-chip
-      filename="pending.txt"
-      filetype="text/plain"
-      size="1024"
-      status="pending"
-    ></loquix-attachment-chip>
-    <loquix-attachment-chip
-      filename="uploading.csv"
-      filetype="text/csv"
-      size="50000"
-      status="uploading"
-      progress="40"
-    ></loquix-attachment-chip>
-    <loquix-attachment-chip
-      filename="complete.pdf"
-      filetype="application/pdf"
-      size="245000"
-      status="complete"
-    ></loquix-attachment-chip>
-    <loquix-attachment-chip
-      filename="error.zip"
-      filetype="application/zip"
-      size="10000000"
-      status="error"
-      error="Upload failed"
-    ></loquix-attachment-chip>
-  </div>`,
+  render: () =>
+    html` <div style="display:flex;flex-direction:column;gap:8px">
+      <loquix-attachment-chip
+        filename="pending.txt"
+        filetype="text/plain"
+        size="1024"
+        status="pending"
+      ></loquix-attachment-chip>
+      <loquix-attachment-chip
+        filename="uploading.csv"
+        filetype="text/csv"
+        size="50000"
+        status="uploading"
+        progress="40"
+      ></loquix-attachment-chip>
+      <loquix-attachment-chip
+        filename="complete.pdf"
+        filetype="application/pdf"
+        size="245000"
+        status="complete"
+      ></loquix-attachment-chip>
+      <loquix-attachment-chip
+        filename="error.zip"
+        filetype="application/zip"
+        size="10000000"
+        status="error"
+        error="Upload failed"
+      ></loquix-attachment-chip>
+    </div>`,
 };

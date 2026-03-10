@@ -67,112 +67,134 @@ const uploadButton = html` <button
 
 /** Default attachment panel with built-in trigger button. */
 export const Default: Story = {
-  render: () => html` <div style="width:600px">
-    <loquix-chat-composer variant="contained" placeholder="Type a message..." ${ref(wireComposer)}>
-      <loquix-attachment-panel slot="toolbar-top"></loquix-attachment-panel>
-    </loquix-chat-composer>
-  </div>`,
+  render: () =>
+    html` <div style="width:600px">
+      <loquix-chat-composer
+        variant="contained"
+        placeholder="Type a message..."
+        ${ref(wireComposer)}
+      >
+        <loquix-attachment-panel slot="toolbar-top"></loquix-attachment-panel>
+      </loquix-chat-composer>
+    </div>`,
 };
 
 /** Paste files from clipboard. */
 export const PasteToUpload: Story = {
-  render: () => html` <div style="width:600px">
-    <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
-      Copy a file to the clipboard, then press
-      <kbd style="padding:2px 6px;border:1px solid #ccc;border-radius:4px;font-size:0.8125rem"
-        >⌘V</kbd
+  render: () =>
+    html` <div style="width:600px">
+      <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
+        Copy a file to the clipboard, then press
+        <kbd style="padding:2px 6px;border:1px solid #ccc;border-radius:4px;font-size:0.8125rem"
+          >⌘V</kbd
+        >
+        /
+        <kbd style="padding:2px 6px;border:1px solid #ccc;border-radius:4px;font-size:0.8125rem"
+          >Ctrl+V</kbd
+        >
+        inside the input.
+      </p>
+      <loquix-chat-composer
+        variant="contained"
+        placeholder="Paste a file here..."
+        ${ref(wireComposer)}
       >
-      /
-      <kbd style="padding:2px 6px;border:1px solid #ccc;border-radius:4px;font-size:0.8125rem"
-        >Ctrl+V</kbd
-      >
-      inside the input.
-    </p>
-    <loquix-chat-composer
-      variant="contained"
-      placeholder="Paste a file here..."
-      ${ref(wireComposer)}
-    >
-      <loquix-attachment-panel slot="toolbar-top" no-trigger></loquix-attachment-panel>
-      ${uploadButton}
-    </loquix-chat-composer>
-  </div>`,
+        <loquix-attachment-panel slot="toolbar-top" no-trigger></loquix-attachment-panel>
+        ${uploadButton}
+      </loquix-chat-composer>
+    </div>`,
 };
 
 /** Drag and drop files onto the input area. */
 export const DragAndDrop: Story = {
-  render: () => html` <div style="width:600px">
-    <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
-      Drag files from your file manager onto the input area below.
-    </p>
-    <loquix-chat-composer variant="contained" placeholder="Drop files here..." ${ref(wireComposer)}>
-      <loquix-attachment-panel slot="toolbar-top" no-trigger></loquix-attachment-panel>
-      ${uploadButton}
-    </loquix-chat-composer>
-  </div>`,
+  render: () =>
+    html` <div style="width:600px">
+      <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
+        Drag files from your file manager onto the input area below.
+      </p>
+      <loquix-chat-composer
+        variant="contained"
+        placeholder="Drop files here..."
+        ${ref(wireComposer)}
+      >
+        <loquix-attachment-panel slot="toolbar-top" no-trigger></loquix-attachment-panel>
+        ${uploadButton}
+      </loquix-chat-composer>
+    </div>`,
 };
 
 /** Click the paperclip icon to open the native file picker. */
 export const FilePicker: Story = {
-  render: () => html` <div style="width:600px">
-    <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
-      Click the paperclip icon below the input to open the file picker.
-    </p>
-    <loquix-chat-composer variant="contained" placeholder="Type a message..." ${ref(wireComposer)}>
-      <loquix-attachment-panel slot="toolbar-top" no-trigger></loquix-attachment-panel>
-      ${uploadButton}
-    </loquix-chat-composer>
-  </div>`,
+  render: () =>
+    html` <div style="width:600px">
+      <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
+        Click the paperclip icon below the input to open the file picker.
+      </p>
+      <loquix-chat-composer
+        variant="contained"
+        placeholder="Type a message..."
+        ${ref(wireComposer)}
+      >
+        <loquix-attachment-panel slot="toolbar-top" no-trigger></loquix-attachment-panel>
+        ${uploadButton}
+      </loquix-chat-composer>
+    </div>`,
 };
 
 /** All upload methods work together — paste, drag-and-drop, and file picker. */
 export const Combined: Story = {
-  render: () => html` <div style="width:600px">
-    <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
-      Upload files via paste, drag-and-drop, or the paperclip button. Files appear alongside
-      existing attachments.
-    </p>
-    <loquix-chat-composer variant="contained" placeholder="Type a message..." ${ref(wireComposer)}>
-      <loquix-attachment-panel
-        slot="toolbar-top"
-        no-trigger
-        .attachments=${[
-          {
-            id: '1',
-            filename: 'report.pdf',
-            filetype: 'application/pdf',
-            size: 245000,
-            status: 'complete' as const,
-          },
-          {
-            id: '2',
-            filename: 'data.csv',
-            filetype: 'text/csv',
-            size: 50000,
-            status: 'complete' as const,
-          },
-        ]}
-      ></loquix-attachment-panel>
-      ${uploadButton}
-    </loquix-chat-composer>
-  </div>`,
+  render: () =>
+    html` <div style="width:600px">
+      <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
+        Upload files via paste, drag-and-drop, or the paperclip button. Files appear alongside
+        existing attachments.
+      </p>
+      <loquix-chat-composer
+        variant="contained"
+        placeholder="Type a message..."
+        ${ref(wireComposer)}
+      >
+        <loquix-attachment-panel
+          slot="toolbar-top"
+          no-trigger
+          .attachments=${[
+            {
+              id: '1',
+              filename: 'report.pdf',
+              filetype: 'application/pdf',
+              size: 245000,
+              status: 'complete' as const,
+            },
+            {
+              id: '2',
+              filename: 'data.csv',
+              filetype: 'text/csv',
+              size: 50000,
+              status: 'complete' as const,
+            },
+          ]}
+        ></loquix-attachment-panel>
+        ${uploadButton}
+      </loquix-chat-composer>
+    </div>`,
 };
 
 /** Only images are accepted — other file types are silently rejected. */
 export const ImagesOnly: Story = {
-  render: () => html` <div style="width:600px">
-    <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
-      Only image files are accepted. Non-image files will be rejected.
-    </p>
-    <loquix-chat-composer variant="contained" placeholder="Upload images..." ${ref(wireComposer)}>
-      <loquix-attachment-panel
-        slot="toolbar-top"
-        no-trigger
-        accepted-types="image/*"
-      ></loquix-attachment-panel>
-      ${uploadButton}
-    </loquix-chat-composer>
-  </div>`,
+  render: () =>
+    html` <div style="width:600px">
+      <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
+        Only image files are accepted. Non-image files will be rejected.
+      </p>
+      <loquix-chat-composer variant="contained" placeholder="Upload images..." ${ref(wireComposer)}>
+        <loquix-attachment-panel
+          slot="toolbar-top"
+          no-trigger
+          accepted-types="image/*"
+        ></loquix-attachment-panel>
+        ${uploadButton}
+      </loquix-chat-composer>
+    </div>`,
 };
 
 /** Dropdown menu with "+" button — extensible for future sources (Google Drive, etc.). */
@@ -224,22 +246,23 @@ export const WithDropdownMenu: Story = {
 
 /** Single file upload — only one file allowed at a time. */
 export const SingleFile: Story = {
-  render: () => html` <div style="width:600px">
-    <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
-      Only one file can be attached at a time.
-    </p>
-    <loquix-chat-composer
-      variant="contained"
-      placeholder="Attach a single file..."
-      ${ref(wireComposer)}
-    >
-      <loquix-attachment-panel
-        slot="toolbar-top"
-        no-trigger
-        max-files="1"
-        .multiple=${false}
-      ></loquix-attachment-panel>
-      ${uploadButton}
-    </loquix-chat-composer>
-  </div>`,
+  render: () =>
+    html` <div style="width:600px">
+      <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
+        Only one file can be attached at a time.
+      </p>
+      <loquix-chat-composer
+        variant="contained"
+        placeholder="Attach a single file..."
+        ${ref(wireComposer)}
+      >
+        <loquix-attachment-panel
+          slot="toolbar-top"
+          no-trigger
+          max-files="1"
+          .multiple=${false}
+        ></loquix-attachment-panel>
+        ${uploadButton}
+      </loquix-chat-composer>
+    </div>`,
 };

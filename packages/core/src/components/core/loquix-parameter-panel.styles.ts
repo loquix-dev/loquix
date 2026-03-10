@@ -35,7 +35,10 @@ const styles = css`
     font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
   }
 
   .preset:hover:not(:disabled) {

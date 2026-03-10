@@ -18,45 +18,55 @@ type Story = StoryObj;
 
 export const Default: Story = {
   args: { autoScroll: true, showTimestamps: false },
-  render: args => html` <div style="width:600px;height:400px">
-    <loquix-message-list ?auto-scroll=${args.autoScroll} ?show-timestamps=${args.showTimestamps}>
-      <loquix-message-item sender="user" status="complete">
-        <p>What is the meaning of life?</p>
-      </loquix-message-item>
-      <loquix-message-item sender="assistant" status="complete" model="Claude 3.5">
-        <p>
-          That is one of humanity's most profound philosophical questions, explored across cultures
-          and millennia.
-        </p>
-      </loquix-message-item>
-      <loquix-message-item sender="user" status="complete">
-        <p>Can you elaborate?</p>
-      </loquix-message-item>
-      <loquix-message-item sender="assistant" status="complete" model="Claude 3.5">
-        <p>There are many perspectives to consider, from existentialist to religious viewpoints.</p>
-      </loquix-message-item>
-    </loquix-message-list>
-  </div>`,
+  render: args =>
+    html` <div style="width:600px;height:400px">
+      <loquix-message-list ?auto-scroll=${args.autoScroll} ?show-timestamps=${args.showTimestamps}>
+        <loquix-message-item sender="user" status="complete">
+          <p>What is the meaning of life?</p>
+        </loquix-message-item>
+        <loquix-message-item sender="assistant" status="complete" model="Claude 3.5">
+          <p>
+            That is one of humanity's most profound philosophical questions, explored across
+            cultures and millennia.
+          </p>
+        </loquix-message-item>
+        <loquix-message-item sender="user" status="complete">
+          <p>Can you elaborate?</p>
+        </loquix-message-item>
+        <loquix-message-item sender="assistant" status="complete" model="Claude 3.5">
+          <p>
+            There are many perspectives to consider, from existentialist to religious viewpoints.
+          </p>
+        </loquix-message-item>
+      </loquix-message-list>
+    </div>`,
 };
 
 export const WithTimestamps: Story = {
   args: { showTimestamps: true },
-  render: args => html` <div style="width:600px;height:400px">
-    <loquix-message-list ?show-timestamps=${args.showTimestamps}>
-      <loquix-message-item sender="user" status="complete" timestamp="2:30 PM">
-        <p>Hello there!</p>
-      </loquix-message-item>
-      <loquix-message-item sender="assistant" status="complete" model="Claude" timestamp="2:30 PM">
-        <p>Hi! How can I help you today?</p>
-      </loquix-message-item>
-    </loquix-message-list>
-  </div>`,
+  render: args =>
+    html` <div style="width:600px;height:400px">
+      <loquix-message-list ?show-timestamps=${args.showTimestamps}>
+        <loquix-message-item sender="user" status="complete" timestamp="2:30 PM">
+          <p>Hello there!</p>
+        </loquix-message-item>
+        <loquix-message-item
+          sender="assistant"
+          status="complete"
+          model="Claude"
+          timestamp="2:30 PM"
+        >
+          <p>Hi! How can I help you today?</p>
+        </loquix-message-item>
+      </loquix-message-list>
+    </div>`,
 };
 
 export const Empty: Story = {
-  render: () => html` <div style="width:600px;height:200px">
-    <loquix-message-list></loquix-message-list>
-  </div>`,
+  render: () =>
+    html` <div style="width:600px;height:200px">
+      <loquix-message-list></loquix-message-list>
+    </div>`,
 };
 
 export const WithScrollAnchor: Story = {

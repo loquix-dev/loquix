@@ -74,36 +74,39 @@ type Story = StoryObj;
 
 export const Default: Story = {
   args: { heading: 'Choose a template' },
-  render: args => html` <div>
-    <button @click=${openPicker}>Open Template Picker</button>
-    <loquix-template-picker
-      heading=${args.heading}
-      .templates=${templates}
-      .categories=${['Writing', 'Development', 'Analysis']}
-    ></loquix-template-picker>
-  </div>`,
+  render: args =>
+    html` <div>
+      <button @click=${openPicker}>Open Template Picker</button>
+      <loquix-template-picker
+        heading=${args.heading}
+        .templates=${templates}
+        .categories=${['Writing', 'Development', 'Analysis']}
+      ></loquix-template-picker>
+    </div>`,
 };
 
 export const WithSearch: Story = {
   args: { heading: 'Find a template', searchable: true },
-  render: args => html` <div>
-    <button @click=${openPicker}>Open Template Picker</button>
-    <loquix-template-picker
-      heading=${args.heading}
-      ?searchable=${args.searchable}
-      .templates=${templates}
-      .categories=${['Writing', 'Development', 'Analysis']}
-    ></loquix-template-picker>
-  </div>`,
+  render: args =>
+    html` <div>
+      <button @click=${openPicker}>Open Template Picker</button>
+      <loquix-template-picker
+        heading=${args.heading}
+        ?searchable=${args.searchable}
+        .templates=${templates}
+        .categories=${['Writing', 'Development', 'Analysis']}
+      ></loquix-template-picker>
+    </div>`,
 };
 
 export const NoCategories: Story = {
   args: { heading: 'Templates' },
-  render: args => html` <div>
-    <button @click=${openPicker}>Open Template Picker</button>
-    <loquix-template-picker
-      heading=${args.heading}
-      .templates=${templates}
-    ></loquix-template-picker>
-  </div>`,
+  render: args =>
+    html` <div>
+      <button @click=${openPicker}>Open Template Picker</button>
+      <loquix-template-picker
+        heading=${args.heading}
+        .templates=${templates}
+      ></loquix-template-picker>
+    </div>`,
 };

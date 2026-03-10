@@ -32,7 +32,8 @@ const styles = css`
       var(--loquix-action-color, var(--loquix-text-secondary-color, #6b7280))
     );
     cursor: pointer;
-    transition: background var(--loquix-transition-duration, 200ms)
+    transition:
+      background var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
       color var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
@@ -125,7 +126,8 @@ const styles = css`
     font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background var(--loquix-transition-duration, 200ms)
+    transition:
+      background var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
       border-color var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));
@@ -146,7 +148,8 @@ const styles = css`
     font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background var(--loquix-transition-duration, 200ms)
+    transition:
+      background var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));

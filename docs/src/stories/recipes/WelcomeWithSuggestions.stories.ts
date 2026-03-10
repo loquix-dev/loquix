@@ -58,79 +58,82 @@ const templates = [
 ];
 
 export const EmptyChatWithWelcome: Story = {
-  render: () => html` <div style="width:100%;height:100vh">
-    <loquix-chat-container layout="full" mode="chat">
-      <loquix-chat-header slot="header" agent-name="Claude">
-        <loquix-message-avatar
-          slot="avatar"
-          variant="initials"
-          name="AI"
-          size="sm"
-        ></loquix-message-avatar>
-      </loquix-chat-header>
-      <loquix-message-list slot="messages">
-        <loquix-welcome-screen
-          heading="Good afternoon!"
-          subheading="What would you like to work on?"
-          layout="centered"
-          suggestion-variant="card"
-          .suggestions=${suggestions}
-        ></loquix-welcome-screen>
-      </loquix-message-list>
-      <loquix-chat-composer
-        slot="composer"
-        variant="contained"
-        placeholder="Start typing..."
-      ></loquix-chat-composer>
-    </loquix-chat-container>
-  </div>`,
+  render: () =>
+    html` <div style="width:100%;height:100vh">
+      <loquix-chat-container layout="full" mode="chat">
+        <loquix-chat-header slot="header" agent-name="Claude">
+          <loquix-message-avatar
+            slot="avatar"
+            variant="initials"
+            name="AI"
+            size="sm"
+          ></loquix-message-avatar>
+        </loquix-chat-header>
+        <loquix-message-list slot="messages">
+          <loquix-welcome-screen
+            heading="Good afternoon!"
+            subheading="What would you like to work on?"
+            layout="centered"
+            suggestion-variant="card"
+            .suggestions=${suggestions}
+          ></loquix-welcome-screen>
+        </loquix-message-list>
+        <loquix-chat-composer
+          slot="composer"
+          variant="contained"
+          placeholder="Start typing..."
+        ></loquix-chat-composer>
+      </loquix-chat-container>
+    </div>`,
 };
 
 export const WithTemplateGallery: Story = {
-  render: () => html` <div style="width:100%;height:100vh">
-    <loquix-chat-container layout="full" mode="chat">
-      <loquix-chat-header slot="header" agent-name="Claude"></loquix-chat-header>
-      <loquix-message-list slot="messages">
-        <loquix-welcome-screen
-          heading="How can I help?"
-          layout="centered"
-          .suggestions=${suggestions.slice(0, 2)}
-        ></loquix-welcome-screen>
-        <loquix-example-gallery
-          variant="grid"
-          columns=${3}
-          heading="Or try an example"
-          .items=${templates.map(t => ({ ...t, prompt: t.prompt }))}
-        ></loquix-example-gallery>
-      </loquix-message-list>
-      <loquix-chat-composer
-        slot="composer"
-        variant="contained"
-        placeholder="Type a message..."
-      ></loquix-chat-composer>
-    </loquix-chat-container>
-  </div>`,
+  render: () =>
+    html` <div style="width:100%;height:100vh">
+      <loquix-chat-container layout="full" mode="chat">
+        <loquix-chat-header slot="header" agent-name="Claude"></loquix-chat-header>
+        <loquix-message-list slot="messages">
+          <loquix-welcome-screen
+            heading="How can I help?"
+            layout="centered"
+            .suggestions=${suggestions.slice(0, 2)}
+          ></loquix-welcome-screen>
+          <loquix-example-gallery
+            variant="grid"
+            columns=${3}
+            heading="Or try an example"
+            .items=${templates.map(t => ({ ...t, prompt: t.prompt }))}
+          ></loquix-example-gallery>
+        </loquix-message-list>
+        <loquix-chat-composer
+          slot="composer"
+          variant="contained"
+          placeholder="Type a message..."
+        ></loquix-chat-composer>
+      </loquix-chat-container>
+    </div>`,
 };
 
 export const WithNudgeBanner: Story = {
-  render: () => html` <div style="width:100%;height:100vh">
-    <loquix-chat-container layout="full" mode="chat">
-      <loquix-chat-header slot="header" agent-name="Claude"></loquix-chat-header>
-      <loquix-message-list slot="messages">
-        <loquix-nudge-banner variant="tip" icon="💡" nudge-id="welcome-tip">
-          Pro tip: You can use templates to get started faster!
-        </loquix-nudge-banner>
-        <loquix-welcome-screen
-          heading="Welcome back!"
-          layout="centered"
-          .suggestions=${suggestions}
-        ></loquix-welcome-screen>
-      </loquix-message-list>
-      <loquix-chat-composer
-        slot="composer"
-        variant="contained"
-        placeholder="Ask me anything..."
-      ></loquix-chat-composer>
-    </loquix-chat-container>
-  </div>`,
+  render: () =>
+    html` <div style="width:100%;height:100vh">
+      <loquix-chat-container layout="full" mode="chat">
+        <loquix-chat-header slot="header" agent-name="Claude"></loquix-chat-header>
+        <loquix-message-list slot="messages">
+          <loquix-nudge-banner variant="tip" icon="💡" nudge-id="welcome-tip">
+            Pro tip: You can use templates to get started faster!
+          </loquix-nudge-banner>
+          <loquix-welcome-screen
+            heading="Welcome back!"
+            layout="centered"
+            .suggestions=${suggestions}
+          ></loquix-welcome-screen>
+        </loquix-message-list>
+        <loquix-chat-composer
+          slot="composer"
+          variant="contained"
+          placeholder="Ask me anything..."
+        ></loquix-chat-composer>
+      </loquix-chat-container>
+    </div>`,
 };

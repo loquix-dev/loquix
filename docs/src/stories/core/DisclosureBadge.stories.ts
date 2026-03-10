@@ -46,26 +46,27 @@ export const Banner: Story = {
 };
 
 export const AllActions: Story = {
-  render: () => html` <div style="display:flex;flex-direction:column;gap:8px">
-    <loquix-disclosure-badge
-      agent-name="Claude"
-      action="generated"
-      variant="label"
-    ></loquix-disclosure-badge>
-    <loquix-disclosure-badge
-      agent-name="Claude"
-      action="summarized"
-      variant="label"
-    ></loquix-disclosure-badge>
-    <loquix-disclosure-badge
-      agent-name="Claude"
-      action="rewrote"
-      variant="label"
-    ></loquix-disclosure-badge>
-    <loquix-disclosure-badge
-      agent-name="Claude"
-      action="suggested"
-      variant="label"
-    ></loquix-disclosure-badge>
-  </div>`,
+  render: () =>
+    html` <div style="display:flex;flex-direction:column;gap:8px">
+      <loquix-disclosure-badge
+        agent-name="Claude"
+        action="generated"
+        variant="label"
+      ></loquix-disclosure-badge>
+      <loquix-disclosure-badge
+        agent-name="Claude"
+        action="summarized"
+        variant="label"
+      ></loquix-disclosure-badge>
+      <loquix-disclosure-badge
+        agent-name="Claude"
+        action="rewrote"
+        variant="label"
+      ></loquix-disclosure-badge>
+      <loquix-disclosure-badge
+        agent-name="Claude"
+        action="suggested"
+        variant="label"
+      ></loquix-disclosure-badge>
+    </div>`,
 };

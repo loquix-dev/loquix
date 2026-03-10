@@ -21,7 +21,9 @@ const styles = css`
     position: relative;
     overflow: hidden;
     max-width: 280px;
-    transition: border-color 0.15s ease, background 0.15s ease;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease;
   }
 
   .chip--pending {
@@ -214,7 +216,9 @@ const styles = css`
     cursor: pointer;
     flex-shrink: 0;
     opacity: 0.8;
-    transition: opacity 0.15s ease, background 0.15s ease;
+    transition:
+      opacity 0.15s ease,
+      background 0.15s ease;
   }
 
   .chip__retry:hover {
@@ -248,7 +252,9 @@ const styles = css`
     cursor: pointer;
     flex-shrink: 0;
     opacity: 0.65;
-    transition: opacity 0.15s ease, background 0.15s ease;
+    transition:
+      opacity 0.15s ease,
+      background 0.15s ease;
   }
 
   .chip__remove:hover {

@@ -51,12 +51,13 @@ export const Disabled: Story = {
 };
 
 export const ButtonRow: Story = {
-  render: () => html` <div style="display:flex;gap:4px">
-    <loquix-action-copy></loquix-action-copy>
-    <loquix-action-feedback sentiment="positive"></loquix-action-feedback>
-    <loquix-action-feedback sentiment="negative"></loquix-action-feedback>
-    <loquix-action-button action="loquix-regenerate" label="Regenerate"
-      >${refreshIcon}</loquix-action-button
-    >
-  </div>`,
+  render: () =>
+    html` <div style="display:flex;gap:4px">
+      <loquix-action-copy></loquix-action-copy>
+      <loquix-action-feedback sentiment="positive"></loquix-action-feedback>
+      <loquix-action-feedback sentiment="negative"></loquix-action-feedback>
+      <loquix-action-button action="loquix-regenerate" label="Regenerate"
+        >${refreshIcon}</loquix-action-button
+      >
+    </div>`,
 };

@@ -30,7 +30,8 @@ const styles = css`
     color: var(--loquix-input-color, var(--loquix-text-color, #1e293b));
     background: var(--loquix-input-bg, var(--loquix-surface-color, #ffffff));
     outline: none;
-    transition: border-color var(--loquix-transition-duration, 200ms)
+    transition:
+      border-color var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
       box-shadow var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));

@@ -88,55 +88,60 @@ export default meta;
 type Story = StoryObj;
 
 export const Default: Story = {
-  render: () => html` <div style="width:350px">
-    <loquix-parameter-panel
-      .parameters=${parameters}
-      .values=${{ temperature: 0.7, max_tokens: 1024, stream: true, format: 'text' }}
-    ></loquix-parameter-panel>
-  </div>`,
+  render: () =>
+    html` <div style="width:350px">
+      <loquix-parameter-panel
+        .parameters=${parameters}
+        .values=${{ temperature: 0.7, max_tokens: 1024, stream: true, format: 'text' }}
+      ></loquix-parameter-panel>
+    </div>`,
 };
 
 export const WithPresets: Story = {
   args: { activePreset: 'balanced' },
-  render: args => html` <div style="width:350px">
-    <loquix-parameter-panel
-      active-preset=${args.activePreset}
-      .parameters=${parameters}
-      .presets=${presets}
-      .values=${{ temperature: 0.7, max_tokens: 1024, top_p: 1, stream: true, format: 'text' }}
-    ></loquix-parameter-panel>
-  </div>`,
+  render: args =>
+    html` <div style="width:350px">
+      <loquix-parameter-panel
+        active-preset=${args.activePreset}
+        .parameters=${parameters}
+        .presets=${presets}
+        .values=${{ temperature: 0.7, max_tokens: 1024, top_p: 1, stream: true, format: 'text' }}
+      ></loquix-parameter-panel>
+    </div>`,
 };
 
 export const ShowAdvanced: Story = {
   args: { showAdvanced: true },
-  render: args => html` <div style="width:350px">
-    <loquix-parameter-panel
-      ?show-advanced=${args.showAdvanced}
-      .parameters=${parameters}
-      .values=${{ temperature: 0.7, max_tokens: 1024, top_p: 1, stream: true, format: 'text' }}
-    ></loquix-parameter-panel>
-  </div>`,
+  render: args =>
+    html` <div style="width:350px">
+      <loquix-parameter-panel
+        ?show-advanced=${args.showAdvanced}
+        .parameters=${parameters}
+        .values=${{ temperature: 0.7, max_tokens: 1024, top_p: 1, stream: true, format: 'text' }}
+      ></loquix-parameter-panel>
+    </div>`,
 };
 
 export const Compact: Story = {
   args: { compact: true },
-  render: args => html` <div style="width:300px">
-    <loquix-parameter-panel
-      ?compact=${args.compact}
-      .parameters=${parameters}
-      .values=${{ temperature: 0.7, max_tokens: 1024, stream: true, format: 'text' }}
-    ></loquix-parameter-panel>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px">
+      <loquix-parameter-panel
+        ?compact=${args.compact}
+        .parameters=${parameters}
+        .values=${{ temperature: 0.7, max_tokens: 1024, stream: true, format: 'text' }}
+      ></loquix-parameter-panel>
+    </div>`,
 };
 
 export const Disabled: Story = {
   args: { disabled: true },
-  render: args => html` <div style="width:350px">
-    <loquix-parameter-panel
-      ?disabled=${args.disabled}
-      .parameters=${parameters}
-      .values=${{ temperature: 0.7, max_tokens: 1024, stream: true, format: 'text' }}
-    ></loquix-parameter-panel>
-  </div>`,
+  render: args =>
+    html` <div style="width:350px">
+      <loquix-parameter-panel
+        ?disabled=${args.disabled}
+        .parameters=${parameters}
+        .values=${{ temperature: 0.7, max_tokens: 1024, stream: true, format: 'text' }}
+      ></loquix-parameter-panel>
+    </div>`,
 };

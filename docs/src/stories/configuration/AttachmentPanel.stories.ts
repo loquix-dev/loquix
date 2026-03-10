@@ -43,46 +43,51 @@ type Story = StoryObj;
 
 export const Empty: Story = {
   args: { maxFiles: 10 },
-  render: args => html` <div style="width:500px">
-    <loquix-attachment-panel
-      max-files=${args.maxFiles}
-      ?disabled=${args.disabled}
-    ></loquix-attachment-panel>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-attachment-panel
+        max-files=${args.maxFiles}
+        ?disabled=${args.disabled}
+      ></loquix-attachment-panel>
+    </div>`,
 };
 
 export const WithAttachments: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-attachment-panel .attachments=${sampleAttachments}></loquix-attachment-panel>
-  </div>`,
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-attachment-panel .attachments=${sampleAttachments}></loquix-attachment-panel>
+    </div>`,
 };
 
 export const ImagesOnly: Story = {
   args: { acceptedTypes: 'image/*', maxFiles: 5 },
-  render: args => html` <div style="width:500px">
-    <loquix-attachment-panel
-      accepted-types=${args.acceptedTypes}
-      max-files=${args.maxFiles}
-    ></loquix-attachment-panel>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-attachment-panel
+        accepted-types=${args.acceptedTypes}
+        max-files=${args.maxFiles}
+      ></loquix-attachment-panel>
+    </div>`,
 };
 
 export const SingleFile: Story = {
   args: { multiple: false, maxFiles: 1 },
-  render: args => html` <div style="width:500px">
-    <loquix-attachment-panel
-      ?multiple=${args.multiple}
-      max-files=${args.maxFiles}
-    ></loquix-attachment-panel>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-attachment-panel
+        ?multiple=${args.multiple}
+        max-files=${args.maxFiles}
+      ></loquix-attachment-panel>
+    </div>`,
 };
 
 export const Disabled: Story = {
   args: { disabled: true },
-  render: args => html` <div style="width:500px">
-    <loquix-attachment-panel
-      ?disabled=${args.disabled}
-      .attachments=${sampleAttachments}
-    ></loquix-attachment-panel>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-attachment-panel
+        ?disabled=${args.disabled}
+        .attachments=${sampleAttachments}
+      ></loquix-attachment-panel>
+    </div>`,
 };

@@ -68,47 +68,51 @@ type Story = StoryObj;
 
 export const Grid: Story = {
   args: { variant: 'grid', columns: 3, heading: 'Try these examples' },
-  render: args => html` <div style="width:700px">
-    <loquix-example-gallery
-      variant=${args.variant}
-      columns=${args.columns}
-      heading=${args.heading}
-      .items=${items}
-      .categories=${['Creative', 'Productivity', 'Health', 'Education']}
-    ></loquix-example-gallery>
-  </div>`,
+  render: args =>
+    html` <div style="width:700px">
+      <loquix-example-gallery
+        variant=${args.variant}
+        columns=${args.columns}
+        heading=${args.heading}
+        .items=${items}
+        .categories=${['Creative', 'Productivity', 'Health', 'Education']}
+      ></loquix-example-gallery>
+    </div>`,
 };
 
 export const List: Story = {
   args: { variant: 'list', heading: 'Examples' },
-  render: args => html` <div style="width:500px">
-    <loquix-example-gallery
-      variant=${args.variant}
-      heading=${args.heading}
-      .items=${items}
-    ></loquix-example-gallery>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-example-gallery
+        variant=${args.variant}
+        heading=${args.heading}
+        .items=${items}
+      ></loquix-example-gallery>
+    </div>`,
 };
 
 export const Carousel: Story = {
   args: { variant: 'carousel', heading: 'Featured Examples' },
-  render: args => html` <div style="width:600px">
-    <loquix-example-gallery
-      variant=${args.variant}
-      heading=${args.heading}
-      .items=${items}
-    ></loquix-example-gallery>
-  </div>`,
+  render: args =>
+    html` <div style="width:600px">
+      <loquix-example-gallery
+        variant=${args.variant}
+        heading=${args.heading}
+        .items=${items}
+      ></loquix-example-gallery>
+    </div>`,
 };
 
 export const TwoColumns: Story = {
   args: { variant: 'grid', columns: 2, heading: 'Examples' },
-  render: args => html` <div style="width:500px">
-    <loquix-example-gallery
-      variant=${args.variant}
-      columns=${args.columns}
-      heading=${args.heading}
-      .items=${items.slice(0, 4)}
-    ></loquix-example-gallery>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-example-gallery
+        variant=${args.variant}
+        columns=${args.columns}
+        heading=${args.heading}
+        .items=${items.slice(0, 4)}
+      ></loquix-example-gallery>
+    </div>`,
 };

@@ -22,7 +22,8 @@ const styles = css`
     background: var(--loquix-action-bg, transparent);
     color: var(--loquix-action-color, var(--loquix-text-secondary-color, #6b7280));
     cursor: pointer;
-    transition: background var(--loquix-transition-duration, 200ms)
+    transition:
+      background var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
       color var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));

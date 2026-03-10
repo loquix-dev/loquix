@@ -34,68 +34,74 @@ type Story = StoryObj;
 
 export const Default: Story = {
   args: { placeholder: 'Select an option...' },
-  render: args => html` <div style="width:300px;padding-top:200px">
-    <loquix-dropdown-select
-      placeholder=${args.placeholder}
-      ?disabled=${args.disabled}
-      .options=${simpleOptions}
-    ></loquix-dropdown-select>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px;padding-top:200px">
+      <loquix-dropdown-select
+        placeholder=${args.placeholder}
+        ?disabled=${args.disabled}
+        .options=${simpleOptions}
+      ></loquix-dropdown-select>
+    </div>`,
 };
 
 export const WithValue: Story = {
   args: { value: 'opt2', placeholder: 'Select...' },
-  render: args => html` <div style="width:300px;padding-top:200px">
-    <loquix-dropdown-select
-      value=${args.value}
-      placeholder=${args.placeholder}
-      .options=${simpleOptions}
-    ></loquix-dropdown-select>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px;padding-top:200px">
+      <loquix-dropdown-select
+        value=${args.value}
+        placeholder=${args.placeholder}
+        .options=${simpleOptions}
+      ></loquix-dropdown-select>
+    </div>`,
 };
 
 export const Searchable: Story = {
   args: { searchable: true, placeholder: 'Search options...' },
-  render: args => html` <div style="width:300px;padding-top:200px">
-    <loquix-dropdown-select
-      ?searchable=${args.searchable}
-      placeholder=${args.placeholder}
-      .options=${simpleOptions}
-    ></loquix-dropdown-select>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px;padding-top:200px">
+      <loquix-dropdown-select
+        ?searchable=${args.searchable}
+        placeholder=${args.placeholder}
+        .options=${simpleOptions}
+      ></loquix-dropdown-select>
+    </div>`,
 };
 
 export const Grouped: Story = {
   args: { placeholder: 'Choose a model...' },
-  render: args => html` <div style="width:300px;padding-top:300px">
-    <loquix-dropdown-select
-      placeholder=${args.placeholder}
-      searchable
-      .options=${groupedOptions}
-    ></loquix-dropdown-select>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px;padding-top:300px">
+      <loquix-dropdown-select
+        placeholder=${args.placeholder}
+        searchable
+        .options=${groupedOptions}
+      ></loquix-dropdown-select>
+    </div>`,
 };
 
 export const Disabled: Story = {
   args: { disabled: true, placeholder: 'Disabled' },
-  render: args => html` <div style="width:300px">
-    <loquix-dropdown-select
-      ?disabled=${args.disabled}
-      placeholder=${args.placeholder}
-      .options=${simpleOptions}
-    ></loquix-dropdown-select>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px">
+      <loquix-dropdown-select
+        ?disabled=${args.disabled}
+        placeholder=${args.placeholder}
+        .options=${simpleOptions}
+      ></loquix-dropdown-select>
+    </div>`,
 };
 
 export const WithActions: Story = {
-  render: () => html` <div style="width:300px;padding-top:250px">
-    <loquix-dropdown-select
-      placeholder="Select..."
-      .options=${[
-        ...simpleOptions,
-        { value: '', label: '', type: 'separator' },
-        { value: 'add-new', label: 'Add new option', type: 'action', icon: '+' },
-      ]}
-    ></loquix-dropdown-select>
-  </div>`,
+  render: () =>
+    html` <div style="width:300px;padding-top:250px">
+      <loquix-dropdown-select
+        placeholder="Select..."
+        .options=${[
+          ...simpleOptions,
+          { value: '', label: '', type: 'separator' },
+          { value: 'add-new', label: 'Add new option', type: 'action', icon: '+' },
+        ]}
+      ></loquix-dropdown-select>
+    </div>`,
 };

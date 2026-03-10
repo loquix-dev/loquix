@@ -10,7 +10,8 @@ const styles = css`
     pointer-events: none;
     opacity: 0;
     transform: translateY(8px);
-    transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      opacity 200ms cubic-bezier(0.4, 0, 0.2, 1),
       transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -33,7 +34,8 @@ const styles = css`
     color: var(--loquix-scroll-anchor-color, var(--loquix-text-secondary-color, #6b7280));
     cursor: pointer;
     box-shadow: var(--loquix-scroll-anchor-shadow, 0 2px 8px rgba(0, 0, 0, 0.1));
-    transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      background 200ms cubic-bezier(0.4, 0, 0.2, 1),
       color 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 

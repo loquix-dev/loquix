@@ -47,10 +47,10 @@ export class LoquixTypingIndicator extends LitElement {
     const showDots = this.variant === 'dots';
     const displayMessage =
       this.variant === 'text'
-        ? this.message ?? this._localize.term('typingIndicator.thinkingMessage')
+        ? (this.message ?? this._localize.term('typingIndicator.thinkingMessage'))
         : this.variant === 'steps'
-        ? this.message ?? this._localize.term('typingIndicator.workingMessage')
-        : nothing;
+          ? (this.message ?? this._localize.term('typingIndicator.workingMessage'))
+          : nothing;
 
     return html`
       <div

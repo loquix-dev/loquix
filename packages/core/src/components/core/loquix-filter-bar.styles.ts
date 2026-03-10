@@ -52,7 +52,10 @@ const styles = css`
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease;
     line-height: 1.4;
   }
 

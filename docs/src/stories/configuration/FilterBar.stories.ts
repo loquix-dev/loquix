@@ -25,35 +25,39 @@ export default meta;
 type Story = StoryObj;
 
 export const Default: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-filter-bar .filters=${filters}></loquix-filter-bar>
-  </div>`,
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-filter-bar .filters=${filters}></loquix-filter-bar>
+    </div>`,
 };
 
 export const WithValues: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-filter-bar .filters=${filters} .values=${['code', 'recent']}></loquix-filter-bar>
-  </div>`,
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-filter-bar .filters=${filters} .values=${['code', 'recent']}></loquix-filter-bar>
+    </div>`,
 };
 
 export const WithNegativePrompt: Story = {
   args: { showNegativePrompt: true, negativePrompt: '' },
-  render: args => html` <div style="width:500px">
-    <loquix-filter-bar
-      ?show-negative-prompt=${args.showNegativePrompt}
-      negative-prompt=${args.negativePrompt}
-      .filters=${filters}
-    ></loquix-filter-bar>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-filter-bar
+        ?show-negative-prompt=${args.showNegativePrompt}
+        negative-prompt=${args.negativePrompt}
+        .filters=${filters}
+      ></loquix-filter-bar>
+    </div>`,
 };
 
 export const Disabled: Story = {
   args: { disabled: true },
-  render: args => html` <div style="width:500px">
-    <loquix-filter-bar
-      ?disabled=${args.disabled}
-      .filters=${filters}
-      .values=${['code']}
-    ></loquix-filter-bar>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-filter-bar
+        ?disabled=${args.disabled}
+        .filters=${filters}
+        .values=${['code']}
+      ></loquix-filter-bar>
+    </div>`,
 };

@@ -30,7 +30,8 @@ const styles = css`
     font-family: var(--loquix-font-family, sans-serif);
     font-size: var(--loquix-gen-button-font-size, 0.8125rem);
     cursor: pointer;
-    transition: background var(--loquix-transition-duration, 200ms)
+    transition:
+      background var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)),
       border-color var(--loquix-transition-duration, 200ms)
         var(--loquix-transition-easing, cubic-bezier(0.4, 0, 0.2, 1));

@@ -64,63 +64,69 @@ type Story = StoryObj;
 
 export const Default: Story = {
   args: { placeholder: 'Select model...', value: '' },
-  render: args => html` <div style="width:300px;padding-top:300px">
-    <loquix-model-selector
-      placeholder=${args.placeholder}
-      value=${args.value}
-      .models=${models}
-    ></loquix-model-selector>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px;padding-top:300px">
+      <loquix-model-selector
+        placeholder=${args.placeholder}
+        value=${args.value}
+        .models=${models}
+      ></loquix-model-selector>
+    </div>`,
 };
 
 export const WithValue: Story = {
   args: { value: 'claude-3.5-sonnet' },
-  render: args => html` <div style="width:300px;padding-top:300px">
-    <loquix-model-selector value=${args.value} .models=${models}></loquix-model-selector>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px;padding-top:300px">
+      <loquix-model-selector value=${args.value} .models=${models}></loquix-model-selector>
+    </div>`,
 };
 
 export const ShowCost: Story = {
   args: { value: 'claude-3.5-sonnet', showCost: true },
-  render: args => html` <div style="width:300px;padding-top:350px">
-    <loquix-model-selector
-      value=${args.value}
-      ?show-cost=${args.showCost}
-      .models=${models}
-    ></loquix-model-selector>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px;padding-top:350px">
+      <loquix-model-selector
+        value=${args.value}
+        ?show-cost=${args.showCost}
+        .models=${models}
+      ></loquix-model-selector>
+    </div>`,
 };
 
 export const ShowCapabilities: Story = {
   args: { value: 'claude-3.5-sonnet', showCapabilities: true },
-  render: args => html` <div style="width:350px;padding-top:350px">
-    <loquix-model-selector
-      value=${args.value}
-      ?show-capabilities=${args.showCapabilities}
-      .models=${models}
-    ></loquix-model-selector>
-  </div>`,
+  render: args =>
+    html` <div style="width:350px;padding-top:350px">
+      <loquix-model-selector
+        value=${args.value}
+        ?show-capabilities=${args.showCapabilities}
+        .models=${models}
+      ></loquix-model-selector>
+    </div>`,
 };
 
 export const Grouped: Story = {
   args: { grouped: true, searchable: true, showCost: true },
-  render: args => html` <div style="width:350px;padding-top:400px">
-    <loquix-model-selector
-      ?grouped=${args.grouped}
-      ?searchable=${args.searchable}
-      ?show-cost=${args.showCost}
-      .models=${models}
-    ></loquix-model-selector>
-  </div>`,
+  render: args =>
+    html` <div style="width:350px;padding-top:400px">
+      <loquix-model-selector
+        ?grouped=${args.grouped}
+        ?searchable=${args.searchable}
+        ?show-cost=${args.showCost}
+        .models=${models}
+      ></loquix-model-selector>
+    </div>`,
 };
 
 export const Disabled: Story = {
   args: { value: 'gpt-4o', disabled: true },
-  render: args => html` <div style="width:300px">
-    <loquix-model-selector
-      value=${args.value}
-      ?disabled=${args.disabled}
-      .models=${models}
-    ></loquix-model-selector>
-  </div>`,
+  render: args =>
+    html` <div style="width:300px">
+      <loquix-model-selector
+        value=${args.value}
+        ?disabled=${args.disabled}
+        .models=${models}
+      ></loquix-model-selector>
+    </div>`,
 };

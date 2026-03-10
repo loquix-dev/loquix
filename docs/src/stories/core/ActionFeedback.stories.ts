@@ -42,8 +42,9 @@ export const ActivePositive: Story = {
 };
 
 export const Pair: Story = {
-  render: () => html` <div style="display:flex;gap:4px">
-    <loquix-action-feedback sentiment="positive"></loquix-action-feedback>
-    <loquix-action-feedback sentiment="negative"></loquix-action-feedback>
-  </div>`,
+  render: () =>
+    html` <div style="display:flex;gap:4px">
+      <loquix-action-feedback sentiment="positive"></loquix-action-feedback>
+      <loquix-action-feedback sentiment="negative"></loquix-action-feedback>
+    </div>`,
 };

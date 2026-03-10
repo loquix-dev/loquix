@@ -101,217 +101,231 @@ type Story = StoryObj;
 /** Default — mixed file types at medium size. */
 export const Default: Story = {
   args: { size: 'md', removable: false, maxVisible: 0 },
-  render: args => html` <div style="width:500px">
-    <loquix-message-attachments
-      size=${args.size}
-      ?removable=${args.removable}
-      max-visible=${args.maxVisible}
-      .attachments=${mixedAttachments}
-    ></loquix-message-attachments>
-  </div>`,
+  render: args =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size=${args.size}
+        ?removable=${args.removable}
+        max-visible=${args.maxVisible}
+        .attachments=${mixedAttachments}
+      ></loquix-message-attachments>
+    </div>`,
 };
 
 /** Image gallery — cards with image previews. */
 export const ImageGallery: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="lg"
-      .attachments=${imageAttachments}
-    ></loquix-message-attachments>
-  </div>`,
-};
-
-/** Small size — compact thumbnails, no filename. Tooltip on hover shows full name. */
-export const SizeSmall: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="sm"
-      .attachments=${mixedAttachments}
-    ></loquix-message-attachments>
-  </div>`,
-};
-
-/** Medium size — thumbnail + truncated filename. */
-export const SizeMedium: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="md"
-      .attachments=${mixedAttachments}
-    ></loquix-message-attachments>
-  </div>`,
-};
-
-/** Large size — thumbnail + filename + file size. */
-export const SizeLarge: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="lg"
-      .attachments=${mixedAttachments}
-    ></loquix-message-attachments>
-  </div>`,
-};
-
-/** Removable — shows "x" button on each card. Useful for edit mode. */
-export const Removable: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="md"
-      removable
-      .attachments=${mixedAttachments}
-      @loquix-attachment-remove=${(e: CustomEvent) => {
-        console.log('Remove:', e.detail.attachment.filename);
-      }}
-    ></loquix-message-attachments>
-  </div>`,
-};
-
-/** Overflow — only first 4 visible, "+N more" button expands the rest. */
-export const WithOverflow: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="md"
-      max-visible="4"
-      .attachments=${manyAttachments}
-    ></loquix-message-attachments>
-  </div>`,
-};
-
-/** Inside a message — typical usage within loquix-message-item. */
-export const InsideMessage: Story = {
-  render: () => html` <div style="width:600px">
-    <loquix-message-item
-      sender="assistant"
-      status="complete"
-      model="Claude 3.5"
-      timestamp="3:42 PM"
-    >
-      <p>Here are the files you requested.</p>
-      <loquix-message-attachments
-        size="md"
-        .attachments=${mixedAttachments}
-      ></loquix-message-attachments>
-    </loquix-message-item>
-  </div>`,
-};
-
-/** User message with image attachments. */
-export const UserMessageWithImages: Story = {
-  render: () => html` <div style="width:600px">
-    <loquix-message-item sender="user" status="complete">
-      <p>Take a look at these designs.</p>
+  render: () =>
+    html` <div style="width:500px">
       <loquix-message-attachments
         size="lg"
         .attachments=${imageAttachments}
       ></loquix-message-attachments>
-    </loquix-message-item>
-  </div>`,
+    </div>`,
+};
+
+/** Small size — compact thumbnails, no filename. Tooltip on hover shows full name. */
+export const SizeSmall: Story = {
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size="sm"
+        .attachments=${mixedAttachments}
+      ></loquix-message-attachments>
+    </div>`,
+};
+
+/** Medium size — thumbnail + truncated filename. */
+export const SizeMedium: Story = {
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size="md"
+        .attachments=${mixedAttachments}
+      ></loquix-message-attachments>
+    </div>`,
+};
+
+/** Large size — thumbnail + filename + file size. */
+export const SizeLarge: Story = {
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size="lg"
+        .attachments=${mixedAttachments}
+      ></loquix-message-attachments>
+    </div>`,
+};
+
+/** Removable — shows "x" button on each card. Useful for edit mode. */
+export const Removable: Story = {
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size="md"
+        removable
+        .attachments=${mixedAttachments}
+        @loquix-attachment-remove=${(e: CustomEvent) => {
+          console.log('Remove:', e.detail.attachment.filename);
+        }}
+      ></loquix-message-attachments>
+    </div>`,
+};
+
+/** Overflow — only first 4 visible, "+N more" button expands the rest. */
+export const WithOverflow: Story = {
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size="md"
+        max-visible="4"
+        .attachments=${manyAttachments}
+      ></loquix-message-attachments>
+    </div>`,
+};
+
+/** Inside a message — typical usage within loquix-message-item. */
+export const InsideMessage: Story = {
+  render: () =>
+    html` <div style="width:600px">
+      <loquix-message-item
+        sender="assistant"
+        status="complete"
+        model="Claude 3.5"
+        timestamp="3:42 PM"
+      >
+        <p>Here are the files you requested.</p>
+        <loquix-message-attachments
+          size="md"
+          .attachments=${mixedAttachments}
+        ></loquix-message-attachments>
+      </loquix-message-item>
+    </div>`,
+};
+
+/** User message with image attachments. */
+export const UserMessageWithImages: Story = {
+  render: () =>
+    html` <div style="width:600px">
+      <loquix-message-item sender="user" status="complete">
+        <p>Take a look at these designs.</p>
+        <loquix-message-attachments
+          size="lg"
+          .attachments=${imageAttachments}
+        ></loquix-message-attachments>
+      </loquix-message-item>
+    </div>`,
 };
 
 /** Single file — a common case with just one attachment. */
 export const SingleFile: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="md"
-      .attachments=${[mixedAttachments[0]]}
-    ></loquix-message-attachments>
-  </div>`,
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size="md"
+        .attachments=${[mixedAttachments[0]]}
+      ></loquix-message-attachments>
+    </div>`,
 };
 
 /** Vertical (portrait) image previews — demonstrates object-fit: cover cropping. */
 export const VerticalImages: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="lg"
-      .attachments=${[
-        {
-          id: 'v-1',
-          filename: 'portrait-photo.jpg',
-          filetype: 'image/jpeg',
-          size: 3100000,
-          status: 'complete',
-          url: 'https://picsum.photos/seed/portrait1/300/500',
-        },
-        {
-          id: 'v-2',
-          filename: 'mobile-screenshot.png',
-          filetype: 'image/png',
-          size: 2200000,
-          status: 'complete',
-          url: 'https://picsum.photos/seed/portrait2/300/500',
-        },
-        {
-          id: 'v-3',
-          filename: 'story-frame.webp',
-          filetype: 'image/webp',
-          size: 1400000,
-          status: 'complete',
-          url: 'https://picsum.photos/seed/portrait3/300/500',
-        },
-      ] as Attachment[]}
-    ></loquix-message-attachments>
-  </div>`,
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size="lg"
+        .attachments=${[
+          {
+            id: 'v-1',
+            filename: 'portrait-photo.jpg',
+            filetype: 'image/jpeg',
+            size: 3100000,
+            status: 'complete',
+            url: 'https://picsum.photos/seed/portrait1/300/500',
+          },
+          {
+            id: 'v-2',
+            filename: 'mobile-screenshot.png',
+            filetype: 'image/png',
+            size: 2200000,
+            status: 'complete',
+            url: 'https://picsum.photos/seed/portrait2/300/500',
+          },
+          {
+            id: 'v-3',
+            filename: 'story-frame.webp',
+            filetype: 'image/webp',
+            size: 1400000,
+            status: 'complete',
+            url: 'https://picsum.photos/seed/portrait3/300/500',
+          },
+        ] as Attachment[]}
+      ></loquix-message-attachments>
+    </div>`,
 };
 
 /** Horizontal (landscape) image previews — wide images cropped to square thumbnails. */
 export const HorizontalImages: Story = {
-  render: () => html` <div style="width:500px">
-    <loquix-message-attachments
-      size="lg"
-      .attachments=${[
-        {
-          id: 'h-1',
-          filename: 'panorama-view.jpg',
-          filetype: 'image/jpeg',
-          size: 4200000,
-          status: 'complete',
-          url: 'https://picsum.photos/seed/pano1/800/400',
-        },
-        {
-          id: 'h-2',
-          filename: 'banner-wide.png',
-          filetype: 'image/png',
-          size: 2800000,
-          status: 'complete',
-          url: 'https://picsum.photos/seed/pano2/800/400',
-        },
-        {
-          id: 'h-3',
-          filename: 'landscape-shot.webp',
-          filetype: 'image/webp',
-          size: 1900000,
-          status: 'complete',
-          url: 'https://picsum.photos/seed/pano3/800/400',
-        },
-      ] as Attachment[]}
-    ></loquix-message-attachments>
-  </div>`,
+  render: () =>
+    html` <div style="width:500px">
+      <loquix-message-attachments
+        size="lg"
+        .attachments=${[
+          {
+            id: 'h-1',
+            filename: 'panorama-view.jpg',
+            filetype: 'image/jpeg',
+            size: 4200000,
+            status: 'complete',
+            url: 'https://picsum.photos/seed/pano1/800/400',
+          },
+          {
+            id: 'h-2',
+            filename: 'banner-wide.png',
+            filetype: 'image/png',
+            size: 2800000,
+            status: 'complete',
+            url: 'https://picsum.photos/seed/pano2/800/400',
+          },
+          {
+            id: 'h-3',
+            filename: 'landscape-shot.webp',
+            filetype: 'image/webp',
+            size: 1900000,
+            status: 'complete',
+            url: 'https://picsum.photos/seed/pano3/800/400',
+          },
+        ] as Attachment[]}
+      ></loquix-message-attachments>
+    </div>`,
 };
 
 /** Extra-small size — horizontal inline cards with icon + filename + size. */
 export const SizeExtraSmall: Story = {
-  render: () => html` <div style="width:400px">
-    <loquix-message-attachments
-      size="xs"
-      .attachments=${mixedAttachments}
-    ></loquix-message-attachments>
-  </div>`,
+  render: () =>
+    html` <div style="width:400px">
+      <loquix-message-attachments
+        size="xs"
+        .attachments=${mixedAttachments}
+      ></loquix-message-attachments>
+    </div>`,
 };
 
 /** Below-bubble slot — attachments rendered outside the message bubble. */
 export const BelowBubble: Story = {
-  render: () => html` <div style="width:600px">
-    <loquix-message-item
-      sender="assistant"
-      status="complete"
-      model="Claude 3.5"
-      timestamp="4:10 PM"
-    >
-      <p>Here are the files you requested.</p>
-      <loquix-message-attachments
-        slot="below-bubble"
-        size="xs"
-        .attachments=${mixedAttachments}
-      ></loquix-message-attachments>
-    </loquix-message-item>
-  </div>`,
+  render: () =>
+    html` <div style="width:600px">
+      <loquix-message-item
+        sender="assistant"
+        status="complete"
+        model="Claude 3.5"
+        timestamp="4:10 PM"
+      >
+        <p>Here are the files you requested.</p>
+        <loquix-message-attachments
+          slot="below-bubble"
+          size="xs"
+          .attachments=${mixedAttachments}
+        ></loquix-message-attachments>
+      </loquix-message-item>
+    </div>`,
 };

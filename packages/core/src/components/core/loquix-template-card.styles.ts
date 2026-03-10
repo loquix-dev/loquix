@@ -17,7 +17,10 @@ export default css`
     border-radius: var(--loquix-template-card-border-radius, 12px);
     background: var(--loquix-template-card-bg, #fff);
     cursor: pointer;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      background 0.15s ease;
     text-align: left;
     width: 100%;
     font-family: inherit;
