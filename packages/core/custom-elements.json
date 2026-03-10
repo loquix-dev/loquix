@@ -3804,7 +3804,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accepted file types (comma-separated MIME types, wildcards, or extensions). Use `*` or `*​/*` to allow all.",
+              "description": "Accepted file types (comma-separated MIME types, wildcards, or extensions). Use '*' or a wildcard MIME to allow all.",
               "attribute": "accept"
             },
             {
@@ -3998,7 +3998,7 @@
                 "text": "string"
               },
               "default": "''",
-              "description": "Accepted file types (comma-separated MIME types, wildcards, or extensions). Use `*` or `*​/*` to allow all.",
+              "description": "Accepted file types (comma-separated MIME types, wildcards, or extensions). Use '*' or a wildcard MIME to allow all.",
               "fieldName": "accept"
             },
             {
@@ -8198,7 +8198,7 @@
                   }
                 },
                 {
-                  "name": "globalIdx",
+                  "name": "_globalIdx",
                   "type": {
                     "text": "number"
                   }
