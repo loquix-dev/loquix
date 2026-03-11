@@ -3,6 +3,9 @@
   "version": "0.1.2",
   "description": "Web Components for AI/LLM chat interfaces",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
