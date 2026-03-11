@@ -501,4 +501,403 @@ describe('loquix-dropdown-select', () => {
     await el.updateComplete;
     expect(el.open).to.be.false;
   });
+
+  // === Submenu interaction tests ===
+
+  it('clicking option with children opens submenu instead of selecting', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${withChildren}></loquix-dropdown-select>`,
+    );
+    el.show();
+    await el.updateComplete;
+
+    const options = getShadowParts(el, 'option');
+    // Click parent option (has children) — should toggle submenu, not select
+    options[0].click();
+    await el.updateComplete;
+
+    // Dropdown should still be open (submenu toggled, not closed)
+    expect(el.open).to.be.true;
+    // Value should not change
+    expect(el.value).to.equal('');
+
+    // Submenu should render
+    const submenu = el.shadowRoot!.querySelector('.submenu');
+    expect(submenu).to.exist;
+  });
+
+  it('clicking parent option again closes submenu', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${withChildren}></loquix-dropdown-select>`,
+    );
+    el.show();
+    await el.updateComplete;
+
+    const options = getShadowParts(el, 'option');
+    // Open submenu
+    options[0].click();
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector('.submenu')).to.exist;
+
+    // Click again to close submenu
+    options[0].click();
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector('.submenu')).to.not.exist;
+  });
+
+  it('selecting a submenu child fires event and closes dropdown', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${withChildren}></loquix-dropdown-select>`,
+    );
+    el.show();
+    await el.updateComplete;
+
+    // Open submenu
+    const options = getShadowParts(el, 'option');
+    options[0].click();
+    await el.updateComplete;
+
+    // Click a child in the submenu
+    const submenuOptions = el.shadowRoot!.querySelectorAll('.submenu .option');
+    expect(submenuOptions.length).to.be.greaterThan(0);
+
+    const eventPromise = waitForEvent(el, 'loquix-select-change');
+    (submenuOptions[0] as HTMLElement).click();
+    const event = await eventPromise;
+    expect(event.detail.value).to.equal('child-1');
+    expect(el.value).to.equal('child-1');
+    expect(el.open).to.be.false;
+  });
+
+  it('selecting a disabled submenu child does not fire event', async () => {
+    const optsWithDisabledChild: SelectOption[] = [
+      {
+        value: 'parent',
+        label: 'Parent',
+        children: [{ value: 'child-disabled', label: 'Disabled Child', disabled: true }],
+      },
+    ];
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${optsWithDisabledChild}></loquix-dropdown-select>`,
+    );
+    el.show();
+    await el.updateComplete;
+
+    // Open submenu
+    getShadowParts(el, 'option')[0].click();
+    await el.updateComplete;
+
+    let fired = false;
+    el.addEventListener('loquix-select-change', () => {
+      fired = true;
+    });
+
+    const submenuOptions = el.shadowRoot!.querySelectorAll('.submenu .option');
+    (submenuOptions[0] as HTMLElement).click();
+    await new Promise(r => setTimeout(r, 50));
+    expect(fired).to.be.false;
+  });
+
+  it('action-type submenu child fires event but does not set value', async () => {
+    const optsWithAction: SelectOption[] = [
+      {
+        value: 'parent',
+        label: 'Parent',
+        children: [{ value: 'sub-action', label: 'Sub Action', type: 'action' }],
+      },
+    ];
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${optsWithAction}></loquix-dropdown-select>`,
+    );
+    el.show();
+    await el.updateComplete;
+
+    // Open submenu
+    getShadowParts(el, 'option')[0].click();
+    await el.updateComplete;
+
+    const eventPromise = waitForEvent(el, 'loquix-select-change');
+    const submenuOptions = el.shadowRoot!.querySelectorAll('.submenu .option');
+    (submenuOptions[0] as HTMLElement).click();
+    const event = await eventPromise;
+    expect(event.detail.value).to.equal('sub-action');
+    expect(el.value).to.equal(''); // action type doesn't set value
+  });
+
+  // === Hover hint tests ===
+
+  it('hovering option with hint shows hint text', async () => {
+    const optsWithHint: SelectOption[] = [
+      { value: 'a', label: 'Option A', hint: 'Helpful hint text' },
+    ];
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${optsWithHint} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+
+    const option = getShadowParts(el, 'option')[0];
+    option.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    await el.updateComplete;
+
+    const hint = el.shadowRoot!.querySelector('.hint');
+    expect(hint).to.exist;
+    expect(hint!.textContent).to.contain('Helpful hint text');
+  });
+
+  it('mouse leave clears hint', async () => {
+    const optsWithHint: SelectOption[] = [{ value: 'a', label: 'Option A', hint: 'Some hint' }];
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${optsWithHint} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+
+    const option = getShadowParts(el, 'option')[0];
+    option.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector('.hint')).to.exist;
+
+    option.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector('.hint')).to.not.exist;
+  });
+
+  // === Hover submenu open/close ===
+
+  it('hovering option with children opens submenu', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${withChildren} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+
+    const options = getShadowParts(el, 'option');
+    options[0].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    await el.updateComplete;
+
+    const submenu = el.shadowRoot!.querySelector('.submenu');
+    expect(submenu).to.exist;
+  });
+
+  it('hovering a non-child option schedules submenu close', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${withChildren} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+
+    // Hover parent to open submenu
+    const options = getShadowParts(el, 'option');
+    options[0].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector('.submenu')).to.exist;
+
+    // Hover solo option (no children) — schedules close
+    options[1].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    // Wait for 150ms timeout
+    await new Promise(r => setTimeout(r, 200));
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector('.submenu')).to.not.exist;
+  });
+
+  it('entering submenu panel cancels close timeout', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${withChildren} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+
+    // Open submenu via hover
+    const options = getShadowParts(el, 'option');
+    options[0].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    await el.updateComplete;
+
+    const submenu = el.shadowRoot!.querySelector('.submenu')!;
+    expect(submenu).to.exist;
+
+    // Leave the option (schedules close)
+    options[0].dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+
+    // Enter the submenu (cancels close)
+    submenu.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+
+    // Wait for timeout that would have closed it
+    await new Promise(r => setTimeout(r, 200));
+    await el.updateComplete;
+
+    // Submenu should still be open
+    expect(el.shadowRoot!.querySelector('.submenu')).to.exist;
+  });
+
+  it('leaving submenu panel closes it after delay', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${withChildren} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+
+    // Open submenu via hover
+    const options = getShadowParts(el, 'option');
+    options[0].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    await el.updateComplete;
+
+    const submenu = el.shadowRoot!.querySelector('.submenu')!;
+    expect(submenu).to.exist;
+
+    // Leave submenu
+    submenu.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+
+    // Wait for 150ms close timeout
+    await new Promise(r => setTimeout(r, 200));
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector('.submenu')).to.not.exist;
+  });
+
+  // === External option icon ===
+
+  it('renders external icon for options with external=true', async () => {
+    const optsExternal: SelectOption[] = [
+      { value: 'link', label: 'External Link', external: true },
+    ];
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${optsExternal} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+    const option = getShadowParts(el, 'option')[0];
+    const externalSvg = option.querySelector('.option__external');
+    expect(externalSvg).to.exist;
+  });
+
+  // === Separator type filtering ===
+
+  it('separator type options are skipped in keyboard nav', async () => {
+    const optsWithSep: SelectOption[] = [
+      { value: 'first', label: 'First' },
+      { value: 'sep', label: '', type: 'separator' },
+      { value: 'third', label: 'Third' },
+    ];
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${optsWithSep}></loquix-dropdown-select>`,
+    );
+    el.show();
+    await el.updateComplete;
+
+    // ArrowDown twice should skip separator
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    await el.updateComplete;
+
+    const eventPromise = waitForEvent(el, 'loquix-select-change');
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    const event = await eventPromise;
+    expect(event.detail.value).to.equal('third');
+  });
+
+  // === hasSubmenu flag rendering ===
+
+  it('option with hasSubmenu flag shows submenu arrow', async () => {
+    const optsHasSubmenu: SelectOption[] = [
+      { value: 'sub', label: 'Has Submenu', hasSubmenu: true },
+    ];
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${optsHasSubmenu} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+    const option = getShadowParts(el, 'option')[0];
+    const arrow = option.querySelector('.option__arrow');
+    expect(arrow).to.exist;
+    expect(option.hasAttribute('aria-expanded')).to.be.true;
+  });
+
+  // === Submenu child option icon and description ===
+
+  it('submenu child options render icon and description', async () => {
+    const optsRich: SelectOption[] = [
+      {
+        value: 'parent',
+        label: 'Parent',
+        children: [{ value: 'child', label: 'Child', icon: '🎯', description: 'Child desc' }],
+      },
+    ];
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${optsRich}></loquix-dropdown-select>`,
+    );
+    el.show();
+    await el.updateComplete;
+
+    // Open submenu
+    getShadowParts(el, 'option')[0].click();
+    await el.updateComplete;
+
+    const submenuOpts = el.shadowRoot!.querySelectorAll('.submenu .option');
+    expect(submenuOpts[0].textContent).to.contain('🎯');
+    expect(submenuOpts[0].textContent).to.contain('Child');
+    expect(submenuOpts[0].textContent).to.contain('Child desc');
+  });
+
+  // === Submenu child active state ===
+
+  it('submenu child shows active state when value matches', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select
+        .options=${withChildren}
+        value="child-1"
+      ></loquix-dropdown-select>`,
+    );
+    el.show();
+    await el.updateComplete;
+
+    // Open submenu
+    getShadowParts(el, 'option')[0].click();
+    await el.updateComplete;
+
+    const submenuOpts = el.shadowRoot!.querySelectorAll('.submenu .option');
+    expect(submenuOpts[0].classList.contains('option--active')).to.be.true;
+    expect(submenuOpts[1].classList.contains('option--active')).to.be.false;
+  });
+
+  // === Search custom placeholder ===
+
+  it('uses custom search placeholder when provided', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select
+        .options=${mockOptions}
+        searchable
+        search-placeholder="Find..."
+        open
+      ></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+    const input = el.shadowRoot!.querySelector('.search__input') as HTMLInputElement;
+    expect(input.placeholder).to.equal('Find...');
+  });
+
+  // === Selected option icon in trigger ===
+
+  it('shows selected option icon in trigger', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${mockOptions} value="beta"></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+    const trigger = getShadowPart(el, 'trigger')!;
+    const icon = trigger.querySelector('.trigger__icon');
+    expect(icon).to.exist;
+    expect(icon!.textContent).to.contain('🅱️');
+  });
+
+  // === Cleanup on disconnect ===
+
+  it('cleans up submenu timeout on disconnectedCallback', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${withChildren} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+
+    // Open submenu
+    const options = getShadowParts(el, 'option');
+    options[0].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    await el.updateComplete;
+
+    // Trigger a scheduled close
+    options[0].dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+
+    // Disconnect should clean up without errors
+    el.parentElement!.removeChild(el);
+    // No errors thrown — cleanup successful
+  });
 });

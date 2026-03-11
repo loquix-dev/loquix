@@ -63,6 +63,7 @@
   /* === Message Bubbles === */
   --loquix-user-bubble-bg: var(--loquix-user-color-subtle);
   --loquix-user-bubble-text: var(--loquix-text-color);
+  --loquix-message-user-bg: #f8fafc;
   --loquix-ai-bubble-bg: var(--loquix-surface-secondary-bg);
   --loquix-ai-bubble-text: var(--loquix-text-color);
 

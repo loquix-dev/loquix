@@ -84,7 +84,7 @@ const styles = css`
   }
 
   :host([sender='user']) .bubble {
-    background: var(--loquix-message-user-bg, var(--loquix-surface-color, #f8fafc));
+    background: var(--loquix-message-user-bg, #f8fafc);
   }
 
   /* Editing state — expand bubble to fill bubble-group width for comfortable editing */
@@ -146,11 +146,7 @@ const styles = css`
     right: 0;
     height: 48px;
     pointer-events: none;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      var(--loquix-message-user-bg, var(--loquix-surface-color, #f8fafc))
-    );
+    background: linear-gradient(to bottom, transparent, var(--loquix-message-user-bg, #f8fafc));
   }
 
   .show-more {
@@ -160,10 +156,7 @@ const styles = css`
     margin-top: 4px;
     padding: 0;
     border: none;
-    background-color: var(
-      --loquix-message-show-more-bg,
-      var(--loquix-message-user-bg, var(--loquix-surface-color, #f8fafc))
-    );
+    background-color: var(--loquix-message-show-more-bg, var(--loquix-message-user-bg, #f8fafc));
     color: var(--loquix-message-show-more-color, var(--loquix-ai-color, #7c3aed));
     font-size: 0.8125rem;
     font-family: inherit;

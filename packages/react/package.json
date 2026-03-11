@@ -1,8 +1,11 @@
 {
   "name": "@loquix/react",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "React wrappers for @loquix/core Web Components",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

@@ -1,5 +1,5 @@
-import { LitElement, html, nothing, svg } from 'lit';
-import { property, state, query } from 'lit/decorators.js';
+import { LitElement, html, nothing, svg, type PropertyValues } from 'lit';
+import { property, query } from 'lit/decorators.js';
 import type { Attachment } from '../../types/index.js';
 import { createLoquixEvent } from '../../events/index.js';
 import type {
@@ -11,12 +11,12 @@ import styles from './loquix-attachment-panel.styles.js';
 
 /**
  * @tag loquix-attachment-panel
- * @summary Container for managing file attachments with drag & drop, file picker, and attachment chips.
+ * @summary Container for managing file attachments with file picker and attachment chips.
+ * Drag-and-drop is handled by the parent `loquix-chat-composer` via `loquix-drop-zone`.
  *
  * @csspart panel - The panel container
  * @csspart chips - The chips grid
  * @csspart trigger - The upload trigger button
- * @csspart drop-overlay - The drag-and-drop overlay
  *
  * @slot trigger - Custom upload trigger button
  * @slot trigger-icon - Custom icon for the default trigger button
@@ -64,20 +64,15 @@ export class LoquixAttachmentPanel extends LitElement {
   @property({ type: String, attribute: 'trigger-label' })
   triggerLabel?: string;
 
-  // === State ===
-
-  @state()
-  private _dragCounter = 0;
-
-  @state()
-  private get _isDragOver(): boolean {
-    return this._dragCounter > 0;
-  }
-
   // === Queries ===
 
   @query('.file-input')
   private _fileInput?: HTMLInputElement;
+
+  // === Preview blob URLs ===
+
+  /** Map of attachment id → blob URL for image previews. */
+  private _previewUrls = new Map<string, string>();
 
   // === SVGs ===
 
@@ -87,6 +82,58 @@ export class LoquixAttachmentPanel extends LitElement {
 
   private get _isMaxReached(): boolean {
     return this.attachments.length >= this.maxFiles;
+  }
+
+  // === Preview helpers ===
+
+  private _isImageFile(attachment: Attachment): boolean {
+    const mime = attachment.filetype.toLowerCase();
+    if (mime.startsWith('image/')) return true;
+    const ext = attachment.filename.toLowerCase().split('.').pop() ?? '';
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'].includes(ext);
+  }
+
+  /**
+   * Returns a blob URL preview for image attachments that have a File object.
+   * Lazily creates and caches the URL to avoid re-creating on each render.
+   */
+  private _getPreviewUrl(attachment: Attachment): string | undefined {
+    if (!this._isImageFile(attachment) || !attachment.file) return undefined;
+
+    let url = this._previewUrls.get(attachment.id);
+    if (!url) {
+      url = URL.createObjectURL(attachment.file);
+      this._previewUrls.set(attachment.id, url);
+    }
+    return url;
+  }
+
+  /** Revoke blob URLs for attachments no longer in the list. */
+  private _cleanupPreviewUrls(): void {
+    const activeIds = new Set(this.attachments.map(a => a.id));
+    for (const [id, url] of this._previewUrls) {
+      if (!activeIds.has(id)) {
+        URL.revokeObjectURL(url);
+        this._previewUrls.delete(id);
+      }
+    }
+  }
+
+  // === Lifecycle ===
+
+  protected override updated(changed: PropertyValues): void {
+    if (changed.has('attachments')) {
+      this._cleanupPreviewUrls();
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    // Revoke all blob URLs
+    for (const url of this._previewUrls.values()) {
+      URL.revokeObjectURL(url);
+    }
+    this._previewUrls.clear();
   }
 
   // === File handling ===
@@ -203,35 +250,6 @@ export class LoquixAttachmentPanel extends LitElement {
     }
   }
 
-  // === Drag and drop ===
-
-  private _handleDragEnter(e: DragEvent): void {
-    e.preventDefault();
-    if (this.disabled) return;
-    this._dragCounter++;
-  }
-
-  private _handleDragLeave(e: DragEvent): void {
-    e.preventDefault();
-    if (this.disabled) return;
-    this._dragCounter = Math.max(0, this._dragCounter - 1);
-  }
-
-  private _handleDragOver(e: DragEvent): void {
-    e.preventDefault();
-    if (this.disabled) return;
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-  }
-
-  private _handleDrop(e: DragEvent): void {
-    e.preventDefault();
-    this._dragCounter = 0;
-    if (this.disabled) return;
-    if (e.dataTransfer?.files?.length) {
-      this._emitValidFiles(e.dataTransfer.files);
-    }
-  }
-
   // === Child chip events ===
 
   private _handleChipRemove(e: Event, attachment: Attachment): void {
@@ -250,14 +268,7 @@ export class LoquixAttachmentPanel extends LitElement {
 
   protected render() {
     return html`
-      <div
-        part="panel"
-        class="panel ${this._isDragOver ? 'panel--drag-over' : ''}"
-        @dragenter=${this._handleDragEnter}
-        @dragleave=${this._handleDragLeave}
-        @dragover=${this._handleDragOver}
-        @drop=${this._handleDrop}
-      >
+      <div part="panel" class="panel">
         <input
           class="file-input"
           type="file"
@@ -279,6 +290,7 @@ export class LoquixAttachmentPanel extends LitElement {
                       .status=${a.status}
                       .progress=${a.progress ?? 0}
                       .attachmentId=${a.id}
+                      .preview=${this._getPreviewUrl(a) ?? ''}
                       @loquix-attachment-remove=${(e: Event) => this._handleChipRemove(e, a)}
                     ></loquix-attachment-chip>
                   `,
@@ -302,13 +314,6 @@ export class LoquixAttachmentPanel extends LitElement {
                   >
                 </button>
               </slot>
-            `
-          : nothing}
-        ${this._isDragOver
-          ? html`
-              <div part="drop-overlay" class="drop-overlay">
-                <span>${this._localize.term('attachmentPanel.dropOverlay')}</span>
-              </div>
             `
           : nothing}
       </div>

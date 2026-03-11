@@ -6,12 +6,14 @@ import type {
   LoquixChangeDetail,
   LoquixSubmitDetail,
   LoquixPasteFilesDetail,
+  LoquixDropDetail,
 } from '../../events/index.js';
 import { LocalizeController } from '../../i18n/index.js';
 import styles from './loquix-chat-composer.styles.js';
 
 // Auto-register child components
 import './define-prompt-input.js';
+import './define-drop-zone.js';
 
 /**
  * @tag loquix-chat-composer
@@ -111,6 +113,22 @@ export class LoquixChatComposer extends LitElement {
   }
 
   // ---------------------------------------------------------------------------
+  // Drop-zone auto-wiring
+  // ---------------------------------------------------------------------------
+
+  private _handleDrop(e: CustomEvent<LoquixDropDetail>): void {
+    const panels = this.querySelectorAll('loquix-attachment-panel');
+    for (const panel of panels) {
+      if ('addFiles' in panel && typeof panel.addFiles === 'function') {
+        panel.addFiles(e.detail.files);
+        e.stopPropagation();
+        return;
+      }
+    }
+    // If no panel found, event continues bubbling
+  }
+
+  // ---------------------------------------------------------------------------
   // Event handlers
   // ---------------------------------------------------------------------------
 
@@ -182,80 +200,84 @@ export class LoquixChatComposer extends LitElement {
 
   private _renderDefaultLayout() {
     return html`
-      <div part="composer" class="composer">
-        <div part="toolbar" class="toolbar toolbar--top">
-          <slot name="toolbar-top"></slot>
-        </div>
+      <loquix-drop-zone ?disabled=${this.disabled} @loquix-drop=${this._handleDrop}>
+        <div part="composer" class="composer">
+          <div part="toolbar" class="toolbar toolbar--top">
+            <slot name="toolbar-top"></slot>
+          </div>
 
-        <div class="input-row">
-          <slot name="input">
-            <loquix-prompt-input
-              .value=${this._inputValue}
-              placeholder=${this.placeholder ?? this._localize.term('chatComposer.placeholder')}
-              ?disabled=${this.disabled}
-              auto-resize
-              submit-on-enter
-              @loquix-change=${this._handleInputChange}
-              @loquix-submit=${this._handleSubmitFromInput}
-            ></loquix-prompt-input>
-          </slot>
-
-          ${this.streaming ? this._renderStopButton() : this._renderSendButton()}
-        </div>
-
-        <slot name="suggestions"></slot>
-
-        <div part="toolbar" class="toolbar toolbar--bottom">
-          <slot name="toolbar-bottom"></slot>
-        </div>
-
-        <slot name="footer"></slot>
-      </div>
-    `;
-  }
-
-  private _renderContainedLayout() {
-    return html`
-      <div part="composer" class="composer composer--contained">
-        <div part="toolbar" class="toolbar toolbar--top">
-          <slot name="toolbar-top"></slot>
-        </div>
-
-        <div part="container" class="container">
-          <div class="container__input">
+          <div class="input-row">
             <slot name="input">
               <loquix-prompt-input
                 .value=${this._inputValue}
                 placeholder=${this.placeholder ?? this._localize.term('chatComposer.placeholder')}
                 ?disabled=${this.disabled}
-                variant="panel"
                 auto-resize
                 submit-on-enter
                 @loquix-change=${this._handleInputChange}
                 @loquix-submit=${this._handleSubmitFromInput}
               ></loquix-prompt-input>
             </slot>
+
+            ${this.streaming ? this._renderStopButton() : this._renderSendButton()}
           </div>
 
-          <div part="actions-bar" class="actions-bar">
-            <div class="actions-bar__left">
-              <slot name="actions-left"></slot>
+          <slot name="suggestions"></slot>
+
+          <div part="toolbar" class="toolbar toolbar--bottom">
+            <slot name="toolbar-bottom"></slot>
+          </div>
+
+          <slot name="footer"></slot>
+        </div>
+      </loquix-drop-zone>
+    `;
+  }
+
+  private _renderContainedLayout() {
+    return html`
+      <loquix-drop-zone ?disabled=${this.disabled} @loquix-drop=${this._handleDrop}>
+        <div part="composer" class="composer composer--contained">
+          <div part="toolbar" class="toolbar toolbar--top">
+            <slot name="toolbar-top"></slot>
+          </div>
+
+          <div part="container" class="container">
+            <div class="container__input">
+              <slot name="input">
+                <loquix-prompt-input
+                  .value=${this._inputValue}
+                  placeholder=${this.placeholder ?? this._localize.term('chatComposer.placeholder')}
+                  ?disabled=${this.disabled}
+                  variant="panel"
+                  auto-resize
+                  submit-on-enter
+                  @loquix-change=${this._handleInputChange}
+                  @loquix-submit=${this._handleSubmitFromInput}
+                ></loquix-prompt-input>
+              </slot>
             </div>
-            <div class="actions-bar__right">
-              <slot name="actions-right"></slot>
-              ${this.streaming ? this._renderStopButton() : this._renderSendButton()}
+
+            <div part="actions-bar" class="actions-bar">
+              <div class="actions-bar__left">
+                <slot name="actions-left"></slot>
+              </div>
+              <div class="actions-bar__right">
+                <slot name="actions-right"></slot>
+                ${this.streaming ? this._renderStopButton() : this._renderSendButton()}
+              </div>
             </div>
           </div>
+
+          <slot name="suggestions"></slot>
+
+          <div part="toolbar" class="toolbar toolbar--bottom">
+            <slot name="toolbar-bottom"></slot>
+          </div>
+
+          <slot name="footer"></slot>
         </div>
-
-        <slot name="suggestions"></slot>
-
-        <div part="toolbar" class="toolbar toolbar--bottom">
-          <slot name="toolbar-bottom"></slot>
-        </div>
-
-        <slot name="footer"></slot>
-      </div>
+      </loquix-drop-zone>
     `;
   }
 

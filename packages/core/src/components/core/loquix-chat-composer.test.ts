@@ -5,7 +5,7 @@ import './define-attachment-panel.js';
 import type { LoquixChatComposer } from './loquix-chat-composer.js';
 import type { LoquixAttachmentPanel } from './loquix-attachment-panel.js';
 import { createLoquixEvent } from '../../events/index.js';
-import type { LoquixPasteFilesDetail } from '../../events/index.js';
+import type { LoquixPasteFilesDetail, LoquixDropDetail } from '../../events/index.js';
 
 describe('loquix-chat-composer', () => {
   it('renders with default properties', async () => {
@@ -483,5 +483,130 @@ describe('loquix-chat-composer', () => {
 
     // After submit, send button should be disabled again (no content)
     expect(sendBtn.hasAttribute('disabled')).to.be.true;
+  });
+
+  // === Drop-zone auto-wiring tests (contained layout — default) ===
+
+  it('renders loquix-drop-zone in contained layout', async () => {
+    const el = await fixture<LoquixChatComposer>(
+      html`<loquix-chat-composer></loquix-chat-composer>`,
+    );
+    await el.updateComplete;
+    const dropZone = el.shadowRoot!.querySelector('loquix-drop-zone');
+    expect(dropZone).to.exist;
+  });
+
+  it('forwards loquix-drop to slotted attachment-panel (contained)', async () => {
+    const el = await fixture<LoquixChatComposer>(html`
+      <loquix-chat-composer>
+        <loquix-attachment-panel slot="toolbar-top"></loquix-attachment-panel>
+      </loquix-chat-composer>
+    `);
+    await el.updateComplete;
+
+    const panel = el.querySelector('loquix-attachment-panel') as LoquixAttachmentPanel;
+    expect(panel).to.exist;
+
+    const eventPromise = waitForEvent(panel, 'loquix-attachment-add');
+    const file = new File(['data'], 'dropped.png', { type: 'image/png' });
+
+    // Dispatch loquix-drop from the drop-zone inside shadow DOM
+    const dropZone = el.shadowRoot!.querySelector('loquix-drop-zone')!;
+    dropZone.dispatchEvent(createLoquixEvent<LoquixDropDetail>('loquix-drop', { files: [file] }));
+
+    const event = await eventPromise;
+    expect(event.detail.attachments).to.have.lengthOf(1);
+    expect(event.detail.attachments[0].filename).to.equal('dropped.png');
+  });
+
+  it('lets loquix-drop bubble when no attachment-panel present (contained)', async () => {
+    const el = await fixture<LoquixChatComposer>(html`
+      <loquix-chat-composer></loquix-chat-composer>
+    `);
+    await el.updateComplete;
+
+    const wrapper = el.parentElement!;
+    let bubbled = false;
+    wrapper.addEventListener('loquix-drop', () => {
+      bubbled = true;
+    });
+
+    const dropZone = el.shadowRoot!.querySelector('loquix-drop-zone')!;
+    const file = new File(['data'], 'dropped.png', { type: 'image/png' });
+    dropZone.dispatchEvent(createLoquixEvent<LoquixDropDetail>('loquix-drop', { files: [file] }));
+
+    await new Promise(r => setTimeout(r, 50));
+    expect(bubbled).to.be.true;
+  });
+
+  it('drop-zone is disabled when composer is disabled (contained)', async () => {
+    const el = await fixture<LoquixChatComposer>(
+      html`<loquix-chat-composer disabled></loquix-chat-composer>`,
+    );
+    await el.updateComplete;
+    const dropZone = el.shadowRoot!.querySelector('loquix-drop-zone')!;
+    expect(dropZone.hasAttribute('disabled')).to.be.true;
+  });
+
+  // === Drop-zone auto-wiring tests (default layout — variant="default") ===
+
+  it('renders loquix-drop-zone in default layout', async () => {
+    const el = await fixture<LoquixChatComposer>(
+      html`<loquix-chat-composer variant="default"></loquix-chat-composer>`,
+    );
+    await el.updateComplete;
+    const dropZone = el.shadowRoot!.querySelector('loquix-drop-zone');
+    expect(dropZone).to.exist;
+  });
+
+  it('forwards loquix-drop to slotted attachment-panel (default layout)', async () => {
+    const el = await fixture<LoquixChatComposer>(html`
+      <loquix-chat-composer variant="default">
+        <loquix-attachment-panel slot="toolbar-top"></loquix-attachment-panel>
+      </loquix-chat-composer>
+    `);
+    await el.updateComplete;
+
+    const panel = el.querySelector('loquix-attachment-panel') as LoquixAttachmentPanel;
+    expect(panel).to.exist;
+
+    const eventPromise = waitForEvent(panel, 'loquix-attachment-add');
+    const file = new File(['data'], 'dropped.pdf', { type: 'application/pdf' });
+
+    const dropZone = el.shadowRoot!.querySelector('loquix-drop-zone')!;
+    dropZone.dispatchEvent(createLoquixEvent<LoquixDropDetail>('loquix-drop', { files: [file] }));
+
+    const event = await eventPromise;
+    expect(event.detail.attachments).to.have.lengthOf(1);
+    expect(event.detail.attachments[0].filename).to.equal('dropped.pdf');
+  });
+
+  it('lets loquix-drop bubble when no attachment-panel present (default layout)', async () => {
+    const el = await fixture<LoquixChatComposer>(html`
+      <loquix-chat-composer variant="default"></loquix-chat-composer>
+    `);
+    await el.updateComplete;
+
+    const wrapper = el.parentElement!;
+    let bubbled = false;
+    wrapper.addEventListener('loquix-drop', () => {
+      bubbled = true;
+    });
+
+    const dropZone = el.shadowRoot!.querySelector('loquix-drop-zone')!;
+    const file = new File(['data'], 'dropped.pdf', { type: 'application/pdf' });
+    dropZone.dispatchEvent(createLoquixEvent<LoquixDropDetail>('loquix-drop', { files: [file] }));
+
+    await new Promise(r => setTimeout(r, 50));
+    expect(bubbled).to.be.true;
+  });
+
+  it('drop-zone is disabled when composer is disabled (default layout)', async () => {
+    const el = await fixture<LoquixChatComposer>(
+      html`<loquix-chat-composer variant="default" disabled></loquix-chat-composer>`,
+    );
+    await el.updateComplete;
+    const dropZone = el.shadowRoot!.querySelector('loquix-drop-zone')!;
+    expect(dropZone.hasAttribute('disabled')).to.be.true;
   });
 });
