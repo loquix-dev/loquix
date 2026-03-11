@@ -493,4 +493,19 @@ describe('loquix-message-item', () => {
     const showMore = el.shadowRoot!.querySelector('.show-more');
     expect(showMore).to.not.exist;
   });
+
+  // ---------------------------------------------------------------------------
+  // Regression: user bubble background token
+  // ---------------------------------------------------------------------------
+
+  it('user bubble has light gray background by default (light theme)', async () => {
+    const el = await fixture<LoquixMessageItem>(
+      html`<loquix-message-item sender="user">Hello</loquix-message-item>`,
+    );
+    const bubble = getShadowPart(el, 'bubble');
+    expect(bubble).to.exist;
+    const bg = getComputedStyle(bubble!).backgroundColor;
+    // #f8fafc = rgb(248, 250, 252)
+    expect(bg).to.equal('rgb(248, 250, 252)');
+  });
 });

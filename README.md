@@ -9,6 +9,10 @@
 
 A framework-agnostic UI kit of 35 production-ready components for building AI and LLM chat interfaces. Built with [Lit](https://lit.dev/) 3.x, TypeScript strict mode, and Shadow DOM encapsulation.
 
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="Loquix Interactive Chat Demo" width="480" />
+</p>
+
 ## Why Loquix
 
 Every team building an AI product ends up implementing the same chat UI from scratch: message bubbles, streaming indicators, file uploads, model selectors, feedback buttons, parameter panels. It takes weeks of work, and the result is rarely accessible or themeable.
@@ -171,7 +175,7 @@ document.addEventListener('loquix-stop', () => {
 
 ### File Upload Chat
 
-Add file attachments with drag-and-drop and paste support:
+Add file attachments with drag-and-drop and paste support (drag-and-drop is handled by the composer):
 
 ```html
 <loquix-chat-composer slot="composer" placeholder="Type a message...">
@@ -370,7 +374,7 @@ Development is organized into phases, from core chat primitives to advanced AI i
 
 - [x] `mode-selector` — tabs, dropdown, toggle, pills variants
 - [x] `model-selector` — model picker with tiers, costs, capabilities
-- [x] `attachment-panel` — file upload with drag-drop, paste, MIME validation
+- [x] `attachment-panel` — file upload with paste, MIME validation
 - [x] `attachment-chip` — file preview with type icon and removal
 - [x] `parameter-panel` — temperature, tokens, presets, advanced controls
 - [x] `filter-bar` — source filters and negative prompting

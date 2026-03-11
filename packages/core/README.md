@@ -94,7 +94,7 @@ import '@loquix/core/tokens/themes/dark.css';
 - `<loquix-model-selector>` - LLM model dropdown with tiers
 - `<loquix-dropdown-select>` - Rich dropdown with search
 - `<loquix-attachment-chip>` - File attachment chip
-- `<loquix-attachment-panel>` - File attachment panel with drag & drop
+- `<loquix-attachment-panel>` - File attachment panel with file picker and attachment chips
 - `<loquix-drop-zone>` - Drag-and-drop overlay zone
 - `<loquix-parameter-panel>` - AI parameter sliders/toggles
 - `<loquix-filter-bar>` - Filter chip bar

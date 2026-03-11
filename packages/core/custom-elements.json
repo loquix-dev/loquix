@@ -2199,10 +2199,6 @@
             {
               "description": "The upload trigger button",
               "name": "trigger"
-            },
-            {
-              "description": "The drag-and-drop overlay",
-              "name": "drop-overlay"
             }
           ],
           "slots": [
@@ -2305,29 +2301,18 @@
             },
             {
               "kind": "field",
-              "name": "_dragCounter",
-              "type": {
-                "text": "number"
-              },
-              "privacy": "private",
-              "default": "0"
-            },
-            {
-              "kind": "field",
-              "name": "_isDragOver",
-              "type": {
-                "text": "boolean"
-              },
-              "privacy": "private",
-              "readonly": true
-            },
-            {
-              "kind": "field",
               "name": "_fileInput",
               "type": {
                 "text": "HTMLInputElement | undefined"
               },
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_previewUrls",
+              "privacy": "private",
+              "default": "new Map<string, string>()",
+              "description": "Map of attachment id → blob URL for image previews."
             },
             {
               "kind": "field",
@@ -2343,6 +2328,54 @@
               },
               "privacy": "private",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "_isImageFile",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "attachment",
+                  "type": {
+                    "text": "Attachment"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_getPreviewUrl",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "attachment",
+                  "type": {
+                    "text": "Attachment"
+                  }
+                }
+              ],
+              "description": "Returns a blob URL preview for image attachments that have a File object.\nLazily creates and caches the URL to avoid re-creating on each render."
+            },
+            {
+              "kind": "method",
+              "name": "_cleanupPreviewUrls",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Revoke blob URLs for attachments no longer in the list."
             },
             {
               "kind": "method",
@@ -2439,78 +2472,6 @@
                 }
               ],
               "description": "Run validation then dispatch the attachment-add event."
-            },
-            {
-              "kind": "method",
-              "name": "_handleDragEnter",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "DragEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleDragLeave",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "DragEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleDragOver",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "DragEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_handleDrop",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "e",
-                  "type": {
-                    "text": "DragEvent"
-                  }
-                }
-              ]
             },
             {
               "kind": "method",
@@ -2626,7 +2587,7 @@
           },
           "tagName": "loquix-attachment-panel",
           "customElement": true,
-          "summary": "Container for managing file attachments with drag & drop, file picker, and attachment chips."
+          "summary": "Container for managing file attachments with file picker and attachment chips.\nDrag-and-drop is handled by the parent `loquix-chat-composer` via `loquix-drop-zone`."
         }
       ],
       "exports": [
@@ -2950,6 +2911,24 @@
                   "name": "e",
                   "type": {
                     "text": "CustomEvent<LoquixPasteFilesDetail>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleDrop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "CustomEvent<LoquixDropDetail>"
                   }
                 }
               ]

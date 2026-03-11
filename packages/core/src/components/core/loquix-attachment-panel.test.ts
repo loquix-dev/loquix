@@ -359,40 +359,6 @@ describe('loquix-attachment-panel', () => {
     expect(event.detail.attachments).to.have.lengthOf(1);
   });
 
-  // === Drag over overlay text from localization ===
-
-  it('shows drop overlay with localized text on drag enter', async () => {
-    const el = await fixture<LoquixAttachmentPanel>(
-      html`<loquix-attachment-panel></loquix-attachment-panel>`,
-    );
-    const panel = getShadowPart(el, 'panel')!;
-
-    // Simulate drag enter
-    const dragEnter = new DragEvent('dragenter', { bubbles: true, cancelable: true });
-    panel.dispatchEvent(dragEnter);
-    await el.updateComplete;
-
-    const overlay = getShadowPart(el, 'drop-overlay');
-    expect(overlay).to.exist;
-    expect(overlay!.textContent).to.contain('Drop files here');
-  });
-
-  it('hides drop overlay after drag leave', async () => {
-    const el = await fixture<LoquixAttachmentPanel>(
-      html`<loquix-attachment-panel></loquix-attachment-panel>`,
-    );
-    const panel = getShadowPart(el, 'panel')!;
-
-    // Simulate drag enter then leave
-    panel.dispatchEvent(new DragEvent('dragenter', { bubbles: true, cancelable: true }));
-    await el.updateComplete;
-    expect(getShadowPart(el, 'drop-overlay')).to.exist;
-
-    panel.dispatchEvent(new DragEvent('dragleave', { bubbles: true, cancelable: true }));
-    await el.updateComplete;
-    expect(getShadowPart(el, 'drop-overlay')).to.not.exist;
-  });
-
   // === Trigger button label from localization ===
 
   it('trigger button uses localized label by default', async () => {
@@ -426,43 +392,6 @@ describe('loquix-attachment-panel', () => {
     el.addFiles([file1, file2, file3]);
     const event = await eventPromise;
     expect(event.detail.attachments).to.have.lengthOf(3);
-  });
-
-  // === Disabled state prevents file addition ===
-
-  it('drag and drop does not add files when disabled', async () => {
-    const el = await fixture<LoquixAttachmentPanel>(
-      html`<loquix-attachment-panel disabled></loquix-attachment-panel>`,
-    );
-    let fired = false;
-    el.addEventListener('loquix-attachment-add', () => {
-      fired = true;
-    });
-
-    const panel = getShadowPart(el, 'panel')!;
-    const file = new File(['data'], 'test.txt', { type: 'text/plain' });
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    const dropEvent = new DragEvent('drop', {
-      bubbles: true,
-      cancelable: true,
-      dataTransfer: dt,
-    });
-    panel.dispatchEvent(dropEvent);
-
-    await new Promise(r => setTimeout(r, 50));
-    expect(fired).to.be.false;
-  });
-
-  it('drag enter does not show overlay when disabled', async () => {
-    const el = await fixture<LoquixAttachmentPanel>(
-      html`<loquix-attachment-panel disabled></loquix-attachment-panel>`,
-    );
-    const panel = getShadowPart(el, 'panel')!;
-    panel.dispatchEvent(new DragEvent('dragenter', { bubbles: true, cancelable: true }));
-    await el.updateComplete;
-    const overlay = getShadowPart(el, 'drop-overlay');
-    expect(overlay).to.not.exist;
   });
 
   // === Multiple files can be added ===

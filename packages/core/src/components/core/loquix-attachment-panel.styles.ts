@@ -17,11 +17,6 @@ const styles = css`
       background 0.15s ease;
   }
 
-  .panel--drag-over {
-    background: var(--loquix-attachment-panel-drop-bg, rgba(124, 58, 237, 0.06));
-    border-color: var(--loquix-attachment-panel-drop-border-color, var(--loquix-ai-color, #7c3aed));
-  }
-
   /* === Chips grid === */
 
   .chips {
@@ -65,25 +60,6 @@ const styles = css`
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-  }
-
-  /* === Drop overlay === */
-
-  .drop-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--loquix-attachment-panel-border-radius, 12px);
-    background: var(--loquix-attachment-panel-drop-bg, rgba(124, 58, 237, 0.08));
-    border: 2px dashed
-      var(--loquix-attachment-panel-drop-border-color, var(--loquix-ai-color, #7c3aed));
-    color: var(--loquix-ai-color, #7c3aed);
-    font-size: 0.875rem;
-    font-weight: 500;
-    pointer-events: none;
-    z-index: 1;
   }
 
   /* === Hidden file input === */
