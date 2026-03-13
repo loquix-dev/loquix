@@ -51,3 +51,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+
+      - name: Trigger website deploy
+        if: steps.changesets.outputs.published == 'true'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.WEBSITE_DEPLOY_TOKEN }}
+          repository: loquix-dev/website
+          event-type: loquix-released
+          client-payload: |
+            {
+              "version": "${{ fromJSON(steps.changesets.outputs.publishedPackages)[0].version }}",
+              "ref": "${{ github.sha }}"
+            }
