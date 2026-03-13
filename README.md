@@ -406,7 +406,7 @@ Development is organized into phases, from core chat primitives to advanced AI i
 Detailed plans for these packages will be published as the core library stabilizes.
 
 - [ ] Theme packs — additional prebuilt themes beyond light/dark
-- [ ] `@loquix/react` — React wrappers with hooks and context providers
+- [x] `@loquix/react` — React wrappers with hooks and context providers
 - [ ] `@loquix/vue` — Vue bindings with composables
 - [ ] `@loquix/svelte` — Svelte component wrappers
 - [ ] Provider integrations — prebuilt adapters for OpenAI, Anthropic, Google, and other AI services
