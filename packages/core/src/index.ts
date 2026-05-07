@@ -173,6 +173,8 @@ export { LoquixScrollAnchor } from './components/core/loquix-scroll-anchor.js';
 export { LoquixMessageAttachments } from './components/core/loquix-message-attachments.js';
 // Phase 4 PR #2 — Confidence & Uncertainty components
 export { LoquixConfidenceIndicator } from './components/core/loquix-confidence-indicator.js';
+export { LoquixUncertaintyMarker } from './components/core/loquix-uncertainty-marker.js';
+export { LoquixDisagreementMarker } from './components/core/loquix-disagreement-marker.js';
 
 // === Side-effect registrations (auto-define all tags) ===
 import './components/core/define-message-avatar.js';
@@ -213,3 +215,5 @@ import './components/core/define-scroll-anchor.js';
 import './components/core/define-message-attachments.js';
 // Phase 4 PR #2 — Confidence & Uncertainty registrations
 import './components/core/define-confidence-indicator.js';
+import './components/core/define-uncertainty-marker.js';
+import './components/core/define-disagreement-marker.js';

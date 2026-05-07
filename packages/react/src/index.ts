@@ -39,3 +39,5 @@ export { MessageAttachments } from './components/MessageAttachments.js';
 
 // Phase 4 PR #2 — Confidence & Uncertainty
 export { ConfidenceIndicator } from './components/ConfidenceIndicator.js';
+export { UncertaintyMarker } from './components/UncertaintyMarker.js';
+export { DisagreementMarker } from './components/DisagreementMarker.js';

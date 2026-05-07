@@ -184,6 +184,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-disagreement-marker.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-disagreement-marker",
+          "declaration": {
+            "name": "LoquixDisagreementMarker",
+            "module": "/src/components/core/loquix-disagreement-marker.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-disclosure-badge.ts",
       "declarations": [],
       "exports": [
@@ -523,6 +538,21 @@
           "declaration": {
             "name": "LoquixTypingIndicator",
             "module": "/src/components/core/loquix-typing-indicator.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-uncertainty-marker.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-uncertainty-marker",
+          "declaration": {
+            "name": "LoquixUncertaintyMarker",
+            "module": "/src/components/core/loquix-uncertainty-marker.js"
           }
         }
       ]
@@ -3808,6 +3838,158 @@
           "declaration": {
             "name": "LoquixConfidenceIndicator",
             "module": "src/components/core/loquix-confidence-indicator.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-disagreement-marker.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixDisagreementMarker",
+          "cssProperties": [
+            {
+              "description": "Background colour (shared with low-confidence palette).",
+              "name": "--loquix-conf-low-bg"
+            },
+            {
+              "description": "Foreground colour.",
+              "name": "--loquix-conf-low-color"
+            },
+            {
+              "description": "Border accent colour.",
+              "name": "--loquix-conf-low-fill"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The wrapper element (pill for inline, container for banner).",
+              "name": "marker"
+            },
+            {
+              "description": "The leading icon.",
+              "name": "icon"
+            },
+            {
+              "description": "Banner body (title + reason + slotted content).",
+              "name": "body"
+            },
+            {
+              "description": "Banner title.",
+              "name": "title"
+            },
+            {
+              "description": "Banner reason text.",
+              "name": "reason"
+            },
+            {
+              "description": "The \"Mark resolved\" button (banner only).",
+              "name": "resolve"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Banner-only: extra content under the title and reason.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "DisagreementVariant"
+              },
+              "default": "'inline'",
+              "description": "Visual variant.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "reason",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional reason text shown beneath the title (banner) or after the label (inline).",
+              "attribute": "reason"
+            },
+            {
+              "kind": "field",
+              "name": "resolvable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Banner-only: whether to show the \"Mark resolved\" button.",
+              "attribute": "resolvable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_onResolve",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the resolve button is clicked.",
+              "name": "loquix-disagreement-resolve"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "DisagreementVariant"
+              },
+              "default": "'inline'",
+              "description": "Visual variant.",
+              "fieldName": "variant"
+            },
+            {
+              "name": "reason",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional reason text shown beneath the title (banner) or after the label (inline).",
+              "fieldName": "reason"
+            },
+            {
+              "name": "resolvable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Banner-only: whether to show the \"Mark resolved\" button.",
+              "fieldName": "resolvable"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-disagreement-marker",
+          "customElement": true,
+          "summary": "Marks an assistant message that the user has disagreed with.\n\nTwo variants: an inline pill (for trailing references in prose) and a banner\nattached to the disputed message. The banner can optionally show a \"Mark\nresolved\" button when `resolvable` is set."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixDisagreementMarker",
+          "declaration": {
+            "name": "LoquixDisagreementMarker",
+            "module": "src/components/core/loquix-disagreement-marker.ts"
           }
         }
       ]
@@ -10645,6 +10827,206 @@
           "declaration": {
             "name": "LoquixTypingIndicator",
             "module": "src/components/core/loquix-typing-indicator.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-uncertainty-marker.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixUncertaintyMarker",
+          "cssProperties": [
+            {
+              "description": "Foreground for `unsure` kind.",
+              "name": "--loquix-uncert-unsure-color"
+            },
+            {
+              "description": "Highlight background for `unsure` kind.",
+              "name": "--loquix-uncert-unsure-bg"
+            },
+            {
+              "description": "Foreground for `needs-verification` kind.",
+              "name": "--loquix-uncert-verify-color"
+            },
+            {
+              "description": "Highlight background for `needs-verification` kind.",
+              "name": "--loquix-uncert-verify-bg"
+            },
+            {
+              "description": "Foreground for `speculative` kind.",
+              "name": "--loquix-uncert-spec-color"
+            },
+            {
+              "description": "Highlight background for `speculative` kind.",
+              "name": "--loquix-uncert-spec-bg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The marker wrapper.",
+              "name": "marker"
+            },
+            {
+              "description": "The slotted-text container.",
+              "name": "text"
+            },
+            {
+              "description": "The trailing icon (icon variant only).",
+              "name": "icon"
+            },
+            {
+              "description": "The tooltip element.",
+              "name": "tooltip"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The inline text to mark.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "kind",
+              "type": {
+                "text": "UncertaintyKind"
+              },
+              "default": "'unsure'",
+              "description": "What kind of uncertainty applies to the wrapped phrase.",
+              "attribute": "kind",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "UncertaintyVariant"
+              },
+              "default": "'underline'",
+              "description": "How the phrase is visually marked.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "reason",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional explicit reason text. Overrides the localised default for the kind.",
+              "attribute": "reason"
+            },
+            {
+              "kind": "field",
+              "name": "_open",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "_tipText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_show",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hide",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_activate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_onKeyDown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onClick",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the marker is activated by click, Enter, or Space. Detail: `{ kind, reason? }`.",
+              "name": "loquix-uncertainty-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "kind",
+              "type": {
+                "text": "UncertaintyKind"
+              },
+              "default": "'unsure'",
+              "description": "What kind of uncertainty applies to the wrapped phrase.",
+              "fieldName": "kind"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "UncertaintyVariant"
+              },
+              "default": "'underline'",
+              "description": "How the phrase is visually marked.",
+              "fieldName": "variant"
+            },
+            {
+              "name": "reason",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional explicit reason text. Overrides the localised default for the kind.",
+              "fieldName": "reason"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-uncertainty-marker",
+          "customElement": true,
+          "summary": "Wraps an inline phrase to flag it as unsure, needing verification, or speculative.\n\nThe slotted text remains the control's accessible name; the kind/reason is exposed via\n`aria-describedby` so screen readers announce the uncertainty as a description rather\nthan overriding the phrase. Tooltip opens on hover or focus and closes on\nmouseleave/blur/Escape."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixUncertaintyMarker",
+          "declaration": {
+            "name": "LoquixUncertaintyMarker",
+            "module": "src/components/core/loquix-uncertainty-marker.ts"
           }
         }
       ]

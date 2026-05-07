@@ -42,6 +42,8 @@ import '@loquix/core/define/define-scroll-anchor';
 import '@loquix/core/define/define-message-attachments';
 // Phase 4 PR #2 — Confidence & Uncertainty
 import '@loquix/core/define/define-confidence-indicator';
+import '@loquix/core/define/define-uncertainty-marker';
+import '@loquix/core/define/define-disagreement-marker';
 
 const preview: Preview = {
   globalTypes: {
