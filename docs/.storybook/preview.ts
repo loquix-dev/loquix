@@ -44,6 +44,8 @@ import '@loquix/core/define/define-message-attachments';
 import '@loquix/core/define/define-confidence-indicator';
 import '@loquix/core/define/define-uncertainty-marker';
 import '@loquix/core/define/define-disagreement-marker';
+import '@loquix/core/define/define-feedback-form';
+import '@loquix/core/define/define-correction-input';
 
 const preview: Preview = {
   globalTypes: {

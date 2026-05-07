@@ -175,6 +175,8 @@ export { LoquixMessageAttachments } from './components/core/loquix-message-attac
 export { LoquixConfidenceIndicator } from './components/core/loquix-confidence-indicator.js';
 export { LoquixUncertaintyMarker } from './components/core/loquix-uncertainty-marker.js';
 export { LoquixDisagreementMarker } from './components/core/loquix-disagreement-marker.js';
+export { LoquixFeedbackForm } from './components/core/loquix-feedback-form.js';
+export { LoquixCorrectionInput } from './components/core/loquix-correction-input.js';
 
 // === Side-effect registrations (auto-define all tags) ===
 import './components/core/define-message-avatar.js';
@@ -217,3 +219,5 @@ import './components/core/define-message-attachments.js';
 import './components/core/define-confidence-indicator.js';
 import './components/core/define-uncertainty-marker.js';
 import './components/core/define-disagreement-marker.js';
+import './components/core/define-feedback-form.js';
+import './components/core/define-correction-input.js';

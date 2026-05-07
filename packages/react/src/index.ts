@@ -41,3 +41,5 @@ export { MessageAttachments } from './components/MessageAttachments.js';
 export { ConfidenceIndicator } from './components/ConfidenceIndicator.js';
 export { UncertaintyMarker } from './components/UncertaintyMarker.js';
 export { DisagreementMarker } from './components/DisagreementMarker.js';
+export { FeedbackForm } from './components/FeedbackForm.js';
+export { CorrectionInput } from './components/CorrectionInput.js';

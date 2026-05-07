@@ -184,6 +184,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-correction-input.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-correction-input",
+          "declaration": {
+            "name": "LoquixCorrectionInput",
+            "module": "/src/components/core/loquix-correction-input.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-disagreement-marker.ts",
       "declarations": [],
       "exports": [
@@ -253,6 +268,21 @@
           "declaration": {
             "name": "LoquixExampleGallery",
             "module": "/src/components/core/loquix-example-gallery.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-feedback-form.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-feedback-form",
+          "declaration": {
+            "name": "LoquixFeedbackForm",
+            "module": "/src/components/core/loquix-feedback-form.js"
           }
         }
       ]
@@ -3844,6 +3874,196 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/loquix-correction-input.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixCorrectionInput",
+          "cssParts": [
+            {
+              "description": "The outer wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "The strikethrough block showing the original text.",
+              "name": "original"
+            },
+            {
+              "description": "One labelled field (correction or reason).",
+              "name": "field"
+            },
+            {
+              "description": "The correction textarea.",
+              "name": "textarea"
+            },
+            {
+              "description": "The reason input.",
+              "name": "input"
+            },
+            {
+              "description": "Submit button.",
+              "name": "submit"
+            },
+            {
+              "description": "Cancel button.",
+              "name": "cancel"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "_uid",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "original",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The original assistant text that the user wants to correct.",
+              "attribute": "original"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The current correction text. Two-way: updates internally on input.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "reason",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The reason text. Two-way: updates internally on input.",
+              "attribute": "reason"
+            },
+            {
+              "kind": "field",
+              "name": "reasonRequired",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, requires a non-empty reason before Submit is enabled.",
+              "attribute": "reason-required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_onValueInput",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onReasonInput",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_isSubmitDisabled",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_onSubmit",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onCancel",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When Submit is clicked. Detail: `{ correction, reason?, original? }`.",
+              "name": "loquix-correction-submit"
+            },
+            {
+              "description": "When Cancel is clicked.",
+              "name": "loquix-correction-cancel"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "original",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The original assistant text that the user wants to correct.",
+              "fieldName": "original"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The current correction text. Two-way: updates internally on input.",
+              "fieldName": "value"
+            },
+            {
+              "name": "reason",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The reason text. Two-way: updates internally on input.",
+              "fieldName": "reason"
+            },
+            {
+              "name": "reason-required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, requires a non-empty reason before Submit is enabled.",
+              "fieldName": "reasonRequired"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-correction-input",
+          "customElement": true,
+          "summary": "Inline form for proposing a correction to an assistant message.\n\nShows the original answer (strikethrough) when provided, plus a textarea for\nthe correction and an optional reason input. Submit is disabled until the\ncorrection is non-empty (and reason is non-empty when `reason-required`).\n\nAll values are rendered as text — no `unsafeHTML` — so user-supplied content\ncannot inject markup."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixCorrectionInput",
+          "declaration": {
+            "name": "LoquixCorrectionInput",
+            "module": "src/components/core/loquix-correction-input.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/loquix-disagreement-marker.ts",
       "declarations": [
         {
@@ -5425,6 +5645,224 @@
           "declaration": {
             "name": "LoquixExampleGallery",
             "module": "src/components/core/loquix-example-gallery.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-feedback-form.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixFeedbackForm",
+          "cssProperties": [
+            {
+              "description": "Active chip background and primary button colour.",
+              "name": "--loquix-ai-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The thumbs row.",
+              "name": "buttons"
+            },
+            {
+              "description": "The reasons + comment card shown after a sentiment is picked.",
+              "name": "form"
+            },
+            {
+              "description": "The radiogroup of reason chips.",
+              "name": "reasons"
+            },
+            {
+              "description": "A single reason chip.",
+              "name": "chip"
+            },
+            {
+              "description": "The comment textarea.",
+              "name": "textarea"
+            },
+            {
+              "description": "Submit button.",
+              "name": "submit"
+            },
+            {
+              "description": "Cancel button.",
+              "name": "cancel"
+            },
+            {
+              "description": "Thanks message shown after submit.",
+              "name": "thanks"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "allowReason",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to open the reasons + comment card after a sentiment is picked.",
+              "attribute": "allow-reason"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "FeedbackSentiment | null"
+              },
+              "default": "null",
+              "description": "Currently selected sentiment, or null if neither is picked.",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "requireCommentOnDown",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, requires a non-empty comment before Send is enabled on negative feedback.",
+              "attribute": "require-comment-on-down"
+            },
+            {
+              "kind": "field",
+              "name": "_reason",
+              "type": {
+                "text": "FeedbackReason | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_comment",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "_submitted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_onChildFeedback",
+              "privacy": "private",
+              "description": "Intercepts the inner `loquix-feedback` and reads the post-toggle `.active`\nstate from the child to update parent state. Stops propagation so the\ninner event never escapes the form — only `loquix-feedback-submit` is the\npublic surface."
+            },
+            {
+              "kind": "method",
+              "name": "_onChipClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "reason",
+                  "type": {
+                    "text": "FeedbackReason"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "_onCommentInput",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_isSendDisabled",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_onSend",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onCancel",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the user clicks Send. Detail: `{ sentiment, reason?, comment? }`.",
+              "name": "loquix-feedback-submit"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "allow-reason",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to open the reasons + comment card after a sentiment is picked.",
+              "fieldName": "allowReason"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "FeedbackSentiment | null"
+              },
+              "default": "null",
+              "description": "Currently selected sentiment, or null if neither is picked.",
+              "fieldName": "value"
+            },
+            {
+              "name": "require-comment-on-down",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, requires a non-empty comment before Send is enabled on negative feedback.",
+              "fieldName": "requireCommentOnDown"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-feedback-form",
+          "customElement": true,
+          "summary": "Higher-order feedback flow: thumbs up/down + reason chips + optional comment.\n\nComposes two `loquix-action-feedback` buttons into a single flow, then opens a\nreasons + comment card once a sentiment is picked. The inner `loquix-feedback`\nevents are intercepted (stopPropagation) so consumers only ever see the\nhigher-level `loquix-feedback-submit`.\n\nThe reason payload carries a stable `FeedbackReason` ID, never the localised\nchip label."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixFeedbackForm",
+          "declaration": {
+            "name": "LoquixFeedbackForm",
+            "module": "src/components/core/loquix-feedback-form.ts"
           }
         }
       ]
