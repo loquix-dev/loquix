@@ -51,6 +51,13 @@ export type {
   ParameterDef,
   ParameterPreset,
   FilterOption,
+  // Phase 4 PR #2 — Confidence & Uncertainty types
+  ConfidenceVariant,
+  ConfidenceLevel,
+  UncertaintyKind,
+  UncertaintyVariant,
+  DisagreementVariant,
+  FeedbackReason,
 } from './types/index.js';
 
 // === Events ===
@@ -92,6 +99,12 @@ export type {
   LoquixPasteFilesDetail,
   LoquixScrollBottomDetail,
   LoquixScrollAwayDetail,
+  // Phase 4 PR #2 — Confidence & Uncertainty events
+  LoquixFeedbackSubmitDetail,
+  LoquixCorrectionSubmitDetail,
+  LoquixCorrectionCancelDetail,
+  LoquixDisagreementResolveDetail,
+  LoquixUncertaintyClickDetail,
 } from './events/index.js';
 
 // === Localization ===
@@ -158,6 +171,8 @@ export { LoquixFilterBar } from './components/core/loquix-filter-bar.js';
 export { LoquixDropZone } from './components/core/loquix-drop-zone.js';
 export { LoquixScrollAnchor } from './components/core/loquix-scroll-anchor.js';
 export { LoquixMessageAttachments } from './components/core/loquix-message-attachments.js';
+// Phase 4 PR #2 — Confidence & Uncertainty components
+export { LoquixConfidenceIndicator } from './components/core/loquix-confidence-indicator.js';
 
 // === Side-effect registrations (auto-define all tags) ===
 import './components/core/define-message-avatar.js';
@@ -196,3 +211,5 @@ import './components/core/define-filter-bar.js';
 import './components/core/define-drop-zone.js';
 import './components/core/define-scroll-anchor.js';
 import './components/core/define-message-attachments.js';
+// Phase 4 PR #2 — Confidence & Uncertainty registrations
+import './components/core/define-confidence-indicator.js';

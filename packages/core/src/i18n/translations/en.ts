@@ -131,4 +131,48 @@ export const en: LoquixTranslations = {
 
   // === loquix-scroll-anchor ===
   'scrollAnchor.label': 'Scroll to bottom',
+
+  // === loquix-confidence-indicator (Phase 4 PR #2) ===
+  'confidenceIndicator.labelDefault': 'Confidence',
+  'confidenceIndicator.levelLow': 'low',
+  'confidenceIndicator.levelMedium': 'medium',
+  'confidenceIndicator.levelHigh': 'high',
+
+  // === loquix-uncertainty-marker (Phase 4 PR #2) ===
+  'uncertaintyMarker.tipUnsure': 'Model is uncertain about this claim',
+  'uncertaintyMarker.tipNeedsVerification': 'This statement needs verification',
+  'uncertaintyMarker.tipSpeculative': 'Speculative — not directly grounded in sources',
+
+  // === loquix-feedback-form (Phase 4 PR #2) ===
+  'feedbackForm.groupLabel': 'Rate this response',
+  'feedbackForm.reasonsGroupLabel': 'Reason',
+  'feedbackForm.helpfulLabel': 'Helpful',
+  'feedbackForm.notHelpfulLabel': 'Not helpful',
+  'feedbackForm.sendLabel': 'Send',
+  'feedbackForm.cancelLabel': 'Cancel',
+  'feedbackForm.placeholderUp': 'What did you like? (optional)',
+  'feedbackForm.placeholderDown': 'What went wrong? (optional)',
+  'feedbackForm.thanksMessage': 'Thanks — your feedback was sent.',
+  'feedbackForm.reasonAccurate': 'Accurate',
+  'feedbackForm.reasonWellWritten': 'Well-written',
+  'feedbackForm.reasonHelpful': 'Helpful',
+  'feedbackForm.reasonInaccurate': 'Inaccurate',
+  'feedbackForm.reasonOffTopic': 'Off-topic',
+  'feedbackForm.reasonUnsafe': 'Unsafe',
+  'feedbackForm.reasonOther': 'Other',
+
+  // === loquix-correction-input (Phase 4 PR #2) ===
+  'correctionInput.originalLabel': 'Original',
+  'correctionInput.correctionLabel': 'Correction',
+  'correctionInput.reasonLabel': 'Why is this wrong?',
+  'correctionInput.reasonPlaceholder': 'Brief explanation',
+  'correctionInput.correctionPlaceholder': 'Provide the correct version…',
+  'correctionInput.submitLabel': 'Submit correction',
+  'correctionInput.cancelLabel': 'Cancel',
+  'correctionInput.reasonRequiredMark': '*',
+
+  // === loquix-disagreement-marker (Phase 4 PR #2) ===
+  'disagreementMarker.title': 'User disagreed with this response',
+  'disagreementMarker.markResolvedLabel': 'Mark resolved',
+  'disagreementMarker.inlineLabel': 'Disagreement',
 };

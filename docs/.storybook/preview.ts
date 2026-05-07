@@ -40,6 +40,8 @@ import '@loquix/core/define/define-filter-bar';
 import '@loquix/core/define/define-drop-zone';
 import '@loquix/core/define/define-scroll-anchor';
 import '@loquix/core/define/define-message-attachments';
+// Phase 4 PR #2 — Confidence & Uncertainty
+import '@loquix/core/define/define-confidence-indicator';
 
 const preview: Preview = {
   globalTypes: {

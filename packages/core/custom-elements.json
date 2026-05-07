@@ -169,6 +169,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-confidence-indicator.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-confidence-indicator",
+          "declaration": {
+            "name": "LoquixConfidenceIndicator",
+            "module": "/src/components/core/loquix-confidence-indicator.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-disclosure-badge.ts",
       "declarations": [],
       "exports": [
@@ -3547,6 +3562,252 @@
           "declaration": {
             "name": "LoquixComposerToolbar",
             "module": "src/components/core/loquix-composer-toolbar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-confidence-indicator.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixConfidenceIndicator",
+          "cssProperties": [
+            {
+              "description": "Low-confidence background.",
+              "name": "--loquix-conf-low-bg"
+            },
+            {
+              "description": "Low-confidence foreground.",
+              "name": "--loquix-conf-low-color"
+            },
+            {
+              "description": "Low-confidence solid fill (bar/dot).",
+              "name": "--loquix-conf-low-fill"
+            },
+            {
+              "description": "Medium-confidence background.",
+              "name": "--loquix-conf-med-bg"
+            },
+            {
+              "description": "Medium-confidence foreground.",
+              "name": "--loquix-conf-med-color"
+            },
+            {
+              "description": "Medium-confidence solid fill (bar/dot).",
+              "name": "--loquix-conf-med-fill"
+            },
+            {
+              "description": "High-confidence background.",
+              "name": "--loquix-conf-high-bg"
+            },
+            {
+              "description": "High-confidence foreground.",
+              "name": "--loquix-conf-high-color"
+            },
+            {
+              "description": "High-confidence solid fill (bar/dot).",
+              "name": "--loquix-conf-high-fill"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The host element acts as the meter wrapper.",
+              "name": "meter"
+            },
+            {
+              "description": "The bar variant track.",
+              "name": "track"
+            },
+            {
+              "description": "The bar variant fill.",
+              "name": "fill"
+            },
+            {
+              "description": "A dot in the dots variant.",
+              "name": "dot"
+            },
+            {
+              "description": "The numeric value text.",
+              "name": "value"
+            },
+            {
+              "description": "The label text.",
+              "name": "label"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Confidence score in [0, 1]. Values outside the range are clamped.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "ConfidenceVariant"
+              },
+              "default": "'bar'",
+              "description": "Visual variant.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "level",
+              "type": {
+                "text": "ConfidenceLevel | undefined"
+              },
+              "description": "Optional override for the derived level. When set, beats the threshold-based derivation.",
+              "attribute": "level",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional textual label. Falls back to a localised default for `aria-label`.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "lowThreshold",
+              "default": "0.4",
+              "description": "Lower threshold — `value < lowThreshold` → `low`. Invalid values fall back to 0.4.",
+              "attribute": "low-threshold",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "highThreshold",
+              "default": "0.75",
+              "description": "Upper threshold — `value >= highThreshold` → `high`. Invalid values fall back to 0.75.",
+              "attribute": "high-threshold",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to render the numeric percentage alongside the visual.",
+              "attribute": "show-value"
+            },
+            {
+              "kind": "method",
+              "name": "_deriveLevel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "ConfidenceLevel"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "effectiveLevel",
+              "type": {
+                "text": "ConfidenceLevel"
+              },
+              "description": "The currently effective confidence level, derived from `value`/thresholds\nunless `level` is explicitly set. Exposed for tests and consumers who need\nto read the derived value without recomputing it themselves.",
+              "readonly": true
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Confidence score in [0, 1]. Values outside the range are clamped.",
+              "fieldName": "value"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "ConfidenceVariant"
+              },
+              "default": "'bar'",
+              "description": "Visual variant.",
+              "fieldName": "variant"
+            },
+            {
+              "name": "level",
+              "type": {
+                "text": "ConfidenceLevel | undefined"
+              },
+              "description": "Optional override for the derived level. When set, beats the threshold-based derivation.",
+              "fieldName": "level"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional textual label. Falls back to a localised default for `aria-label`.",
+              "fieldName": "label"
+            },
+            {
+              "name": "low-threshold",
+              "default": "DEFAULT_LOW",
+              "description": "Lower threshold — `value < lowThreshold` → `low`. Invalid values fall back to 0.4.",
+              "fieldName": "lowThreshold"
+            },
+            {
+              "name": "high-threshold",
+              "default": "DEFAULT_HIGH",
+              "description": "Upper threshold — `value >= highThreshold` → `high`. Invalid values fall back to 0.75.",
+              "fieldName": "highThreshold"
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to render the numeric percentage alongside the visual.",
+              "fieldName": "showValue"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-confidence-indicator",
+          "customElement": true,
+          "summary": "Visualises an assistant confidence score (0..1) as a bar / dots / badge / numeric.\n\nAuto-derives `level` (`low` / `medium` / `high`) from `value` using `low-threshold`\nand `high-threshold`. If thresholds are invalid or inverted, both reset to defaults\n(0.4 / 0.75) so the derived level still tracks the value. Setting `level` explicitly\noverrides the derived value."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixConfidenceIndicator",
+          "declaration": {
+            "name": "LoquixConfidenceIndicator",
+            "module": "src/components/core/loquix-confidence-indicator.ts"
           }
         }
       ]

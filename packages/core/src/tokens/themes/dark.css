@@ -163,4 +163,23 @@
   /* === Scroll Anchor === */
   --loquix-scroll-anchor-bg: var(--loquix-surface-secondary-bg);
   --loquix-scroll-anchor-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  /* === Confidence palettes (Phase 4 PR #2) === */
+  --loquix-conf-low-bg: rgba(239, 68, 68, 0.15);
+  --loquix-conf-low-color: #fca5a5;
+  --loquix-conf-low-fill: #f87171;
+  --loquix-conf-med-bg: rgba(245, 158, 11, 0.15);
+  --loquix-conf-med-color: #fcd34d;
+  --loquix-conf-med-fill: #fbbf24;
+  --loquix-conf-high-bg: rgba(34, 197, 94, 0.15);
+  --loquix-conf-high-color: #86efac;
+  --loquix-conf-high-fill: #4ade80;
+
+  /* === Uncertainty palettes (Phase 4 PR #2) === */
+  --loquix-uncert-unsure-color: #fcd34d;
+  --loquix-uncert-unsure-bg: color-mix(in srgb, #fbbf24 22%, transparent);
+  --loquix-uncert-verify-color: #93c5fd;
+  --loquix-uncert-verify-bg: color-mix(in srgb, #60a5fa 20%, transparent);
+  --loquix-uncert-spec-color: #c4b5fd;
+  --loquix-uncert-spec-bg: color-mix(in srgb, #a78bfa 22%, transparent);
 }
