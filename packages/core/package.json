@@ -79,7 +79,7 @@
     "lit": "^3.2.0",
     "playwright": "^1.58.2",
     "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "vite": "^6.4.2"
   },
   "customElements": "custom-elements.json"
 }
