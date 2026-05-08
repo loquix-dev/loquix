@@ -33,11 +33,15 @@ const styles = css`
 
   /* Underline variant — longhand only. Safari resets text-decoration-color
      when the shorthand 'text-decoration: underline wavy' is set, so the
-     per-kind colour rules below would no-op in WebKit. */
+     per-kind colour rules below would no-op in WebKit.
+     'skip-ink: none' keeps the wavy line continuous across descenders
+     (p, g, y) — Chrome defaults to 'auto' which carves gaps around them,
+     making the wave look broken; Safari's default already keeps it solid. */
   .marker--underline .text {
     text-decoration-line: underline;
     text-decoration-style: wavy;
     text-decoration-thickness: 1.5px;
+    text-decoration-skip-ink: none;
     text-underline-offset: 3px;
   }
   .marker--underline.marker--unsure .text {

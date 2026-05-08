@@ -5,6 +5,11 @@ const meta: Meta = {
   title: 'Core/FeedbackForm',
   component: 'loquix-feedback-form',
   tags: ['autodocs'],
+  // Override the global 'centered' layout so the buttons row stays at the left
+  // edge in both idle and selected states. Otherwise the host (inline-flex,
+  // sized to content) centers and visibly "jumps" left when the form panel
+  // expands the host width.
+  parameters: { layout: 'padded' },
   argTypes: {
     value: { control: 'select', options: [null, 'positive', 'negative'] },
     allowReason: { control: 'boolean' },
