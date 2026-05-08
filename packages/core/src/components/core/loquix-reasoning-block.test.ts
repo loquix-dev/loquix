@@ -153,13 +153,18 @@ describe('loquix-reasoning-block', () => {
       >
     `);
     await el.updateComplete;
-    // Slot content lives in light DOM; assert via host textContent (which
-    // includes slotted Light DOM) and verify the prop-fallback isn't rendered
-    // inside the shadow root.
+    // Slotted Light DOM is visible via the host element's textContent. The
+    // shadow-DOM-side `content` fallback is rendered only when _hasSlotContent
+    // is false; assert it isn't present in the shadow text.
     expect(el.textContent).to.contain('from slot');
-    const slotEl = el.shadowRoot!.querySelector('slot') as HTMLSlotElement;
-    const fallback = slotEl.textContent ?? '';
-    expect(fallback).to.not.contain('from prop');
+    const text = el.shadowRoot!.querySelector('.text');
+    // Walk own (non-slotted) text — slot.assignedNodes are light DOM, not
+    // direct shadow children, so this only sees what we render ourselves.
+    const ownText = Array.from(text!.childNodes)
+      .filter(n => n.nodeType === Node.TEXT_NODE)
+      .map(n => (n.textContent ?? '').trim())
+      .join('');
+    expect(ownText).to.not.contain('from prop');
   });
 
   it('slot with only whitespace falls back to content prop', async () => {
@@ -169,8 +174,16 @@ describe('loquix-reasoning-block', () => {
       </loquix-reasoning-block>
     `);
     await el.updateComplete;
-    const slotEl = el.shadowRoot!.querySelector('slot') as HTMLSlotElement;
-    expect(slotEl.textContent).to.contain('from prop');
+    // The fallback `content` is rendered as a sibling of the slot, not inside
+    // its <slot> default content (whitespace-only assigned nodes still count
+    // as assigned, suppressing slot fallback). So check the shadow text node
+    // directly.
+    const text = el.shadowRoot!.querySelector('.text');
+    const ownText = Array.from(text!.childNodes)
+      .filter(n => n.nodeType === Node.TEXT_NODE)
+      .map(n => (n.textContent ?? '').trim())
+      .join('');
+    expect(ownText).to.contain('from prop');
   });
 
   it('reflects status attribute', async () => {

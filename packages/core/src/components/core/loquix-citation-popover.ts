@@ -149,6 +149,10 @@ export class LoquixCitationPopover extends LitElement {
     if (this._open) return;
     this._open = true;
     await this.updateComplete;
+    // Guard against a hide() that ran during the await — without this check,
+    // teardown would run before setup, then setup would re-attach autoUpdate
+    // after the popover is already closed (listener leak).
+    if (!this._open || !this.isConnected) return;
     this._setupAutoUpdate();
   };
 
@@ -189,18 +193,16 @@ export class LoquixCitationPopover extends LitElement {
 
   protected override render() {
     const tooltipId = `lq-citation-pop-${this._uid}`;
-    const ariaLabel = this._localize.term('citationPopover.openLabel', {
-      index: this.index,
-    });
-
     const safeFavicon = safeHttpUrl(this.source.favicon);
 
+    // Accessible name is the visible chip text (the index number). The
+    // tooltip / popover content provides the description via aria-describedby.
+    // This matches the description pattern used by loquix-uncertainty-marker:
+    // chip name stays the natural visible text; popover is the description.
     return html`
       <button
         class="chip"
         type="button"
-        role="button"
-        aria-label=${ariaLabel}
         aria-describedby=${tooltipId}
         aria-expanded=${this._open ? 'true' : 'false'}
         @mouseenter=${this._show}

@@ -203,9 +203,6 @@ export interface LoquixTranslations {
   'toolCallList.expandLabel': string;
   'toolCallList.collapseLabel': string;
 
-  // === loquix-citation-popover (Phase 4 PR #1) ===
-  'citationPopover.openLabel': string;
-
   // === loquix-source-list (Phase 4 PR #1) ===
   'sourceList.heading': string;
   'sourceList.headingOne': string;

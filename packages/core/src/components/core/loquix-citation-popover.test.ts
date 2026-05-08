@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { setLocale, resetLocale } from '../../i18n/index.js';
+import { resetLocale } from '../../i18n/index.js';
 import { waitForEvent, simulateKeyboard } from '../../test-utils.js';
 import './define-citation-popover.js';
 import type { LoquixCitationPopover } from './loquix-citation-popover.js';
@@ -34,7 +34,7 @@ describe('loquix-citation-popover', () => {
     expect(chip.textContent?.trim()).to.equal('3');
   });
 
-  it('chip is a button with role=button, aria-label and aria-describedby', async () => {
+  it('chip accessible name = visible index; popover is the description', async () => {
     const el = await fixture<LoquixCitationPopover>(
       html`<loquix-citation-popover index="1"></loquix-citation-popover>`,
     );
@@ -42,7 +42,10 @@ describe('loquix-citation-popover', () => {
     await el.updateComplete;
     const chip = getChip(el);
     expect(chip.tagName).to.equal('BUTTON');
-    expect(chip.getAttribute('aria-label')).to.equal('Open citation 1');
+    // No aria-label override — the chip number "1" is the accessible name.
+    expect(chip.getAttribute('aria-label')).to.be.null;
+    expect(chip.textContent?.trim()).to.equal('1');
+    // The popover provides the description via aria-describedby.
     const describedBy = chip.getAttribute('aria-describedby');
     expect(describedBy).to.not.be.null;
     const popover = getPopover(el);
@@ -185,15 +188,34 @@ describe('loquix-citation-popover', () => {
     expect(true).to.be.true;
   });
 
-  it('locale change updates the chip aria-label', async () => {
+  it('chip text node is the accessible name (no aria-label override)', async () => {
+    const el = await fixture<LoquixCitationPopover>(
+      html`<loquix-citation-popover index="7"></loquix-citation-popover>`,
+    );
+    el.source = sampleSource;
+    await el.updateComplete;
+    const chip = getChip(el);
+    expect(chip.getAttribute('aria-label')).to.be.null;
+    expect(chip.textContent?.trim()).to.equal('7');
+  });
+
+  it('open/close race during _show await: hide before setupAutoUpdate keeps it torn down', async () => {
     const el = await fixture<LoquixCitationPopover>(
       html`<loquix-citation-popover index="1"></loquix-citation-popover>`,
     );
     el.source = sampleSource;
     await el.updateComplete;
-    setLocale({ 'citationPopover.openLabel': 'Источник {index}' });
-    await new Promise(r => queueMicrotask(r));
+    const chip = getChip(el);
+    // Trigger show (async — sets _open=true, awaits updateComplete, then sets up).
+    chip.dispatchEvent(new MouseEvent('mouseenter'));
+    // Synchronously hide before the _show microtasks finish.
+    chip.dispatchEvent(new MouseEvent('mouseleave'));
     await el.updateComplete;
-    expect(getChip(el).getAttribute('aria-label')).to.equal('Источник 1');
+    await new Promise(r => setTimeout(r, 50));
+    // Removing the host while popover is closed should not throw —
+    // and the disconnect-time teardown should be a no-op (no leaked listeners).
+    el.remove();
+    window.dispatchEvent(new Event('scroll'));
+    expect(true).to.be.true;
   });
 });

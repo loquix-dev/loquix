@@ -46,7 +46,9 @@ const styles = css`
     border: 1px solid var(--loquix-border-color);
     border-radius: 8px;
     background: var(--loquix-surface-bg);
-    text-decoration: none;
+    /* Longhand-only per repo convention — Safari resets text-decoration-color
+       when the shorthand is set, even when other rules try to override. */
+    text-decoration-line: none;
     color: inherit;
     transition: all 150ms;
   }

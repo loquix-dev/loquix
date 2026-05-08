@@ -201,9 +201,6 @@ export const en: LoquixTranslations = {
   'toolCallList.expandLabel': 'Show tool calls',
   'toolCallList.collapseLabel': 'Hide tool calls',
 
-  // === loquix-citation-popover (Phase 4 PR #1) ===
-  'citationPopover.openLabel': 'Open citation {index}',
-
   // === loquix-source-list (Phase 4 PR #1) ===
   'sourceList.heading': '{count} sources',
   'sourceList.headingOne': '1 source',
