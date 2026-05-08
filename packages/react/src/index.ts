@@ -43,3 +43,10 @@ export { UncertaintyMarker } from './components/UncertaintyMarker.js';
 export { DisagreementMarker } from './components/DisagreementMarker.js';
 export { FeedbackForm } from './components/FeedbackForm.js';
 export { CorrectionInput } from './components/CorrectionInput.js';
+
+// Phase 4 PR #1 — Reasoning & Tool Use
+export { ReasoningBlock } from './components/ReasoningBlock.js';
+export { ToolCall } from './components/ToolCall.js';
+export { ToolCallList } from './components/ToolCallList.js';
+export { CitationPopover } from './components/CitationPopover.js';
+export { SourceList } from './components/SourceList.js';

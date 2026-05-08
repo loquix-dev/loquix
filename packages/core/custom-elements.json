@@ -154,6 +154,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-citation-popover.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-citation-popover",
+          "declaration": {
+            "name": "LoquixCitationPopover",
+            "module": "/src/components/core/loquix-citation-popover.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-composer-toolbar.ts",
       "declarations": [],
       "exports": [
@@ -499,6 +514,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-reasoning-block.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-reasoning-block",
+          "declaration": {
+            "name": "LoquixReasoningBlock",
+            "module": "/src/components/core/loquix-reasoning-block.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-scroll-anchor.ts",
       "declarations": [],
       "exports": [
@@ -508,6 +538,21 @@
           "declaration": {
             "name": "LoquixScrollAnchor",
             "module": "/src/components/core/loquix-scroll-anchor.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-source-list.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-source-list",
+          "declaration": {
+            "name": "LoquixSourceList",
+            "module": "/src/components/core/loquix-source-list.js"
           }
         }
       ]
@@ -553,6 +598,36 @@
           "declaration": {
             "name": "LoquixTemplatePicker",
             "module": "/src/components/core/loquix-template-picker.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-tool-call-list.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-tool-call-list",
+          "declaration": {
+            "name": "LoquixToolCallList",
+            "module": "/src/components/core/loquix-tool-call-list.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-tool-call.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-tool-call",
+          "declaration": {
+            "name": "LoquixToolCall",
+            "module": "/src/components/core/loquix-tool-call.js"
           }
         }
       ]
@@ -3524,6 +3599,234 @@
           "declaration": {
             "name": "LoquixChatHeader",
             "module": "src/components/core/loquix-chat-header.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-citation-popover.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixCitationPopover",
+          "cssProperties": [
+            {
+              "description": "Chip foreground / hover background.",
+              "name": "--loquix-ai-color"
+            },
+            {
+              "description": "Chip resting background.",
+              "name": "--loquix-ai-color-subtle"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The clickable chip wrapper (`<button>`).",
+              "name": "chip"
+            },
+            {
+              "description": "The numeric badge.",
+              "name": "index"
+            },
+            {
+              "description": "The popover panel.",
+              "name": "popover"
+            },
+            {
+              "description": "Favicon container in the popover.",
+              "name": "favicon"
+            },
+            {
+              "description": "Popover text container.",
+              "name": "body"
+            },
+            {
+              "description": "Source title.",
+              "name": "title"
+            },
+            {
+              "description": "Source host name.",
+              "name": "host"
+            },
+            {
+              "description": "Source snippet text.",
+              "name": "snippet"
+            },
+            {
+              "description": "Trailing external-link icon.",
+              "name": "arrow"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "_uid",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "index",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "1-based citation index.",
+              "attribute": "index"
+            },
+            {
+              "kind": "field",
+              "name": "source",
+              "type": {
+                "text": "Source"
+              },
+              "default": "{ title: '', url: '' }",
+              "description": "Source data. Property-only — no JSON-attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "_open",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_placement",
+              "type": {
+                "text": "'top' | 'bottom'"
+              },
+              "privacy": "private",
+              "default": "'top'"
+            },
+            {
+              "kind": "field",
+              "name": "_cleanupAutoUpdate",
+              "type": {
+                "text": "() => void | undefined"
+              },
+              "privacy": "private",
+              "description": "Cleanup function returned by floating-ui's autoUpdate."
+            },
+            {
+              "kind": "field",
+              "name": "_chip",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_popover",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_updatePosition",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_setupAutoUpdate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_teardownAutoUpdate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_show",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hide",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onChipKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_activate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_onClick",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the chip is clicked or activated via keyboard. Detail: `{ index, source }`.",
+              "name": "loquix-citation-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "index",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "1-based citation index.",
+              "fieldName": "index"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-citation-popover",
+          "customElement": true,
+          "summary": "Inline numbered citation chip with a hover/focus popover showing\nthe source's title, host, and snippet.\n\nSlotted text remains the chip's accessible name? Actually the chip renders\nits own number, no slot. Description pattern via `aria-describedby` lets\nscreen readers announce the popover content as a description, not as the\naccessible name.\n\nPopover positioning uses `@floating-ui/dom` with `autoUpdate()` for\nscroll/resize resilience. The cleanup function is stored and called on\nclose + `disconnectedCallback` to avoid listener leaks.\n\nBoth `source.url` and `source.favicon` are validated against an `http(s):`\nallowlist before rendering. Click events fire even for unsafe URLs — the\nconsumer is responsible for navigation."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixCitationPopover",
+          "declaration": {
+            "name": "LoquixCitationPopover",
+            "module": "src/components/core/loquix-citation-popover.ts"
           }
         }
       ]
@@ -10293,6 +10596,288 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/loquix-reasoning-block.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixReasoningBlock",
+          "cssProperties": [
+            {
+              "description": "Background colour.",
+              "name": "--loquix-thought-bg"
+            },
+            {
+              "description": "Border colour.",
+              "name": "--loquix-thought-border-color"
+            },
+            {
+              "description": "Body text colour.",
+              "name": "--loquix-thought-text-color"
+            },
+            {
+              "description": "Caret + thinking-state accent.",
+              "name": "--loquix-streaming-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "The clickable header `<button>`.",
+              "name": "header"
+            },
+            {
+              "description": "The status label text.",
+              "name": "label"
+            },
+            {
+              "description": "Duration + token meta string.",
+              "name": "meta"
+            },
+            {
+              "description": "The expand/collapse chevron.",
+              "name": "chevron"
+            },
+            {
+              "description": "The collapsed preview text (when applicable).",
+              "name": "preview"
+            },
+            {
+              "description": "The expanded content region.",
+              "name": "content"
+            },
+            {
+              "description": "The streaming caret (only while `status='thinking'`).",
+              "name": "cursor"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Optional reasoning body. When the slot has any non-whitespace content, it wins over the `content` prop.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "_uid",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "ReasoningStatus"
+              },
+              "default": "'done'",
+              "description": "Current lifecycle: streaming or done.",
+              "attribute": "status",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "duration",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Optional duration in seconds (shown in the header when `status='done'`).",
+              "attribute": "duration"
+            },
+            {
+              "kind": "field",
+              "name": "tokens",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Optional token count (shown alongside duration).",
+              "attribute": "tokens"
+            },
+            {
+              "kind": "field",
+              "name": "preview",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "One-line preview shown when collapsed and `status='done'`.\nFalls back to truncating `content` if not provided.",
+              "attribute": "preview"
+            },
+            {
+              "kind": "field",
+              "name": "content",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Full thinking text. Rendered as a text node — never as HTML.",
+              "attribute": "content"
+            },
+            {
+              "kind": "field",
+              "name": "defaultOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state. Used only on first render; user toggles win after that.\nDefault: `true` while thinking, `false` when done.",
+              "attribute": "default-open"
+            },
+            {
+              "kind": "field",
+              "name": "_open",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_hasSlotContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_userToggled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Once `true`, status/defaultOpen changes don't re-derive `_open`."
+            },
+            {
+              "kind": "field",
+              "name": "_slot",
+              "type": {
+                "text": "HTMLSlotElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onSlotChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onToggle",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_formatDuration",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_previewText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "When the user expands or collapses the panel. Detail: `{ open }`.",
+              "name": "loquix-reasoning-toggle"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "status",
+              "type": {
+                "text": "ReasoningStatus"
+              },
+              "default": "'done'",
+              "description": "Current lifecycle: streaming or done.",
+              "fieldName": "status"
+            },
+            {
+              "name": "duration",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Optional duration in seconds (shown in the header when `status='done'`).",
+              "fieldName": "duration"
+            },
+            {
+              "name": "tokens",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Optional token count (shown alongside duration).",
+              "fieldName": "tokens"
+            },
+            {
+              "name": "preview",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "One-line preview shown when collapsed and `status='done'`.\nFalls back to truncating `content` if not provided.",
+              "fieldName": "preview"
+            },
+            {
+              "name": "content",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Full thinking text. Rendered as a text node — never as HTML.",
+              "fieldName": "content"
+            },
+            {
+              "name": "default-open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state. Used only on first render; user toggles win after that.\nDefault: `true` while thinking, `false` when done.",
+              "fieldName": "defaultOpen"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-reasoning-block",
+          "customElement": true,
+          "summary": "Collapsible \"thinking\" panel; streams reasoning content live and\nshows duration / token count when done.\n\nOnce the user toggles the panel manually, subsequent `status` or `defaultOpen`\nchanges do not re-derive `_open` — the user's choice wins. This avoids\nclobbering when streaming finishes (`thinking` → `done`) or when an external\ncontroller mutates `defaultOpen`."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixReasoningBlock",
+          "declaration": {
+            "name": "LoquixReasoningBlock",
+            "module": "src/components/core/loquix-reasoning-block.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/loquix-scroll-anchor.ts",
       "declarations": [
         {
@@ -10429,6 +11014,198 @@
           "declaration": {
             "name": "LoquixScrollAnchor",
             "module": "src/components/core/loquix-scroll-anchor.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-source-list.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSourceList",
+          "cssProperties": [
+            {
+              "description": "Hover border / index foreground.",
+              "name": "--loquix-ai-color"
+            },
+            {
+              "description": "Index background.",
+              "name": "--loquix-ai-color-subtle"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "The \"N sources\" header row.",
+              "name": "header"
+            },
+            {
+              "description": "The grid/list container.",
+              "name": "items"
+            },
+            {
+              "description": "A single source row (`<a>` or `<span>`).",
+              "name": "source"
+            },
+            {
+              "description": "The top metadata row inside a source.",
+              "name": "top"
+            },
+            {
+              "description": "The numeric badge.",
+              "name": "index"
+            },
+            {
+              "description": "The host name.",
+              "name": "host"
+            },
+            {
+              "description": "The source title.",
+              "name": "title"
+            },
+            {
+              "description": "The snippet text.",
+              "name": "snippet"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "_uid",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "sources",
+              "type": {
+                "text": "Source[]"
+              },
+              "default": "[]",
+              "description": "Sources to render. Property-only — no JSON-attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "layout",
+              "type": {
+                "text": "SourceListLayout"
+              },
+              "default": "'grid'",
+              "description": "Display variant.",
+              "attribute": "layout",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Override the localised heading.",
+              "attribute": "heading"
+            },
+            {
+              "kind": "method",
+              "name": "_onSourceClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "Source"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderSource",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "Source"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "description": "Cancelable. Detail: `{ index, source }`.",
+              "name": "loquix-source-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "layout",
+              "type": {
+                "text": "SourceListLayout"
+              },
+              "default": "'grid'",
+              "description": "Display variant.",
+              "fieldName": "layout"
+            },
+            {
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Override the localised heading.",
+              "fieldName": "heading"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-source-list",
+          "customElement": true,
+          "summary": "Anchored grid or list of sources under an assistant message.\n\nIndices are 1-based and match the numbering in `loquix-citation-popover`.\n`loquix-source-click` is dispatched with `cancelable: true` before\nnavigation; consumers can `e.preventDefault()` to keep the user on-page\n(e.g. open in a side panel instead).\n\nEach source's `url` and `favicon` are validated against an `http(s):`\nallowlist before rendering — sources with unsafe URLs render as a\nnon-anchor `<span>` row (visible but inert)."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSourceList",
+          "declaration": {
+            "name": "LoquixSourceList",
+            "module": "src/components/core/loquix-source-list.ts"
           }
         }
       ]
@@ -11168,6 +11945,470 @@
           "declaration": {
             "name": "LoquixTemplatePicker",
             "module": "src/components/core/loquix-template-picker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-tool-call-list.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixToolCallList",
+          "cssParts": [
+            {
+              "description": "The outer wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "The clickable header `<button>`.",
+              "name": "header"
+            },
+            {
+              "description": "The summary text span.",
+              "name": "summary"
+            },
+            {
+              "description": "Expand/collapse chevron.",
+              "name": "chevron"
+            },
+            {
+              "description": "The slotted-children container.",
+              "name": "items"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Default slot for `<loquix-tool-call>` children.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "_uid",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "summary",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional explicit summary text (overrides the localised count).",
+              "attribute": "summary"
+            },
+            {
+              "kind": "field",
+              "name": "defaultCollapsed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial collapsed state. User toggles win after first render.",
+              "attribute": "default-collapsed"
+            },
+            {
+              "kind": "field",
+              "name": "_collapsed",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_count",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "_userToggled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Once `true`, defaultCollapsed prop changes still re-derive (consumer override), but no other state does."
+            },
+            {
+              "kind": "field",
+              "name": "_slot",
+              "type": {
+                "text": "HTMLSlotElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onSlotChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onToggle",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the user expands or collapses. Detail: `{ open }`.",
+              "name": "loquix-tool-group-toggle"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "summary",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional explicit summary text (overrides the localised count).",
+              "fieldName": "summary"
+            },
+            {
+              "name": "default-collapsed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial collapsed state. User toggles win after first render.",
+              "fieldName": "defaultCollapsed"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-tool-call-list",
+          "customElement": true,
+          "summary": "Group container for parallel `loquix-tool-call` children.\n\nHeader shows a localised \"Used N tools\" summary (override via `summary`\nattribute). Body collapses on click. Initial collapsed state derives from\n`default-collapsed`; user toggles win after that.\n\nSlotted child counting uses `slot.assignedElements({ flatten: true })`\nfiltered by `localName === 'loquix-tool-call'` — whitespace text and\nstray wrapper elements don't inflate the count."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixToolCallList",
+          "declaration": {
+            "name": "LoquixToolCallList",
+            "module": "src/components/core/loquix-tool-call-list.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-tool-call.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixToolCall",
+          "cssProperties": [
+            {
+              "description": "Background colour.",
+              "name": "--loquix-tool-bg"
+            },
+            {
+              "description": "Status pill background when success.",
+              "name": "--loquix-tool-success-bg"
+            },
+            {
+              "description": "Status pill / icon background when error.",
+              "name": "--loquix-tool-error-bg"
+            },
+            {
+              "description": "Result block background.",
+              "name": "--loquix-tool-result-bg"
+            },
+            {
+              "description": "Result block border.",
+              "name": "--loquix-tool-result-border"
+            },
+            {
+              "description": "Error block border.",
+              "name": "--loquix-tool-error-border"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "The clickable header `<button>`.",
+              "name": "header"
+            },
+            {
+              "description": "The leading tool icon (or spinner while running).",
+              "name": "icon"
+            },
+            {
+              "description": "The tool name + inline args summary.",
+              "name": "name"
+            },
+            {
+              "description": "The inline args summary span.",
+              "name": "arg-summary"
+            },
+            {
+              "description": "The status pill on the right.",
+              "name": "status"
+            },
+            {
+              "description": "Expand/collapse chevron.",
+              "name": "chevron"
+            },
+            {
+              "description": "The expanded body with args / result / error sections.",
+              "name": "body"
+            },
+            {
+              "description": "The args block.",
+              "name": "args"
+            },
+            {
+              "description": "The result block.",
+              "name": "result"
+            },
+            {
+              "description": "The error block.",
+              "name": "error"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Tool name rendered in monospace.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "toolId",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional stable id (analytics). Reflected as kebab attribute `tool-id`.",
+              "attribute": "tool-id",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "ToolCallStatus"
+              },
+              "default": "'pending'",
+              "description": "Lifecycle state.",
+              "attribute": "status",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "args",
+              "type": {
+                "text": "Record<string, unknown> | undefined"
+              },
+              "description": "Tool arguments. Property-only (no JSON-attribute parsing)."
+            },
+            {
+              "kind": "field",
+              "name": "result",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Multi-line result text. Pre-formatted (CSS preserves whitespace).",
+              "attribute": "result"
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Error text (shown when `status='error'`).",
+              "attribute": "error"
+            },
+            {
+              "kind": "field",
+              "name": "duration",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Duration in ms. Shown only when `status='success'`.",
+              "attribute": "duration"
+            },
+            {
+              "kind": "field",
+              "name": "defaultOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state. Used only on first render; user toggles win after.",
+              "attribute": "default-open"
+            },
+            {
+              "kind": "field",
+              "name": "compact",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Smaller padding when set.",
+              "attribute": "compact",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_open",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_userToggled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Once `true`, status changes don't re-derive `_open`."
+            },
+            {
+              "kind": "field",
+              "name": "_onToggle",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderIcon",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderArgSummary",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the user expands or collapses. Detail: `{ name, toolId?, open }`.",
+              "name": "loquix-tool-call-toggle"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Tool name rendered in monospace.",
+              "fieldName": "name"
+            },
+            {
+              "name": "tool-id",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional stable id (analytics). Reflected as kebab attribute `tool-id`.",
+              "fieldName": "toolId"
+            },
+            {
+              "name": "status",
+              "type": {
+                "text": "ToolCallStatus"
+              },
+              "default": "'pending'",
+              "description": "Lifecycle state.",
+              "fieldName": "status"
+            },
+            {
+              "name": "result",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Multi-line result text. Pre-formatted (CSS preserves whitespace).",
+              "fieldName": "result"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Error text (shown when `status='error'`).",
+              "fieldName": "error"
+            },
+            {
+              "name": "duration",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Duration in ms. Shown only when `status='success'`.",
+              "fieldName": "duration"
+            },
+            {
+              "name": "default-open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Initial open state. Used only on first render; user toggles win after.",
+              "fieldName": "defaultOpen"
+            },
+            {
+              "name": "compact",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Smaller padding when set.",
+              "fieldName": "compact"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-tool-call",
+          "customElement": true,
+          "summary": "Renders a single tool call (pending / running / success / error)\nwith a name, args summary, and an expandable body for the full args + result/error.\n\n`args` is property-only (no JSON-attribute parsing) — set it via JS or via\nthe React wrapper's prop. JSON serialization for display is guarded against\ncyclic objects.\n\nInitial open state derives from `defaultOpen` (when explicitly set) or from\n`status` (running / error open by default; pending / success closed).\nOnce the user toggles the panel, status changes don't re-derive `_open` —\nan explicit `defaultOpen` write does."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixToolCall",
+          "declaration": {
+            "name": "LoquixToolCall",
+            "module": "src/components/core/loquix-tool-call.ts"
           }
         }
       ]

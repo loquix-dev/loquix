@@ -58,6 +58,11 @@ export type {
   UncertaintyVariant,
   DisagreementVariant,
   FeedbackReason,
+  // Phase 4 PR #1 — Reasoning & Tool Use types
+  ReasoningStatus,
+  ToolCallStatus,
+  SourceListLayout,
+  Source,
 } from './types/index.js';
 
 // === Events ===
@@ -105,6 +110,12 @@ export type {
   LoquixCorrectionCancelDetail,
   LoquixDisagreementResolveDetail,
   LoquixUncertaintyClickDetail,
+  // Phase 4 PR #1 — Reasoning & Tool Use events
+  LoquixReasoningToggleDetail,
+  LoquixToolCallToggleDetail,
+  LoquixToolGroupToggleDetail,
+  LoquixCitationClickDetail,
+  LoquixSourceClickDetail,
 } from './events/index.js';
 
 // === Localization ===
@@ -177,6 +188,12 @@ export { LoquixUncertaintyMarker } from './components/core/loquix-uncertainty-ma
 export { LoquixDisagreementMarker } from './components/core/loquix-disagreement-marker.js';
 export { LoquixFeedbackForm } from './components/core/loquix-feedback-form.js';
 export { LoquixCorrectionInput } from './components/core/loquix-correction-input.js';
+// Phase 4 PR #1 — Reasoning & Tool Use components
+export { LoquixReasoningBlock } from './components/core/loquix-reasoning-block.js';
+export { LoquixToolCall } from './components/core/loquix-tool-call.js';
+export { LoquixToolCallList } from './components/core/loquix-tool-call-list.js';
+export { LoquixCitationPopover } from './components/core/loquix-citation-popover.js';
+export { LoquixSourceList } from './components/core/loquix-source-list.js';
 
 // === Side-effect registrations (auto-define all tags) ===
 import './components/core/define-message-avatar.js';
@@ -221,3 +238,9 @@ import './components/core/define-uncertainty-marker.js';
 import './components/core/define-disagreement-marker.js';
 import './components/core/define-feedback-form.js';
 import './components/core/define-correction-input.js';
+// Phase 4 PR #1 — Reasoning & Tool Use registrations
+import './components/core/define-reasoning-block.js';
+import './components/core/define-tool-call.js';
+import './components/core/define-tool-call-list.js';
+import './components/core/define-citation-popover.js';
+import './components/core/define-source-list.js';
