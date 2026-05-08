@@ -24,14 +24,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # node 24 ships with npm 11.x out of the box, which has full
+          # Trusted Publisher OIDC handshake support (npm 10.x doesn't).
+          node-version: 24
           cache: pnpm
           registry-url: https://registry.npmjs.org
-
-      # npm 11.5+ has full Trusted Publisher OIDC handshake support.
-      # node 22 LTS ships with npm 10.x, so upgrade explicitly.
-      - name: Upgrade npm to latest
-        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
