@@ -1,5 +1,12 @@
 # @loquix/react
 
+## 0.2.0
+
+### Patch Changes
+
+- Updated dependencies [f1f5ee2]
+  - @loquix/core@0.2.0
+
 ## 0.1.2
 
 ### Patch Changes

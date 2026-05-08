@@ -1,6 +1,6 @@
 {
   "name": "@loquix/core",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Web Components for AI/LLM chat interfaces",
   "license": "MIT",
   "publishConfig": {
