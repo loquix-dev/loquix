@@ -101,4 +101,12 @@
   --loquix-uncert-verify-bg: color-mix(in srgb, #3b82f6 16%, transparent);
   --loquix-uncert-spec-color: #7c3aed;
   --loquix-uncert-spec-bg: color-mix(in srgb, #8b5cf6 16%, transparent);
+
+  /* === Tool-call palettes (Phase 4 PR #1) === */
+  --loquix-tool-bg: var(--loquix-surface-bg);
+  --loquix-tool-success-bg: #dcfce7;
+  --loquix-tool-error-bg: #fee2e2;
+  --loquix-tool-result-bg: #f0fdf4;
+  --loquix-tool-result-border: #bbf7d0;
+  --loquix-tool-error-border: #fecaca;
 }

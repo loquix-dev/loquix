@@ -86,6 +86,37 @@ export type FeedbackReason =
   | 'unsafe'
   | 'other';
 
+// === Reasoning & Tool Use (Phase 4 PR #1) ===
+
+/** Reasoning block lifecycle. */
+export type ReasoningStatus = 'thinking' | 'done';
+
+/** Tool call lifecycle. */
+export type ToolCallStatus = 'pending' | 'running' | 'success' | 'error';
+
+/** Source list display variant. */
+export type SourceListLayout = 'grid' | 'list';
+
+/**
+ * A single source entry referenced by a citation chip and listed in source-list.
+ * `id` is optional but recommended for analytics — it lets consumers reconcile
+ * citations with sources when several share the same numeric index across turns.
+ */
+export interface Source {
+  /** Optional stable identifier (analytics, de-dup). */
+  id?: string;
+  /** Human-readable title of the source. */
+  title: string;
+  /** URL to navigate to. Validated against an http(s) allowlist before rendering. */
+  url: string;
+  /** Display host (e.g. "arxiv.org"). Optional. */
+  host?: string;
+  /** Snippet text shown in the popover and source-list rows. Optional. */
+  snippet?: string;
+  /** Favicon URL. Validated against the same http(s) allowlist as `url`. Optional. */
+  favicon?: string;
+}
+
 // === Onboarding types (Phase 2) ===
 
 /** A suggestion item for chips, welcome screens, and follow-ups */

@@ -2,6 +2,7 @@ import type {
   FeedbackSentiment,
   FeedbackReason,
   UncertaintyKind,
+  Source,
   Suggestion,
   Template,
   GalleryItem,
@@ -189,6 +190,44 @@ export interface LoquixUncertaintyClickDetail {
   reason?: string;
 }
 
+// === Reasoning & Tool Use events (Phase 4 PR #1) ===
+
+export interface LoquixReasoningToggleDetail {
+  open: boolean;
+}
+
+export interface LoquixToolCallToggleDetail {
+  /** Tool name (matches the `name` attribute on the component). */
+  name: string;
+  /**
+   * Optional stable handle from the `tool-id` attribute. Useful for analytics
+   * when several calls share the same `name`.
+   */
+  toolId?: string;
+  open: boolean;
+}
+
+export interface LoquixToolGroupToggleDetail {
+  open: boolean;
+}
+
+export interface LoquixCitationClickDetail {
+  /** 1-based position. */
+  index: number;
+  source: Source;
+}
+
+/**
+ * Source-list click detail. The event is dispatched as `cancelable: true`
+ * before anchor navigation; calling `preventDefault()` on it stops the
+ * underlying anchor click from navigating.
+ */
+export interface LoquixSourceClickDetail {
+  /** 1-based position. */
+  index: number;
+  source: Source;
+}
+
 // === Scroll events ===
 
 export interface LoquixScrollBottomDetail {}
@@ -257,5 +296,10 @@ declare global {
     'loquix-correction-cancel': CustomEvent<LoquixCorrectionCancelDetail>;
     'loquix-disagreement-resolve': CustomEvent<LoquixDisagreementResolveDetail>;
     'loquix-uncertainty-click': CustomEvent<LoquixUncertaintyClickDetail>;
+    'loquix-reasoning-toggle': CustomEvent<LoquixReasoningToggleDetail>;
+    'loquix-tool-call-toggle': CustomEvent<LoquixToolCallToggleDetail>;
+    'loquix-tool-group-toggle': CustomEvent<LoquixToolGroupToggleDetail>;
+    'loquix-citation-click': CustomEvent<LoquixCitationClickDetail>;
+    'loquix-source-click': CustomEvent<LoquixSourceClickDetail>;
   }
 }

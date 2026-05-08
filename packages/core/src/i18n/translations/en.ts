@@ -175,4 +175,37 @@ export const en: LoquixTranslations = {
   'disagreementMarker.title': 'User disagreed with this response',
   'disagreementMarker.markResolvedLabel': 'Mark resolved',
   'disagreementMarker.inlineLabel': 'Disagreement',
+
+  // === loquix-reasoning-block (Phase 4 PR #1) ===
+  'reasoningBlock.thinking': 'Thinking…',
+  'reasoningBlock.thoughtFor': 'Thought for {seconds}s',
+  'reasoningBlock.thoughtForMinutes': 'Thought for {minutes}m {seconds}s',
+  'reasoningBlock.tokensSuffix': '· {count} tokens',
+  'reasoningBlock.expandLabel': 'Show reasoning',
+  'reasoningBlock.collapseLabel': 'Hide reasoning',
+
+  // === loquix-tool-call (Phase 4 PR #1) ===
+  'toolCall.statusQueued': 'Queued',
+  'toolCall.statusRunning': 'Running',
+  'toolCall.statusDone': 'Done',
+  'toolCall.statusFailed': 'Failed',
+  'toolCall.argumentsLabel': 'Arguments',
+  'toolCall.resultLabel': 'Result',
+  'toolCall.errorLabel': 'Error',
+  'toolCall.expandLabel': 'Expand tool call',
+  'toolCall.collapseLabel': 'Collapse tool call',
+
+  // === loquix-tool-call-list (Phase 4 PR #1) ===
+  'toolCallList.summaryFallback': 'Used {count} tools',
+  'toolCallList.summaryFallbackOne': 'Used 1 tool',
+  'toolCallList.expandLabel': 'Show tool calls',
+  'toolCallList.collapseLabel': 'Hide tool calls',
+
+  // === loquix-citation-popover (Phase 4 PR #1) ===
+  'citationPopover.openLabel': 'Open citation {index}',
+
+  // === loquix-source-list (Phase 4 PR #1) ===
+  'sourceList.heading': '{count} sources',
+  'sourceList.headingOne': '1 source',
+  'sourceList.openLabel': 'Open source {index}',
 };

@@ -177,4 +177,37 @@ export interface LoquixTranslations {
   'disagreementMarker.title': string;
   'disagreementMarker.markResolvedLabel': string;
   'disagreementMarker.inlineLabel': string;
+
+  // === loquix-reasoning-block (Phase 4 PR #1) ===
+  'reasoningBlock.thinking': string;
+  'reasoningBlock.thoughtFor': string;
+  'reasoningBlock.thoughtForMinutes': string;
+  'reasoningBlock.tokensSuffix': string;
+  'reasoningBlock.expandLabel': string;
+  'reasoningBlock.collapseLabel': string;
+
+  // === loquix-tool-call (Phase 4 PR #1) ===
+  'toolCall.statusQueued': string;
+  'toolCall.statusRunning': string;
+  'toolCall.statusDone': string;
+  'toolCall.statusFailed': string;
+  'toolCall.argumentsLabel': string;
+  'toolCall.resultLabel': string;
+  'toolCall.errorLabel': string;
+  'toolCall.expandLabel': string;
+  'toolCall.collapseLabel': string;
+
+  // === loquix-tool-call-list (Phase 4 PR #1) ===
+  'toolCallList.summaryFallback': string;
+  'toolCallList.summaryFallbackOne': string;
+  'toolCallList.expandLabel': string;
+  'toolCallList.collapseLabel': string;
+
+  // === loquix-citation-popover (Phase 4 PR #1) ===
+  'citationPopover.openLabel': string;
+
+  // === loquix-source-list (Phase 4 PR #1) ===
+  'sourceList.heading': string;
+  'sourceList.headingOne': string;
+  'sourceList.openLabel': string;
 }
