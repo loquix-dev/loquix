@@ -68,6 +68,17 @@ describe('loquix-uncertainty-marker', () => {
     expect(tooltip.getAttribute('role')).to.equal('tooltip');
   });
 
+  it('tooltip is NOT a descendant of role="button" (accessible name stays the slotted text)', async () => {
+    const el = await fixture<LoquixUncertaintyMarker>(
+      html`<loquix-uncertainty-marker kind="unsure">around 3.1%</loquix-uncertainty-marker>`,
+    );
+    const marker = getShadowPart(el, 'marker')!;
+    const tooltip = getShadowPart(el, 'tooltip')!;
+    // The accessible-name-from-content algorithm walks descendants of role="button".
+    // If the tooltip lived inside the button, its text would pollute the name.
+    expect(marker.contains(tooltip)).to.be.false;
+  });
+
   it('default tooltip text uses i18n key for kind', async () => {
     const el = await fixture<LoquixUncertaintyMarker>(
       html`<loquix-uncertainty-marker kind="needs-verification">x</loquix-uncertainty-marker>`,

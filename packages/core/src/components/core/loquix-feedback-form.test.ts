@@ -263,6 +263,68 @@ describe('loquix-feedback-form', () => {
     expect(getShadowPart(el, 'form')).to.be.null;
   });
 
+  it('invalid value attribute is treated as null (no form, no submit)', async () => {
+    const el = await fixture<LoquixFeedbackForm>(html`
+      <loquix-feedback-form value="foo"></loquix-feedback-form>
+    `);
+    await el.updateComplete;
+    // value is set via property/attribute but normalised on read; form must stay closed.
+    expect(getShadowPart(el, 'form')).to.be.null;
+    const { pos, neg } = getInnerButtons(el);
+    expect(pos.active).to.be.false;
+    expect(neg.active).to.be.false;
+
+    // No public submit event should fire — the only entry point (Send) is hidden.
+    let fired = false;
+    el.addEventListener('loquix-feedback-submit', () => {
+      fired = true;
+    });
+    // Programmatic call to internal _onSend would fire, but the public surface is the button —
+    // since the form isn't shown, the user has no way to submit.
+    await new Promise(r => setTimeout(r, 30));
+    expect(fired).to.be.false;
+  });
+
+  it('external value=null after submit clears the thanks state', async () => {
+    const el = await fixture<LoquixFeedbackForm>(html`
+      <loquix-feedback-form value="positive"></loquix-feedback-form>
+    `);
+    await el.updateComplete;
+    const submit = getShadowPart(el, 'submit')! as HTMLButtonElement;
+    submit.click();
+    await el.updateComplete;
+    expect(getShadowPart(el, 'thanks')).to.exist;
+
+    // Parent resets externally.
+    el.value = null;
+    await el.updateComplete;
+    expect(getShadowPart(el, 'thanks')).to.be.null;
+    expect(getShadowPart(el, 'form')).to.be.null;
+  });
+
+  it('flipping value externally clears stale draft chip + comment', async () => {
+    const el = await fixture<LoquixFeedbackForm>(html`
+      <loquix-feedback-form value="positive"></loquix-feedback-form>
+    `);
+    await el.updateComplete;
+    const chips = el.shadowRoot!.querySelectorAll('[part="chip"]');
+    (chips[0] as HTMLButtonElement).click();
+    const textarea = getShadowPart(el, 'textarea')! as HTMLTextAreaElement;
+    textarea.value = 'great answer';
+    textarea.dispatchEvent(new Event('input'));
+    await el.updateComplete;
+    expect(chips[0].getAttribute('aria-checked')).to.equal('true');
+
+    el.value = 'negative';
+    await el.updateComplete;
+    const newChips = el.shadowRoot!.querySelectorAll('[part="chip"]');
+    newChips.forEach(c => {
+      expect(c.getAttribute('aria-checked')).to.equal('false');
+    });
+    const newTextarea = getShadowPart(el, 'textarea')! as HTMLTextAreaElement;
+    expect(newTextarea.value).to.equal('');
+  });
+
   it('locale change updates visible chip labels', async () => {
     const el = await fixture<LoquixFeedbackForm>(
       html`<loquix-feedback-form value="positive"></loquix-feedback-form>`,

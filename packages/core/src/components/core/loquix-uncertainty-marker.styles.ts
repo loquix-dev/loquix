@@ -1,13 +1,22 @@
 import { css } from 'lit';
 
 const styles = css`
+  /* Inherit font from surrounding prose — the marker wraps inline text and
+     should NOT visually disrupt the paragraph it lives in. (Setting
+     font-family on :host would cascade through to slotted content via the
+     light DOM tree, making the marker text look heavier or differently-shaped
+     than its surroundings. Tooltip below uses an explicit font-family because
+     it's a separate shadow-DOM popover, not slotted prose.) */
   :host {
     display: inline;
-    font-family: var(--loquix-font-family);
+  }
+
+  .wrapper {
+    position: relative;
+    display: inline;
   }
 
   .marker {
-    position: relative;
     display: inline;
     cursor: help;
     outline: none;
@@ -22,9 +31,12 @@ const styles = css`
     color: inherit;
   }
 
-  /* Underline variant */
+  /* Underline variant — longhand only. Safari resets text-decoration-color
+     when the shorthand 'text-decoration: underline wavy' is set, so the
+     per-kind colour rules below would no-op in WebKit. */
   .marker--underline .text {
-    text-decoration: underline wavy;
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
     text-decoration-thickness: 1.5px;
     text-underline-offset: 3px;
   }

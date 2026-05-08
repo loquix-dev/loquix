@@ -16,6 +16,7 @@ const DEFAULT_HIGH = 0.75;
 const DOTS_TOTAL = 5;
 
 const isFiniteNumber = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n);
+const isValidThreshold = (n: unknown): n is number => isFiniteNumber(n) && n >= 0 && n <= 1;
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
 /**
@@ -85,8 +86,8 @@ export class LoquixConfidenceIndicator extends LitElement {
     if (this.level === 'low' || this.level === 'medium' || this.level === 'high') {
       return this.level;
     }
-    let effLow = isFiniteNumber(this.lowThreshold) ? this.lowThreshold : DEFAULT_LOW;
-    let effHigh = isFiniteNumber(this.highThreshold) ? this.highThreshold : DEFAULT_HIGH;
+    let effLow = isValidThreshold(this.lowThreshold) ? this.lowThreshold : DEFAULT_LOW;
+    let effHigh = isValidThreshold(this.highThreshold) ? this.highThreshold : DEFAULT_HIGH;
     if (effLow >= effHigh) {
       effLow = DEFAULT_LOW;
       effHigh = DEFAULT_HIGH;
@@ -155,7 +156,8 @@ export class LoquixConfidenceIndicator extends LitElement {
     }
 
     if (this.variant === 'dots') {
-      const filled = Math.max(1, Math.round(v * DOTS_TOTAL));
+      // 0 dots at value=0, 5 dots at value=1, monotonic in between.
+      const filled = Math.round(v * DOTS_TOTAL);
       return html`
         <span
           part="meter"

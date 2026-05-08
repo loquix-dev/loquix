@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import type { FeedbackReason, FeedbackSentiment } from '../../types/index.js';
 import { LocalizeController } from '../../i18n/index.js';
@@ -10,6 +10,9 @@ import styles from './loquix-feedback-form.styles.js';
 
 const POS_REASONS: readonly FeedbackReason[] = ['accurate', 'well-written', 'helpful', 'other'];
 const NEG_REASONS: readonly FeedbackReason[] = ['inaccurate', 'off-topic', 'unsafe', 'other'];
+
+const isValidSentiment = (v: unknown): v is FeedbackSentiment =>
+  v === 'positive' || v === 'negative';
 
 const REASON_KEYS: Record<FeedbackReason, keyof LoquixTranslations> = {
   accurate: 'feedbackForm.reasonAccurate',
@@ -73,6 +76,34 @@ export class LoquixFeedbackForm extends LitElement {
   @state()
   private _submitted = false;
 
+  /**
+   * Returns the current value if it's a valid `FeedbackSentiment`, else `null`.
+   * Guards against `value` being set from an attribute or external mutation
+   * to something outside the type union.
+   */
+  private _validValue(): FeedbackSentiment | null {
+    return isValidSentiment(this.value) ? this.value : null;
+  }
+
+  /**
+   * When `value` changes — by user click, external prop assignment, or attribute
+   * change — reset the draft state. This keeps controlled usage clean: a parent
+   * that sets `value=null` after the user submits will see the thanks state
+   * cleared automatically; flipping sentiment externally doesn't carry stale
+   * chip / comment selections from the previous sentiment's chip set.
+   *
+   * Done in `willUpdate` (not `updated`) to fold the resets into the same
+   * render cycle — avoids a second update being scheduled from within
+   * `updated`.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    if (changed.has('value')) {
+      this._reason = null;
+      this._comment = '';
+      this._submitted = false;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Composition with loquix-action-feedback
   // ---------------------------------------------------------------------------
@@ -87,14 +118,8 @@ export class LoquixFeedbackForm extends LitElement {
     e.stopPropagation();
     const target = e.target as LoquixActionFeedback | null;
     if (!target) return;
-    if (target.active) {
-      this.value = e.detail.sentiment;
-    } else {
-      this.value = null;
-    }
-    this._reason = null;
-    this._comment = '';
-    this._submitted = false;
+    // Setting `value` triggers `updated()` which clears _reason / _comment / _submitted.
+    this.value = target.active ? e.detail.sentiment : null;
   };
 
   // ---------------------------------------------------------------------------
@@ -110,24 +135,22 @@ export class LoquixFeedbackForm extends LitElement {
   };
 
   private _isSendDisabled(): boolean {
-    if (!this.value) return true;
-    if (
-      this.requireCommentOnDown &&
-      this.value === 'negative' &&
-      this._comment.trim().length === 0
-    ) {
+    const v = this._validValue();
+    if (!v) return true;
+    if (this.requireCommentOnDown && v === 'negative' && this._comment.trim().length === 0) {
       return true;
     }
     return false;
   }
 
   private _onSend = (): void => {
-    if (this._isSendDisabled() || !this.value) return;
+    const v = this._validValue();
+    if (this._isSendDisabled() || !v) return;
     const detail: {
       sentiment: FeedbackSentiment;
       reason?: FeedbackReason;
       comment?: string;
-    } = { sentiment: this.value };
+    } = { sentiment: v };
     if (this._reason) detail.reason = this._reason;
     const trimmed = this._comment.trim();
     if (trimmed.length > 0) detail.comment = trimmed;
@@ -136,10 +159,8 @@ export class LoquixFeedbackForm extends LitElement {
   };
 
   private _onCancel = (): void => {
+    // Setting `value=null` triggers `updated()` which clears the draft state.
     this.value = null;
-    this._reason = null;
-    this._comment = '';
-    this._submitted = false;
   };
 
   // ---------------------------------------------------------------------------
@@ -151,13 +172,14 @@ export class LoquixFeedbackForm extends LitElement {
     const reasonsLabel = this._localize.term('feedbackForm.reasonsGroupLabel');
     const sendLabel = this._localize.term('feedbackForm.sendLabel');
     const cancelLabel = this._localize.term('feedbackForm.cancelLabel');
+    const v = this._validValue();
     const placeholder =
-      this.value === 'negative'
+      v === 'negative'
         ? this._localize.term('feedbackForm.placeholderDown')
         : this._localize.term('feedbackForm.placeholderUp');
 
-    const reasons = this.value === 'negative' ? NEG_REASONS : POS_REASONS;
-    const showForm = this.allowReason && this.value !== null && !this._submitted;
+    const reasons = v === 'negative' ? NEG_REASONS : POS_REASONS;
+    const showForm = this.allowReason && v !== null && !this._submitted;
 
     return html`
       <div
@@ -169,11 +191,11 @@ export class LoquixFeedbackForm extends LitElement {
       >
         <loquix-action-feedback
           sentiment="positive"
-          ?active=${this.value === 'positive'}
+          ?active=${v === 'positive'}
         ></loquix-action-feedback>
         <loquix-action-feedback
           sentiment="negative"
-          ?active=${this.value === 'negative'}
+          ?active=${v === 'negative'}
         ></loquix-action-feedback>
       </div>
 

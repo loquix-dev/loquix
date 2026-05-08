@@ -52,6 +52,18 @@ describe('loquix-confidence-indicator', () => {
     expect(filled.length).to.equal(3);
   });
 
+  it('dots variant shows 0 filled at value=0 and 5 at value=1', async () => {
+    const zero = await fixture<LoquixConfidenceIndicator>(
+      html`<loquix-confidence-indicator value="0" variant="dots"></loquix-confidence-indicator>`,
+    );
+    expect(zero.shadowRoot!.querySelectorAll('.dots__dot.is-on').length).to.equal(0);
+
+    const one = await fixture<LoquixConfidenceIndicator>(
+      html`<loquix-confidence-indicator value="1" variant="dots"></loquix-confidence-indicator>`,
+    );
+    expect(one.shadowRoot!.querySelectorAll('.dots__dot.is-on').length).to.equal(5);
+  });
+
   it('renders badge variant', async () => {
     const el = await fixture<LoquixConfidenceIndicator>(
       html`<loquix-confidence-indicator
@@ -106,6 +118,18 @@ describe('loquix-confidence-indicator', () => {
         high-threshold="0.4"
       ></loquix-confidence-indicator>`,
     );
+    expect(el.effectiveLevel).to.equal('high');
+  });
+
+  it('out-of-range thresholds fall back to defaults', async () => {
+    const el = await fixture<LoquixConfidenceIndicator>(html`
+      <loquix-confidence-indicator
+        value="0.9"
+        low-threshold="-1"
+        high-threshold="2"
+      ></loquix-confidence-indicator>
+    `);
+    // Both thresholds are out of [0, 1]; should reset to defaults so derivation tracks value.
     expect(el.effectiveLevel).to.equal('high');
   });
 

@@ -116,24 +116,30 @@ export class LoquixUncertaintyMarker extends LitElement {
   protected override render() {
     const tip = this._tipText();
 
+    // Tooltip is rendered as a SIBLING of role="button", not a descendant —
+    // this keeps the slotted text as the button's accessible name and exposes
+    // the tooltip text purely via aria-describedby (description), not via
+    // the descendants-name-from-content algorithm.
     return html`
-      <span
-        part="marker"
-        class="marker marker--${this.variant} marker--${this.kind}"
-        tabindex="0"
-        role="button"
-        aria-describedby=${TOOLTIP_ID}
-        @mouseenter=${this._show}
-        @mouseleave=${this._hide}
-        @focus=${this._show}
-        @blur=${this._hide}
-        @keydown=${this._onKeyDown}
-        @click=${this._onClick}
-      >
-        <span part="text" class="text"><slot></slot></span>
-        ${this.variant === 'icon'
-          ? html`<span part="icon" class="icon" aria-hidden="true">${warningSvg}</span>`
-          : nothing}
+      <span class="wrapper">
+        <span
+          part="marker"
+          class="marker marker--${this.variant} marker--${this.kind}"
+          tabindex="0"
+          role="button"
+          aria-describedby=${TOOLTIP_ID}
+          @mouseenter=${this._show}
+          @mouseleave=${this._hide}
+          @focus=${this._show}
+          @blur=${this._hide}
+          @keydown=${this._onKeyDown}
+          @click=${this._onClick}
+        >
+          <span part="text" class="text"><slot></slot></span>
+          ${this.variant === 'icon'
+            ? html`<span part="icon" class="icon" aria-hidden="true">${warningSvg}</span>`
+            : nothing}
+        </span>
         <span
           part="tooltip"
           id=${TOOLTIP_ID}

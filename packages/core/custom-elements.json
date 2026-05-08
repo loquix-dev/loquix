@@ -5763,6 +5763,17 @@
               "default": "false"
             },
             {
+              "kind": "method",
+              "name": "_validValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "FeedbackSentiment | null"
+                }
+              },
+              "description": "Returns the current value if it's a valid `FeedbackSentiment`, else `null`.\nGuards against `value` being set from an attribute or external mutation\nto something outside the type union."
+            },
+            {
               "kind": "field",
               "name": "_onChildFeedback",
               "privacy": "private",
