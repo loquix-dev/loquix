@@ -3,6 +3,15 @@
   "version": "0.2.0",
   "description": "React wrappers for @loquix/core Web Components",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loquix-dev/loquix.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://loquix.dev",
+  "bugs": {
+    "url": "https://github.com/loquix-dev/loquix/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
