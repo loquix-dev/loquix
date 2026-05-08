@@ -55,6 +55,37 @@ export type ComposerVariant = 'default' | 'contained';
 /** Feedback sentiment */
 export type FeedbackSentiment = 'positive' | 'negative';
 
+// === Confidence & Uncertainty (Phase 4 PR #2) ===
+
+/** Confidence indicator display variant */
+export type ConfidenceVariant = 'bar' | 'dots' | 'badge' | 'numeric';
+
+/** Derived confidence level */
+export type ConfidenceLevel = 'low' | 'medium' | 'high';
+
+/** Uncertainty marker classification */
+export type UncertaintyKind = 'unsure' | 'needs-verification' | 'speculative';
+
+/** Uncertainty marker display variant */
+export type UncertaintyVariant = 'underline' | 'highlight' | 'icon';
+
+/** Disagreement marker display variant */
+export type DisagreementVariant = 'inline' | 'banner';
+
+/**
+ * Stable feedback reason identifiers. Localised labels live in i18n
+ * (`feedbackForm.reason{Accurate,WellWritten,Helpful,Inaccurate,OffTopic,Unsafe,Other}`);
+ * the event payload always carries the stable ID, never a localised string.
+ */
+export type FeedbackReason =
+  | 'accurate'
+  | 'well-written'
+  | 'helpful'
+  | 'inaccurate'
+  | 'off-topic'
+  | 'unsafe'
+  | 'other';
+
 // === Onboarding types (Phase 2) ===
 
 /** A suggestion item for chips, welcome screens, and follow-ups */

@@ -133,4 +133,48 @@ export interface LoquixTranslations {
 
   // === loquix-scroll-anchor ===
   'scrollAnchor.label': string;
+
+  // === loquix-confidence-indicator (Phase 4 PR #2) ===
+  'confidenceIndicator.labelDefault': string;
+  'confidenceIndicator.levelLow': string;
+  'confidenceIndicator.levelMedium': string;
+  'confidenceIndicator.levelHigh': string;
+
+  // === loquix-uncertainty-marker (Phase 4 PR #2) ===
+  'uncertaintyMarker.tipUnsure': string;
+  'uncertaintyMarker.tipNeedsVerification': string;
+  'uncertaintyMarker.tipSpeculative': string;
+
+  // === loquix-feedback-form (Phase 4 PR #2) ===
+  'feedbackForm.groupLabel': string;
+  'feedbackForm.reasonsGroupLabel': string;
+  'feedbackForm.helpfulLabel': string;
+  'feedbackForm.notHelpfulLabel': string;
+  'feedbackForm.sendLabel': string;
+  'feedbackForm.cancelLabel': string;
+  'feedbackForm.placeholderUp': string;
+  'feedbackForm.placeholderDown': string;
+  'feedbackForm.thanksMessage': string;
+  'feedbackForm.reasonAccurate': string;
+  'feedbackForm.reasonWellWritten': string;
+  'feedbackForm.reasonHelpful': string;
+  'feedbackForm.reasonInaccurate': string;
+  'feedbackForm.reasonOffTopic': string;
+  'feedbackForm.reasonUnsafe': string;
+  'feedbackForm.reasonOther': string;
+
+  // === loquix-correction-input (Phase 4 PR #2) ===
+  'correctionInput.originalLabel': string;
+  'correctionInput.correctionLabel': string;
+  'correctionInput.reasonLabel': string;
+  'correctionInput.reasonPlaceholder': string;
+  'correctionInput.correctionPlaceholder': string;
+  'correctionInput.submitLabel': string;
+  'correctionInput.cancelLabel': string;
+  'correctionInput.reasonRequiredMark': string;
+
+  // === loquix-disagreement-marker (Phase 4 PR #2) ===
+  'disagreementMarker.title': string;
+  'disagreementMarker.markResolvedLabel': string;
+  'disagreementMarker.inlineLabel': string;
 }

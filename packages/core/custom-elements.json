@@ -169,6 +169,51 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-confidence-indicator.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-confidence-indicator",
+          "declaration": {
+            "name": "LoquixConfidenceIndicator",
+            "module": "/src/components/core/loquix-confidence-indicator.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-correction-input.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-correction-input",
+          "declaration": {
+            "name": "LoquixCorrectionInput",
+            "module": "/src/components/core/loquix-correction-input.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-disagreement-marker.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-disagreement-marker",
+          "declaration": {
+            "name": "LoquixDisagreementMarker",
+            "module": "/src/components/core/loquix-disagreement-marker.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-disclosure-badge.ts",
       "declarations": [],
       "exports": [
@@ -223,6 +268,21 @@
           "declaration": {
             "name": "LoquixExampleGallery",
             "module": "/src/components/core/loquix-example-gallery.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-feedback-form.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-feedback-form",
+          "declaration": {
+            "name": "LoquixFeedbackForm",
+            "module": "/src/components/core/loquix-feedback-form.js"
           }
         }
       ]
@@ -508,6 +568,21 @@
           "declaration": {
             "name": "LoquixTypingIndicator",
             "module": "/src/components/core/loquix-typing-indicator.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-uncertainty-marker.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-uncertainty-marker",
+          "declaration": {
+            "name": "LoquixUncertaintyMarker",
+            "module": "/src/components/core/loquix-uncertainty-marker.js"
           }
         }
       ]
@@ -3553,6 +3628,594 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/loquix-confidence-indicator.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixConfidenceIndicator",
+          "cssProperties": [
+            {
+              "description": "Low-confidence background.",
+              "name": "--loquix-conf-low-bg"
+            },
+            {
+              "description": "Low-confidence foreground.",
+              "name": "--loquix-conf-low-color"
+            },
+            {
+              "description": "Low-confidence solid fill (bar/dot).",
+              "name": "--loquix-conf-low-fill"
+            },
+            {
+              "description": "Medium-confidence background.",
+              "name": "--loquix-conf-med-bg"
+            },
+            {
+              "description": "Medium-confidence foreground.",
+              "name": "--loquix-conf-med-color"
+            },
+            {
+              "description": "Medium-confidence solid fill (bar/dot).",
+              "name": "--loquix-conf-med-fill"
+            },
+            {
+              "description": "High-confidence background.",
+              "name": "--loquix-conf-high-bg"
+            },
+            {
+              "description": "High-confidence foreground.",
+              "name": "--loquix-conf-high-color"
+            },
+            {
+              "description": "High-confidence solid fill (bar/dot).",
+              "name": "--loquix-conf-high-fill"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The host element acts as the meter wrapper.",
+              "name": "meter"
+            },
+            {
+              "description": "The bar variant track.",
+              "name": "track"
+            },
+            {
+              "description": "The bar variant fill.",
+              "name": "fill"
+            },
+            {
+              "description": "A dot in the dots variant.",
+              "name": "dot"
+            },
+            {
+              "description": "The numeric value text.",
+              "name": "value"
+            },
+            {
+              "description": "The label text.",
+              "name": "label"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Confidence score in [0, 1]. Values outside the range are clamped.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "ConfidenceVariant"
+              },
+              "default": "'bar'",
+              "description": "Visual variant.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "level",
+              "type": {
+                "text": "ConfidenceLevel | undefined"
+              },
+              "description": "Optional override for the derived level. When set, beats the threshold-based derivation.",
+              "attribute": "level",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional textual label. Falls back to a localised default for `aria-label`.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "lowThreshold",
+              "default": "0.4",
+              "description": "Lower threshold — `value < lowThreshold` → `low`. Invalid values fall back to 0.4.",
+              "attribute": "low-threshold",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "highThreshold",
+              "default": "0.75",
+              "description": "Upper threshold — `value >= highThreshold` → `high`. Invalid values fall back to 0.75.",
+              "attribute": "high-threshold",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to render the numeric percentage alongside the visual.",
+              "attribute": "show-value"
+            },
+            {
+              "kind": "method",
+              "name": "_deriveLevel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "ConfidenceLevel"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "effectiveLevel",
+              "type": {
+                "text": "ConfidenceLevel"
+              },
+              "description": "The currently effective confidence level, derived from `value`/thresholds\nunless `level` is explicitly set. Exposed for tests and consumers who need\nto read the derived value without recomputing it themselves.",
+              "readonly": true
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Confidence score in [0, 1]. Values outside the range are clamped.",
+              "fieldName": "value"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "ConfidenceVariant"
+              },
+              "default": "'bar'",
+              "description": "Visual variant.",
+              "fieldName": "variant"
+            },
+            {
+              "name": "level",
+              "type": {
+                "text": "ConfidenceLevel | undefined"
+              },
+              "description": "Optional override for the derived level. When set, beats the threshold-based derivation.",
+              "fieldName": "level"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional textual label. Falls back to a localised default for `aria-label`.",
+              "fieldName": "label"
+            },
+            {
+              "name": "low-threshold",
+              "default": "DEFAULT_LOW",
+              "description": "Lower threshold — `value < lowThreshold` → `low`. Invalid values fall back to 0.4.",
+              "fieldName": "lowThreshold"
+            },
+            {
+              "name": "high-threshold",
+              "default": "DEFAULT_HIGH",
+              "description": "Upper threshold — `value >= highThreshold` → `high`. Invalid values fall back to 0.75.",
+              "fieldName": "highThreshold"
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to render the numeric percentage alongside the visual.",
+              "fieldName": "showValue"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-confidence-indicator",
+          "customElement": true,
+          "summary": "Visualises an assistant confidence score (0..1) as a bar / dots / badge / numeric.\n\nAuto-derives `level` (`low` / `medium` / `high`) from `value` using `low-threshold`\nand `high-threshold`. If thresholds are invalid or inverted, both reset to defaults\n(0.4 / 0.75) so the derived level still tracks the value. Setting `level` explicitly\noverrides the derived value."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixConfidenceIndicator",
+          "declaration": {
+            "name": "LoquixConfidenceIndicator",
+            "module": "src/components/core/loquix-confidence-indicator.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-correction-input.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixCorrectionInput",
+          "cssParts": [
+            {
+              "description": "The outer wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "The strikethrough block showing the original text.",
+              "name": "original"
+            },
+            {
+              "description": "One labelled field (correction or reason).",
+              "name": "field"
+            },
+            {
+              "description": "The correction textarea.",
+              "name": "textarea"
+            },
+            {
+              "description": "The reason input.",
+              "name": "input"
+            },
+            {
+              "description": "Submit button.",
+              "name": "submit"
+            },
+            {
+              "description": "Cancel button.",
+              "name": "cancel"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "_uid",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "original",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The original assistant text that the user wants to correct.",
+              "attribute": "original"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The current correction text. Two-way: updates internally on input.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "reason",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The reason text. Two-way: updates internally on input.",
+              "attribute": "reason"
+            },
+            {
+              "kind": "field",
+              "name": "reasonRequired",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, requires a non-empty reason before Submit is enabled.",
+              "attribute": "reason-required",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_onValueInput",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onReasonInput",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_isSubmitDisabled",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_onSubmit",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onCancel",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When Submit is clicked. Detail: `{ correction, reason?, original? }`.",
+              "name": "loquix-correction-submit"
+            },
+            {
+              "description": "When Cancel is clicked.",
+              "name": "loquix-correction-cancel"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "original",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The original assistant text that the user wants to correct.",
+              "fieldName": "original"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The current correction text. Two-way: updates internally on input.",
+              "fieldName": "value"
+            },
+            {
+              "name": "reason",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The reason text. Two-way: updates internally on input.",
+              "fieldName": "reason"
+            },
+            {
+              "name": "reason-required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, requires a non-empty reason before Submit is enabled.",
+              "fieldName": "reasonRequired"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-correction-input",
+          "customElement": true,
+          "summary": "Inline form for proposing a correction to an assistant message.\n\nShows the original answer (strikethrough) when provided, plus a textarea for\nthe correction and an optional reason input. Submit is disabled until the\ncorrection is non-empty (and reason is non-empty when `reason-required`).\n\nAll values are rendered as text — no `unsafeHTML` — so user-supplied content\ncannot inject markup."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixCorrectionInput",
+          "declaration": {
+            "name": "LoquixCorrectionInput",
+            "module": "src/components/core/loquix-correction-input.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-disagreement-marker.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixDisagreementMarker",
+          "cssProperties": [
+            {
+              "description": "Background colour (shared with low-confidence palette).",
+              "name": "--loquix-conf-low-bg"
+            },
+            {
+              "description": "Foreground colour.",
+              "name": "--loquix-conf-low-color"
+            },
+            {
+              "description": "Border accent colour.",
+              "name": "--loquix-conf-low-fill"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The wrapper element (pill for inline, container for banner).",
+              "name": "marker"
+            },
+            {
+              "description": "The leading icon.",
+              "name": "icon"
+            },
+            {
+              "description": "Banner body (title + reason + slotted content).",
+              "name": "body"
+            },
+            {
+              "description": "Banner title.",
+              "name": "title"
+            },
+            {
+              "description": "Banner reason text.",
+              "name": "reason"
+            },
+            {
+              "description": "The \"Mark resolved\" button (banner only).",
+              "name": "resolve"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Banner-only: extra content under the title and reason.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "DisagreementVariant"
+              },
+              "default": "'inline'",
+              "description": "Visual variant.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "reason",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional reason text shown beneath the title (banner) or after the label (inline).",
+              "attribute": "reason"
+            },
+            {
+              "kind": "field",
+              "name": "resolvable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Banner-only: whether to show the \"Mark resolved\" button.",
+              "attribute": "resolvable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_onResolve",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the resolve button is clicked.",
+              "name": "loquix-disagreement-resolve"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "DisagreementVariant"
+              },
+              "default": "'inline'",
+              "description": "Visual variant.",
+              "fieldName": "variant"
+            },
+            {
+              "name": "reason",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional reason text shown beneath the title (banner) or after the label (inline).",
+              "fieldName": "reason"
+            },
+            {
+              "name": "resolvable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Banner-only: whether to show the \"Mark resolved\" button.",
+              "fieldName": "resolvable"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-disagreement-marker",
+          "customElement": true,
+          "summary": "Marks an assistant message that the user has disagreed with.\n\nTwo variants: an inline pill (for trailing references in prose) and a banner\nattached to the disputed message. The banner can optionally show a \"Mark\nresolved\" button when `resolvable` is set."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixDisagreementMarker",
+          "declaration": {
+            "name": "LoquixDisagreementMarker",
+            "module": "src/components/core/loquix-disagreement-marker.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/loquix-disclosure-badge.ts",
       "declarations": [
         {
@@ -4982,6 +5645,235 @@
           "declaration": {
             "name": "LoquixExampleGallery",
             "module": "src/components/core/loquix-example-gallery.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-feedback-form.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixFeedbackForm",
+          "cssProperties": [
+            {
+              "description": "Active chip background and primary button colour.",
+              "name": "--loquix-ai-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The thumbs row.",
+              "name": "buttons"
+            },
+            {
+              "description": "The reasons + comment card shown after a sentiment is picked.",
+              "name": "form"
+            },
+            {
+              "description": "The radiogroup of reason chips.",
+              "name": "reasons"
+            },
+            {
+              "description": "A single reason chip.",
+              "name": "chip"
+            },
+            {
+              "description": "The comment textarea.",
+              "name": "textarea"
+            },
+            {
+              "description": "Submit button.",
+              "name": "submit"
+            },
+            {
+              "description": "Cancel button.",
+              "name": "cancel"
+            },
+            {
+              "description": "Thanks message shown after submit.",
+              "name": "thanks"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "allowReason",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to open the reasons + comment card after a sentiment is picked.",
+              "attribute": "allow-reason"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "FeedbackSentiment | null"
+              },
+              "default": "null",
+              "description": "Currently selected sentiment, or null if neither is picked.",
+              "attribute": "value",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "requireCommentOnDown",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, requires a non-empty comment before Send is enabled on negative feedback.",
+              "attribute": "require-comment-on-down"
+            },
+            {
+              "kind": "field",
+              "name": "_reason",
+              "type": {
+                "text": "FeedbackReason | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_comment",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "_submitted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "_validValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "FeedbackSentiment | null"
+                }
+              },
+              "description": "Returns the current value if it's a valid `FeedbackSentiment`, else `null`.\nGuards against `value` being set from an attribute or external mutation\nto something outside the type union."
+            },
+            {
+              "kind": "field",
+              "name": "_onChildFeedback",
+              "privacy": "private",
+              "description": "Intercepts the inner `loquix-feedback` and reads the post-toggle `.active`\nstate from the child to update parent state. Stops propagation so the\ninner event never escapes the form — only `loquix-feedback-submit` is the\npublic surface."
+            },
+            {
+              "kind": "method",
+              "name": "_onChipClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "reason",
+                  "type": {
+                    "text": "FeedbackReason"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "_onCommentInput",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_isSendDisabled",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_onSend",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onCancel",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the user clicks Send. Detail: `{ sentiment, reason?, comment? }`.",
+              "name": "loquix-feedback-submit"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "allow-reason",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to open the reasons + comment card after a sentiment is picked.",
+              "fieldName": "allowReason"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "FeedbackSentiment | null"
+              },
+              "default": "null",
+              "description": "Currently selected sentiment, or null if neither is picked.",
+              "fieldName": "value"
+            },
+            {
+              "name": "require-comment-on-down",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, requires a non-empty comment before Send is enabled on negative feedback.",
+              "fieldName": "requireCommentOnDown"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-feedback-form",
+          "customElement": true,
+          "summary": "Higher-order feedback flow: thumbs up/down + reason chips + optional comment.\n\nComposes two `loquix-action-feedback` buttons into a single flow, then opens a\nreasons + comment card once a sentiment is picked. The inner `loquix-feedback`\nevents are intercepted (stopPropagation) so consumers only ever see the\nhigher-level `loquix-feedback-submit`.\n\nThe reason payload carries a stable `FeedbackReason` ID, never the localised\nchip label."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixFeedbackForm",
+          "declaration": {
+            "name": "LoquixFeedbackForm",
+            "module": "src/components/core/loquix-feedback-form.ts"
           }
         }
       ]
@@ -10384,6 +11276,206 @@
           "declaration": {
             "name": "LoquixTypingIndicator",
             "module": "src/components/core/loquix-typing-indicator.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-uncertainty-marker.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixUncertaintyMarker",
+          "cssProperties": [
+            {
+              "description": "Foreground for `unsure` kind.",
+              "name": "--loquix-uncert-unsure-color"
+            },
+            {
+              "description": "Highlight background for `unsure` kind.",
+              "name": "--loquix-uncert-unsure-bg"
+            },
+            {
+              "description": "Foreground for `needs-verification` kind.",
+              "name": "--loquix-uncert-verify-color"
+            },
+            {
+              "description": "Highlight background for `needs-verification` kind.",
+              "name": "--loquix-uncert-verify-bg"
+            },
+            {
+              "description": "Foreground for `speculative` kind.",
+              "name": "--loquix-uncert-spec-color"
+            },
+            {
+              "description": "Highlight background for `speculative` kind.",
+              "name": "--loquix-uncert-spec-bg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The marker wrapper.",
+              "name": "marker"
+            },
+            {
+              "description": "The slotted-text container.",
+              "name": "text"
+            },
+            {
+              "description": "The trailing icon (icon variant only).",
+              "name": "icon"
+            },
+            {
+              "description": "The tooltip element.",
+              "name": "tooltip"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The inline text to mark.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "kind",
+              "type": {
+                "text": "UncertaintyKind"
+              },
+              "default": "'unsure'",
+              "description": "What kind of uncertainty applies to the wrapped phrase.",
+              "attribute": "kind",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "UncertaintyVariant"
+              },
+              "default": "'underline'",
+              "description": "How the phrase is visually marked.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "reason",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional explicit reason text. Overrides the localised default for the kind.",
+              "attribute": "reason"
+            },
+            {
+              "kind": "field",
+              "name": "_open",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "_tipText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_show",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hide",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_activate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_onKeyDown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_onClick",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the marker is activated by click, Enter, or Space. Detail: `{ kind, reason? }`.",
+              "name": "loquix-uncertainty-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "kind",
+              "type": {
+                "text": "UncertaintyKind"
+              },
+              "default": "'unsure'",
+              "description": "What kind of uncertainty applies to the wrapped phrase.",
+              "fieldName": "kind"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "UncertaintyVariant"
+              },
+              "default": "'underline'",
+              "description": "How the phrase is visually marked.",
+              "fieldName": "variant"
+            },
+            {
+              "name": "reason",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional explicit reason text. Overrides the localised default for the kind.",
+              "fieldName": "reason"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-uncertainty-marker",
+          "customElement": true,
+          "summary": "Wraps an inline phrase to flag it as unsure, needing verification, or speculative.\n\nThe slotted text remains the control's accessible name; the kind/reason is exposed via\n`aria-describedby` so screen readers announce the uncertainty as a description rather\nthan overriding the phrase. Tooltip opens on hover or focus and closes on\nmouseleave/blur/Escape."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixUncertaintyMarker",
+          "declaration": {
+            "name": "LoquixUncertaintyMarker",
+            "module": "src/components/core/loquix-uncertainty-marker.ts"
           }
         }
       ]

@@ -1,5 +1,7 @@
 import type {
   FeedbackSentiment,
+  FeedbackReason,
+  UncertaintyKind,
   Suggestion,
   Template,
   GalleryItem,
@@ -158,6 +160,35 @@ export interface LoquixPasteFilesDetail {
   files: File[];
 }
 
+// === Confidence & Uncertainty events (Phase 4 PR #2) ===
+
+export interface LoquixFeedbackSubmitDetail {
+  messageId?: string;
+  sentiment: FeedbackSentiment;
+  reason?: FeedbackReason;
+  comment?: string;
+}
+
+export interface LoquixCorrectionSubmitDetail {
+  messageId?: string;
+  correction: string;
+  reason?: string;
+  original?: string;
+}
+
+export interface LoquixCorrectionCancelDetail {
+  messageId?: string;
+}
+
+export interface LoquixDisagreementResolveDetail {
+  messageId?: string;
+}
+
+export interface LoquixUncertaintyClickDetail {
+  kind: UncertaintyKind;
+  reason?: string;
+}
+
 // === Scroll events ===
 
 export interface LoquixScrollBottomDetail {}
@@ -221,5 +252,10 @@ declare global {
     'loquix-paste-files': CustomEvent<LoquixPasteFilesDetail>;
     'loquix-scroll-bottom': CustomEvent<LoquixScrollBottomDetail>;
     'loquix-scroll-away': CustomEvent<LoquixScrollAwayDetail>;
+    'loquix-feedback-submit': CustomEvent<LoquixFeedbackSubmitDetail>;
+    'loquix-correction-submit': CustomEvent<LoquixCorrectionSubmitDetail>;
+    'loquix-correction-cancel': CustomEvent<LoquixCorrectionCancelDetail>;
+    'loquix-disagreement-resolve': CustomEvent<LoquixDisagreementResolveDetail>;
+    'loquix-uncertainty-click': CustomEvent<LoquixUncertaintyClickDetail>;
   }
 }

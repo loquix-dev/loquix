@@ -36,3 +36,10 @@ export { AttachmentPanel } from './components/AttachmentPanel.js';
 export { ParameterPanel } from './components/ParameterPanel.js';
 export { FilterBar } from './components/FilterBar.js';
 export { MessageAttachments } from './components/MessageAttachments.js';
+
+// Phase 4 PR #2 — Confidence & Uncertainty
+export { ConfidenceIndicator } from './components/ConfidenceIndicator.js';
+export { UncertaintyMarker } from './components/UncertaintyMarker.js';
+export { DisagreementMarker } from './components/DisagreementMarker.js';
+export { FeedbackForm } from './components/FeedbackForm.js';
+export { CorrectionInput } from './components/CorrectionInput.js';
