@@ -5,6 +5,10 @@ const meta: Meta = {
   title: 'Core/ReasoningBlock',
   component: 'loquix-reasoning-block',
   tags: ['autodocs'],
+  // Override the global 'centered' layout: a flex-centering wrapper makes the
+  // block-level host shrink to its content width, so collapsing the body
+  // shrinks the header too. 'padded' keeps width stable across states.
+  parameters: { layout: 'padded' },
   argTypes: {
     status: { control: 'select', options: ['thinking', 'done'] },
     duration: { control: { type: 'number', min: 0 } },
@@ -26,7 +30,12 @@ export const Thinking: Story = {
   args: {
     status: 'thinking',
     defaultOpen: true,
-    content: 'The user is asking about RAG architecture. I should consider…',
+    content: `The user is asking about RAG architecture. I should consider:
+1. Whether they want a high-level overview or specifics
+2. Their apparent technical depth from the phrasing
+3. Whether to lead with retrieval or generation
+
+Given the phrasing "production-ready", they likely want concrete trade-offs, not theory.`,
   },
   render: args => html`
     <div style="max-width:540px">

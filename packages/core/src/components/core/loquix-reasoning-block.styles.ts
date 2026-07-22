@@ -85,6 +85,10 @@ const styles = css`
     flex-direction: column;
     gap: 8px;
   }
+  /* Author 'display' overrides UA [hidden] { display: none } — re-assert it. */
+  .content[hidden] {
+    display: none;
+  }
   .rule {
     height: 1px;
     background: var(--loquix-thought-border-color);
@@ -95,6 +99,12 @@ const styles = css`
     font-size: 13px;
     line-height: 1.65;
     color: var(--loquix-thought-text-color);
+  }
+  /* Apply pre-wrap only to the user-content span, NOT the .text wrapper.
+     Otherwise the formatting whitespace prettier inserts around the slot /
+     span / cursor inside .text would render as visible indentation before
+     the first line and a stray-space gap before the caret. */
+  .text__body {
     white-space: pre-wrap;
   }
 

@@ -5,6 +5,10 @@ const meta: Meta = {
   title: 'Core/ToolCallList',
   component: 'loquix-tool-call-list',
   tags: ['autodocs'],
+  // Override the global 'centered' layout: a flex-centering wrapper makes the
+  // block-level host shrink to its content width, so collapsing the body
+  // shrinks the header too. 'padded' keeps width stable across states.
+  parameters: { layout: 'padded' },
   argTypes: {
     summary: { control: 'text' },
     defaultCollapsed: { control: 'boolean' },

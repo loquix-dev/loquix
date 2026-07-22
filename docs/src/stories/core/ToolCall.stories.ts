@@ -5,6 +5,12 @@ const meta: Meta = {
   title: 'Core/ToolCall',
   component: 'loquix-tool-call',
   tags: ['autodocs'],
+  // Override the global 'centered' layout: in a flex-centering container the
+  // host (display: block) sizes to its current content, so the header visibly
+  // shrinks when the body collapses or the args-summary is hidden. 'padded'
+  // keeps a normal block context so the wrapper's max-width caps width and
+  // the host fills it stably across states.
+  parameters: { layout: 'padded' },
   argTypes: {
     name: { control: 'text' },
     status: { control: 'select', options: ['pending', 'running', 'success', 'error'] },

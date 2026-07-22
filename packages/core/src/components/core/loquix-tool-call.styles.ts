@@ -167,6 +167,10 @@ const styles = css`
     border-top: 1px solid var(--loquix-border-color);
     margin-top: -1px;
   }
+  /* Author 'display' overrides UA [hidden] { display: none } — re-assert it. */
+  .body[hidden] {
+    display: none;
+  }
   .section {
     display: flex;
     flex-direction: column;

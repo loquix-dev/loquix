@@ -153,18 +153,12 @@ describe('loquix-reasoning-block', () => {
       >
     `);
     await el.updateComplete;
-    // Slotted Light DOM is visible via the host element's textContent. The
-    // shadow-DOM-side `content` fallback is rendered only when _hasSlotContent
-    // is false; assert it isn't present in the shadow text.
+    // Slotted Light DOM is visible via the host element's textContent.
+    // The .text__body span (which holds the prop fallback) should not
+    // be rendered when slot has content.
     expect(el.textContent).to.contain('from slot');
-    const text = el.shadowRoot!.querySelector('.text');
-    // Walk own (non-slotted) text — slot.assignedNodes are light DOM, not
-    // direct shadow children, so this only sees what we render ourselves.
-    const ownText = Array.from(text!.childNodes)
-      .filter(n => n.nodeType === Node.TEXT_NODE)
-      .map(n => (n.textContent ?? '').trim())
-      .join('');
-    expect(ownText).to.not.contain('from prop');
+    const body = el.shadowRoot!.querySelector('.text__body');
+    expect(body).to.be.null;
   });
 
   it('slot with only whitespace falls back to content prop', async () => {
@@ -174,16 +168,12 @@ describe('loquix-reasoning-block', () => {
       </loquix-reasoning-block>
     `);
     await el.updateComplete;
-    // The fallback `content` is rendered as a sibling of the slot, not inside
-    // its <slot> default content (whitespace-only assigned nodes still count
-    // as assigned, suppressing slot fallback). So check the shadow text node
-    // directly.
-    const text = el.shadowRoot!.querySelector('.text');
-    const ownText = Array.from(text!.childNodes)
-      .filter(n => n.nodeType === Node.TEXT_NODE)
-      .map(n => (n.textContent ?? '').trim())
-      .join('');
-    expect(ownText).to.contain('from prop');
+    // The fallback content lives in .text__body span (whitespace-only
+    // assigned nodes are still considered assigned, so we can't use the
+    // <slot> fallback feature — we render the prop ourselves).
+    const body = el.shadowRoot!.querySelector('.text__body');
+    expect(body).to.exist;
+    expect(body!.textContent).to.contain('from prop');
   });
 
   it('reflects status attribute', async () => {

@@ -2,6 +2,13 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import type { Source } from '@loquix/core';
 
+// Floating popover (~320×170px) needs room above the chip so `placement: 'top'`
+// wins over `flip()`, plus min-height so the autodocs inline iframe doesn't
+// shrink to the height of the prose paragraph and clip the popover.
+const popoverStoryWrapper = (inner: unknown) => html`
+  <div style="min-height:280px;padding:200px 16px 24px;box-sizing:border-box">${inner}</div>
+`;
+
 const meta: Meta = {
   title: 'Core/CitationPopover',
   component: 'loquix-citation-popover',
@@ -54,31 +61,38 @@ function makeChip(index: number, source: Source) {
 
 export const Single: Story = {
   args: { index: 1 },
+  parameters: { docs: { story: { iframeHeight: 320 } } },
   render: args => {
     const chip = makeChip(args.index, sources[0]);
-    return html`<p style="font-size:14px;max-width:560px">
-      Hybrid retrieval outperforms either approach alone${chip}, especially on long-tail queries.
-    </p>`;
+    return popoverStoryWrapper(
+      html`<p style="font-size:14px;max-width:560px">
+        Hybrid retrieval outperforms either approach alone${chip}, especially on long-tail queries.
+      </p>`,
+    );
   },
 };
 
 export const MultipleInProse: Story = {
-  render: () => html`
-    <p style="font-size:14px;max-width:560px;line-height:1.6">
-      For a 5M-document corpus, hybrid retrieval combining BM25 with dense embeddings outperforms
-      either method in isolation${makeChip(1, sources[0])}, especially on queries that mention rare
-      entities. Production RAG pipelines typically also include a cross-encoder reranking
-      stage${makeChip(2, sources[1])}${makeChip(3, sources[2])} applied to the top-N candidates.
-    </p>
-  `,
+  parameters: { docs: { story: { iframeHeight: 360 } } },
+  render: () =>
+    popoverStoryWrapper(html`
+      <p style="font-size:14px;max-width:560px;line-height:1.6">
+        For a 5M-document corpus, hybrid retrieval combining BM25 with dense embeddings outperforms
+        either method in isolation${makeChip(1, sources[0])}, especially on queries that mention
+        rare entities. Production RAG pipelines typically also include a cross-encoder reranking
+        stage${makeChip(2, sources[1])}${makeChip(3, sources[2])} applied to the top-N candidates.
+      </p>
+    `),
 };
 
 export const KeyboardFocus: Story = {
-  render: () => html`
-    <p style="font-size:14px;max-width:560px">
-      Tab into the chip and press <kbd>Enter</kbd> or <kbd>Space</kbd> to fire
-      <code>loquix-citation-click</code>; <kbd>Esc</kbd> closes the popover.
-      ${makeChip(1, sources[0])}
-    </p>
-  `,
+  parameters: { docs: { story: { iframeHeight: 320 } } },
+  render: () =>
+    popoverStoryWrapper(html`
+      <p style="font-size:14px;max-width:560px">
+        Tab into the chip and press <kbd>Enter</kbd> or <kbd>Space</kbd> to fire
+        <code>loquix-citation-click</code>; <kbd>Esc</kbd> closes the popover.
+        ${makeChip(1, sources[0])}
+      </p>
+    `),
 };

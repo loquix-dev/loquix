@@ -256,7 +256,9 @@ export class LoquixReasoningBlock extends LitElement {
           <div class="rule"></div>
           <div class="text">
             <slot @slotchange=${this._onSlotChange}></slot>
-            ${this._hasSlotContent ? nothing : this.content}
+            ${this._hasSlotContent
+              ? nothing
+              : html`<span class="text__body">${this.content}</span>`}
             ${isStreaming
               ? html`<span part="cursor" class="cursor" aria-hidden="true"></span>`
               : nothing}

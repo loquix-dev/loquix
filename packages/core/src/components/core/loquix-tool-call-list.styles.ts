@@ -57,6 +57,10 @@ const styles = css`
     flex-direction: column;
     gap: 6px;
   }
+  /* Author 'display' overrides UA [hidden] { display: none } — re-assert it. */
+  .items[hidden] {
+    display: none;
+  }
 
   ::slotted(loquix-tool-call) {
     background: var(--loquix-surface-bg);
