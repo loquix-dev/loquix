@@ -98,6 +98,9 @@ export class LoquixDropdownSelect extends LitElement {
   @query('.panel')
   private _panelEl?: HTMLElement;
 
+  @query('slot[name="footer"]')
+  private _footerSlot?: HTMLSlotElement;
+
   // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
@@ -126,6 +129,10 @@ export class LoquixDropdownSelect extends LitElement {
         this._removeDocumentListeners();
       }
     }
+  }
+
+  protected firstUpdated(): void {
+    this._syncFooterContent();
   }
 
   private _addDocumentListeners(): void {
@@ -337,6 +344,19 @@ export class LoquixDropdownSelect extends LitElement {
 
   private _handleSubmenuLeave(): void {
     this._scheduleSubmenuClose();
+  }
+
+  private _handleFooterSlotChange(e: Event): void {
+    this._syncFooterContent(e.target as HTMLSlotElement);
+  }
+
+  private _syncFooterContent(slot = this._footerSlot): void {
+    const nodes = slot?.assignedNodes({ flatten: true }) ?? [];
+    const hasFooterContent = nodes.some(node => {
+      if (node.nodeType === Node.TEXT_NODE) return (node.textContent ?? '').trim().length > 0;
+      return true;
+    });
+    this.toggleAttribute('data-footer-content', hasFooterContent);
   }
 
   private _scheduleSubmenuClose(): void {
@@ -557,6 +577,11 @@ export class LoquixDropdownSelect extends LitElement {
   protected render() {
     const selected = this._selectedOption;
     const grouped = this._groupedOptions;
+    const triggerLabel =
+      selected?.label ??
+      (this.placeholder !== undefined
+        ? this.placeholder
+        : this._localize.term('dropdownSelect.placeholder'));
 
     return html`
       ${this._hoveredHint ? html`<div class="hint">${this._hoveredHint}</div>` : nothing}
@@ -572,12 +597,7 @@ export class LoquixDropdownSelect extends LitElement {
         <slot name="trigger-icon">
           ${selected?.icon ? html`<span class="trigger__icon">${selected.icon}</span>` : nothing}
         </slot>
-        ${selected?.label || this.placeholder || this._localize.term('dropdownSelect.placeholder')
-          ? html`<span class="trigger__label"
-              >${selected?.label ||
-              (this.placeholder ?? this._localize.term('dropdownSelect.placeholder'))}</span
-            >`
-          : nothing}
+        ${triggerLabel ? html`<span class="trigger__label">${triggerLabel}</span>` : nothing}
         ${this.noChevron ? nothing : this._chevronSvg()}
       </button>
 
@@ -610,7 +630,7 @@ export class LoquixDropdownSelect extends LitElement {
         </div>
 
         <div part="footer" class="footer">
-          <slot name="footer"></slot>
+          <slot name="footer" @slotchange=${this._handleFooterSlotChange}></slot>
         </div>
       </div>
 

@@ -46,6 +46,12 @@ import '@loquix/core/define/define-uncertainty-marker';
 import '@loquix/core/define/define-disagreement-marker';
 import '@loquix/core/define/define-feedback-form';
 import '@loquix/core/define/define-correction-input';
+// Phase 4 PR #1 — Reasoning & Tool Use
+import '@loquix/core/define/define-reasoning-block';
+import '@loquix/core/define/define-tool-call';
+import '@loquix/core/define/define-tool-call-list';
+import '@loquix/core/define/define-citation-popover';
+import '@loquix/core/define/define-source-list';
 
 const preview: Preview = {
   globalTypes: {

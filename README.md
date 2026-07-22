@@ -7,7 +7,7 @@
 
 **Web Components for AI Chat Interfaces**
 
-A framework-agnostic UI kit of 35 production-ready components for building AI and LLM chat interfaces. Built with [Lit](https://lit.dev/) 3.x, TypeScript strict mode, and Shadow DOM encapsulation.
+A framework-agnostic UI kit of 40 production-ready components for building AI and LLM chat interfaces. Built with [Lit](https://lit.dev/) 3.x, TypeScript strict mode, and Shadow DOM encapsulation.
 
 <p align="center">
   <img src="docs/assets/demo.gif" alt="Loquix Interactive Chat Demo" width="480" />
@@ -248,7 +248,7 @@ document.addEventListener('loquix-mode-change', e => {
 
 ## Features
 
-### 35 Production-Ready Components
+### 40 Production-Ready Components
 
 From message bubbles and avatars to model selectors and parameter tuning panels. Every component you need for a modern AI chat interface, designed to work together or independently.
 
@@ -289,6 +289,7 @@ Strict mode throughout. Full type definitions for all components, events, contro
 | **Actions**           | `action-button` `action-copy` `action-edit` `action-feedback`                                 |
 | **Input & Selection** | `prompt-input` `dropdown-select` `suggestion-chips` `follow-up-suggestions` `example-gallery` |
 | **AI Controls**       | `generation-controls` `typing-indicator` `mode-selector` `model-selector` `parameter-panel`   |
+| **Reasoning & Trust** | `reasoning-block` `tool-call` `tool-call-list` `citation-popover` `source-list`               |
 | **File Handling**     | `attachment-panel` `attachment-chip` `drop-zone`                                              |
 | **Navigation & UI**   | `scroll-anchor` `nudge-banner` `caveat-notice` `disclosure-badge` `filter-bar`                |
 | **Templates**         | `template-card` `template-picker` `welcome-screen`                                            |
@@ -382,11 +383,13 @@ Development is organized into phases, from core chat primitives to advanced AI i
 
 ### Phase 4 — Control & Transparency
 
-- [ ] `stream-of-thought` — real-time AI reasoning display (plan, tool calls, decisions)
+- [x] `reasoning-block` — collapsible AI reasoning display with streaming and completed states
+- [x] `tool-call` — single tool execution row with arguments, result, status, and toggle event
+- [x] `tool-call-list` — grouped tool execution timeline with collapsed and expanded states
+- [x] `citation-popover` — inline citation chip with accessible source preview popover
+- [x] `source-list` — aggregated source list for citations and reference panels
 - [ ] `action-plan` — step list before execution (advisory and contractual variants)
 - [ ] `verification-dialog` — confirmation for risky/destructive actions with cost estimates
-- [ ] `citation-inline` — superscript, highlight, badge inline source annotations
-- [ ] `references-panel` — aggregated source list (panel, aside, nested variants)
 - [ ] `variations-carousel` — multiple response variants with diff highlighting
 - [ ] `branches-nav` — conversation branch tree navigation
 

@@ -56,6 +56,14 @@ describe('loquix-dropdown-select', () => {
     expect(trigger!.textContent).to.contain('Choose...');
   });
 
+  it('does not render trigger label for empty placeholder', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select placeholder=""></loquix-dropdown-select>`,
+    );
+    const label = el.shadowRoot!.querySelector('.trigger__label');
+    expect(label).to.not.exist;
+  });
+
   it('opens panel on trigger click', async () => {
     const el = await fixture<LoquixDropdownSelect>(
       html`<loquix-dropdown-select .options=${mockOptions}></loquix-dropdown-select>`,
@@ -201,6 +209,21 @@ describe('loquix-dropdown-select', () => {
     await el.updateComplete;
     const footer = getShadowPart(el, 'footer');
     expect(footer).to.exist;
+    expect(el.hasAttribute('data-footer-content')).to.be.true;
+    expect(getComputedStyle(footer!).display).to.not.equal('none');
+    const footerSlot = footer!.querySelector('slot') as HTMLSlotElement;
+    expect(footerSlot.assignedElements()[0].textContent).to.contain('Create new');
+  });
+
+  it('hides footer when no footer content is assigned', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${mockOptions} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+    const footer = getShadowPart(el, 'footer');
+    expect(footer).to.exist;
+    expect(el.hasAttribute('data-footer-content')).to.be.false;
+    expect(getComputedStyle(footer!).display).to.equal('none');
   });
 
   it('reflects value attribute', async () => {
