@@ -215,32 +215,37 @@ export const WithDropdownMenu: Story = {
       }
     }
 
-    return html` <div style="width:600px">
-      <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
-        Click the "+" button to open the attachment menu.
-      </p>
-      <loquix-chat-composer
-        variant="contained"
-        placeholder="Type a message..."
-        ${ref(wireComposer)}
-      >
-        <loquix-attachment-panel slot="toolbar-top" no-trigger></loquix-attachment-panel>
-        <loquix-dropdown-select
-          slot="actions-left"
-          placeholder=""
-          no-chevron
-          .options=${attachOptions}
-          @loquix-select-change=${handleSelect}
-          style="--loquix-dropdown-trigger-padding:6px;--loquix-dropdown-trigger-radius:8px;--loquix-dropdown-min-width:180px"
+    return html` <style>
+        .file-upload-dropdown-story loquix-chat-composer::part(container) {
+          overflow: visible;
+        }
+      </style>
+      <div class="file-upload-dropdown-story" style="width:600px">
+        <p style="margin:0 0 12px;font-size:0.875rem;color:var(--loquix-text-secondary-color,#666)">
+          Click the "+" button to open the attachment menu.
+        </p>
+        <loquix-chat-composer
+          variant="contained"
+          placeholder="Type a message..."
+          ${ref(wireComposer)}
         >
-          <span
-            slot="trigger-icon"
-            style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:1.25rem;line-height:1"
-            >+</span
+          <loquix-attachment-panel slot="toolbar-top" no-trigger></loquix-attachment-panel>
+          <loquix-dropdown-select
+            slot="actions-left"
+            placeholder=""
+            no-chevron
+            .options=${attachOptions}
+            @loquix-select-change=${handleSelect}
+            style="--loquix-dropdown-trigger-padding:6px;--loquix-dropdown-trigger-radius:8px;--loquix-dropdown-min-width:180px"
           >
-        </loquix-dropdown-select>
-      </loquix-chat-composer>
-    </div>`;
+            <span
+              slot="trigger-icon"
+              style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:1.25rem;line-height:1"
+              >+</span
+            >
+          </loquix-dropdown-select>
+        </loquix-chat-composer>
+      </div>`;
   },
 };
 

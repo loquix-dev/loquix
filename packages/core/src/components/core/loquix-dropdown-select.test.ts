@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { waitForEvent, getShadowPart, getShadowParts } from '../../test-utils.js';
+import { waitForEvent, getShadowPart, getShadowParts, nextFrame } from '../../test-utils.js';
 import './define-dropdown-select.js';
 import type { LoquixDropdownSelect } from './loquix-dropdown-select.js';
 import type { SelectOption } from '../../types/index.js';
@@ -54,6 +54,14 @@ describe('loquix-dropdown-select', () => {
     );
     const trigger = getShadowPart(el, 'trigger');
     expect(trigger!.textContent).to.contain('Choose...');
+  });
+
+  it('does not render trigger label for empty placeholder', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select placeholder=""></loquix-dropdown-select>`,
+    );
+    const label = el.shadowRoot!.querySelector('.trigger__label');
+    expect(label).to.not.exist;
   });
 
   it('opens panel on trigger click', async () => {
@@ -199,8 +207,25 @@ describe('loquix-dropdown-select', () => {
       </loquix-dropdown-select>`,
     );
     await el.updateComplete;
+    await nextFrame();
     const footer = getShadowPart(el, 'footer');
     expect(footer).to.exist;
+    expect(el.hasAttribute('data-footer-content')).to.be.true;
+    expect(getComputedStyle(footer!).display).to.not.equal('none');
+    const footerSlot = footer!.querySelector('slot') as HTMLSlotElement;
+    expect(footerSlot.assignedElements()[0].textContent).to.contain('Create new');
+  });
+
+  it('hides footer when no footer content is assigned', async () => {
+    const el = await fixture<LoquixDropdownSelect>(
+      html`<loquix-dropdown-select .options=${mockOptions} open></loquix-dropdown-select>`,
+    );
+    await el.updateComplete;
+    await nextFrame();
+    const footer = getShadowPart(el, 'footer');
+    expect(footer).to.exist;
+    expect(el.hasAttribute('data-footer-content')).to.be.false;
+    expect(getComputedStyle(footer!).display).to.equal('none');
   });
 
   it('reflects value attribute', async () => {

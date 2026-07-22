@@ -287,6 +287,10 @@ const styles = css`
     padding: 4px;
   }
 
+  :host(:not([data-footer-content])) .footer {
+    display: none;
+  }
+
   .footer:empty {
     display: none;
   }
