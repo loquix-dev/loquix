@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { waitForEvent, getShadowPart, getShadowParts, nextFrame } from '../../test-utils.js';
+import { waitForEvent, getShadowPart, getShadowParts } from '../../test-utils.js';
 import './define-dropdown-select.js';
 import type { LoquixDropdownSelect } from './loquix-dropdown-select.js';
 import type { SelectOption } from '../../types/index.js';
@@ -207,7 +207,6 @@ describe('loquix-dropdown-select', () => {
       </loquix-dropdown-select>`,
     );
     await el.updateComplete;
-    await nextFrame();
     const footer = getShadowPart(el, 'footer');
     expect(footer).to.exist;
     expect(el.hasAttribute('data-footer-content')).to.be.true;
@@ -221,7 +220,6 @@ describe('loquix-dropdown-select', () => {
       html`<loquix-dropdown-select .options=${mockOptions} open></loquix-dropdown-select>`,
     );
     await el.updateComplete;
-    await nextFrame();
     const footer = getShadowPart(el, 'footer');
     expect(footer).to.exist;
     expect(el.hasAttribute('data-footer-content')).to.be.false;
