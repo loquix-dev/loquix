@@ -2,7 +2,7 @@
 
 React wrappers for [@loquix/core](https://www.npmjs.com/package/@loquix/core) Web Components.
 
-Built with [@lit/react](https://www.npmjs.com/package/@lit/react) — provides proper React integration with full prop/event binding for all 35 Loquix components.
+Built with [@lit/react](https://www.npmjs.com/package/@lit/react) — provides proper React integration with full prop/event binding for all 50+ Loquix components.
 
 ## Installation
 
@@ -42,6 +42,14 @@ function App() {
 ### Tuning & Configuration
 
 `ComposerToolbar` · `DropdownSelect` · `AttachmentChip` · `ModeSelector` · `ModelSelector` · `AttachmentPanel` · `ParameterPanel` · `FilterBar` · `MessageAttachments`
+
+### Reasoning & Tool Use
+
+`ReasoningBlock` · `ToolCall` · `ToolCallList` · `CitationPopover` · `SourceList` · `ConfidenceIndicator` · `UncertaintyMarker` · `DisagreementMarker`
+
+### Smart Search
+
+`SearchInput` · `SearchFooter` · `SearchDialog` · `SearchPanel` · `SearchAnswer` · `SearchSources` · `SearchResult` · `SearchResults`
 
 ## How It Works
 

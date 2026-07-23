@@ -278,6 +278,7 @@ import './components/core/define-source-list.js';
 import './components/core/define-search-input.js';
 import './components/core/define-search-footer.js';
 import './components/core/define-search-dialog.js';
+import './components/core/define-search-panel.js';
 import './components/core/define-search-answer.js';
 import './components/core/define-search-sources.js';
 import './components/core/define-search-result.js';

@@ -50,3 +50,13 @@ export { ToolCall } from './components/ToolCall.js';
 export { ToolCallList } from './components/ToolCallList.js';
 export { CitationPopover } from './components/CitationPopover.js';
 export { SourceList } from './components/SourceList.js';
+
+// Smart Search
+export { SearchInput } from './components/SearchInput.js';
+export { SearchFooter } from './components/SearchFooter.js';
+export { SearchDialog } from './components/SearchDialog.js';
+export { SearchPanel } from './components/SearchPanel.js';
+export { SearchAnswer } from './components/SearchAnswer.js';
+export { SearchSources } from './components/SearchSources.js';
+export { SearchResult } from './components/SearchResult.js';
+export { SearchResults } from './components/SearchResults.js';
