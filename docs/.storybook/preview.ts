@@ -55,6 +55,7 @@ import '@loquix/core/define/define-source-list';
 // Smart Search
 import '@loquix/core/define/define-search-input';
 import '@loquix/core/define/define-search-footer';
+import '@loquix/core/define/define-search-sources';
 import '@loquix/core/define/define-search-result';
 import '@loquix/core/define/define-search-results';
 

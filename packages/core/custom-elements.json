@@ -604,6 +604,29 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-search-sources.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-search-sources",
+          "declaration": {
+            "name": "LoquixSearchSources",
+            "module": "/src/components/core/loquix-search-sources.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "LoquixSearchSources",
+          "declaration": {
+            "name": "LoquixSearchSources",
+            "module": "src/components/core/define-search-sources.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-source-list.ts",
       "declarations": [],
       "exports": [
@@ -12085,6 +12108,350 @@
           "declaration": {
             "name": "LoquixSearchResults",
             "module": "src/components/core/loquix-search-results.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-search-sources.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSearchSources",
+          "cssParts": [
+            {
+              "description": "Outer sources wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "Progress header row.",
+              "name": "header"
+            },
+            {
+              "description": "Overall progress spinner.",
+              "name": "spinner"
+            },
+            {
+              "description": "Running total or source result count.",
+              "name": "count"
+            },
+            {
+              "description": "Source pill list.",
+              "name": "list"
+            },
+            {
+              "description": "Individual source pill or filter button.",
+              "name": "pill"
+            },
+            {
+              "description": "Source icon.",
+              "name": "icon"
+            },
+            {
+              "description": "Source name.",
+              "name": "name"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "sources",
+              "type": {
+                "text": "SearchSource[]"
+              },
+              "default": "[]",
+              "description": "Sources to render. Property-only; no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "SearchSourcesVariant"
+              },
+              "default": "'progress'",
+              "description": "Display mode: progress strip or filter chips.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "activeSource",
+              "type": {
+                "text": "string"
+              },
+              "default": "'all'",
+              "description": "Active source id in `filters` variant. Use `all` for the all-sources chip.",
+              "attribute": "active-source"
+            },
+            {
+              "kind": "field",
+              "name": "headline",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Headline override for progress mode.",
+              "attribute": "headline"
+            },
+            {
+              "kind": "field",
+              "name": "runningTotal",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Running total shown in progress mode.",
+              "attribute": "running-total"
+            },
+            {
+              "kind": "field",
+              "name": "showAll",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to render an `All` filter chip in filters mode.",
+              "attribute": "show-all"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible label override.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "_hasRunningSource",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "_totalCount",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "_selectSource",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "sourceId",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "source",
+                  "optional": true,
+                  "type": {
+                    "text": "SearchSource"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_sourceClass",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "SearchSource"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderIcon",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "SearchSource"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderSourceStatus",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "SearchSource"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderProgressPill",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "SearchSource"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderFilterButton",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "sourceId",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "label",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "count",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "source",
+                  "optional": true,
+                  "type": {
+                    "text": "SearchSource"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderHeader",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderProgress",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderFilters",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "Fired when a filter source is selected. Detail: `{ sourceId, source }`.",
+              "name": "loquix-search-source-select"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "type": {
+                "text": "SearchSourcesVariant"
+              },
+              "default": "'progress'",
+              "description": "Display mode: progress strip or filter chips.",
+              "fieldName": "variant"
+            },
+            {
+              "name": "active-source",
+              "type": {
+                "text": "string"
+              },
+              "default": "'all'",
+              "description": "Active source id in `filters` variant. Use `all` for the all-sources chip.",
+              "fieldName": "activeSource"
+            },
+            {
+              "name": "headline",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Headline override for progress mode.",
+              "fieldName": "headline"
+            },
+            {
+              "name": "running-total",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Running total shown in progress mode.",
+              "fieldName": "runningTotal"
+            },
+            {
+              "name": "show-all",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether to render an `All` filter chip in filters mode.",
+              "fieldName": "showAll"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible label override.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-search-sources",
+          "customElement": true,
+          "summary": "Source progress strip and filter chips for smart search surfaces."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSearchSources",
+          "declaration": {
+            "name": "LoquixSearchSources",
+            "module": "src/components/core/loquix-search-sources.ts"
           }
         }
       ]

@@ -131,6 +131,9 @@ export type SearchInputSize = 'md' | 'lg';
 /** Search results layout. */
 export type SearchResultsLayout = 'blended' | 'sectioned';
 
+/** Search sources display mode. */
+export type SearchSourcesVariant = 'progress' | 'filters';
+
 /** Search source lifecycle for progress/filter surfaces. */
 export type SearchSourceStatus = 'idle' | 'running' | 'done' | 'error';
 

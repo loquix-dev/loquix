@@ -5,6 +5,7 @@ import type {
   Source,
   SearchInputMode,
   SearchResult,
+  SearchSource,
   Suggestion,
   Template,
   GalleryItem,
@@ -247,6 +248,11 @@ export interface LoquixSearchResultClickDetail {
   index?: number;
 }
 
+export interface LoquixSearchSourceSelectDetail {
+  sourceId: string;
+  source?: SearchSource;
+}
+
 // === Scroll events ===
 
 export interface LoquixScrollBottomDetail {}
@@ -323,5 +329,6 @@ declare global {
     'loquix-search-submit': CustomEvent<LoquixSearchSubmitDetail>;
     'loquix-search-ask': CustomEvent<LoquixSearchAskDetail>;
     'loquix-search-result-click': CustomEvent<LoquixSearchResultClickDetail>;
+    'loquix-search-source-select': CustomEvent<LoquixSearchSourceSelectDetail>;
   }
 }

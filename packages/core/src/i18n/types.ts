@@ -214,6 +214,11 @@ export interface LoquixTranslations {
   'searchInput.askLabel': string;
   'searchInput.clearLabel': string;
   'searchFooter.ariaLabel': string;
+  'searchSources.ariaLabel': string;
+  'searchSources.searchingSources': string;
+  'searchSources.resultsSoFar': string;
+  'searchSources.allLabel': string;
+  'searchSources.errorLabel': string;
   'searchResults.empty': string;
   'searchResults.unknownSource': string;
   'searchResults.resultCount': string;

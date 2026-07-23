@@ -51,6 +51,7 @@ import './components/core/define-scroll-anchor.js';
 import './components/core/define-message-attachments.js';
 import './components/core/define-search-input.js';
 import './components/core/define-search-footer.js';
+import './components/core/define-search-sources.js';
 import './components/core/define-search-result.js';
 import './components/core/define-search-results.js';
 
