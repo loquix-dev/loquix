@@ -40,7 +40,11 @@ const styles = css`
   .container.is-smart {
     background: var(
       --loquix-search-input-smart-bg,
-      color-mix(in srgb, var(--loquix-ai-color-subtle, #ede9fe) 38%, var(--loquix-surface-bg, #ffffff))
+      color-mix(
+        in srgb,
+        var(--loquix-ai-color-subtle, #ede9fe) 38%,
+        var(--loquix-surface-bg, #ffffff)
+      )
     );
     border-color: var(
       --loquix-search-input-smart-border-color,
@@ -50,8 +54,7 @@ const styles = css`
 
   .container.is-focused {
     border-color: var(--loquix-search-input-focus-border-color, var(--loquix-ai-color, #7c3aed));
-    box-shadow: 0 0 0 2px
-      var(--loquix-search-input-focus-ring-color, rgba(124, 58, 237, 0.15));
+    box-shadow: 0 0 0 2px var(--loquix-search-input-focus-ring-color, rgba(124, 58, 237, 0.15));
   }
 
   .icon,
@@ -170,7 +173,8 @@ const styles = css`
     min-width: 22px;
     height: 22px;
     padding: 0 6px;
-    border: 1px solid var(--loquix-search-input-kbd-border-color, var(--loquix-border-color, #e5e7eb));
+    border: 1px solid
+      var(--loquix-search-input-kbd-border-color, var(--loquix-border-color, #e5e7eb));
     border-radius: 5px;
     background: var(--loquix-search-input-kbd-bg, var(--loquix-surface-secondary-bg, #f9fafb));
     color: var(--loquix-search-input-kbd-color, var(--loquix-text-tertiary-color, #9ca3af));

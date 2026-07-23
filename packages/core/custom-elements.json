@@ -544,6 +544,52 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-search-answer.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-search-answer",
+          "declaration": {
+            "name": "LoquixSearchAnswer",
+            "module": "/src/components/core/loquix-search-answer.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "LoquixSearchAnswer",
+          "declaration": {
+            "name": "LoquixSearchAnswer",
+            "module": "src/components/core/define-search-answer.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-search-dialog.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-search-dialog",
+          "declaration": {
+            "name": "LoquixSearchDialog",
+            "module": "/src/components/core/loquix-search-dialog.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "LoquixSearchDialog",
+          "declaration": {
+            "name": "LoquixSearchDialog",
+            "module": "src/components/core/define-search-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-search-footer.ts",
       "declarations": [],
       "exports": [
@@ -568,6 +614,29 @@
           "declaration": {
             "name": "LoquixSearchInput",
             "module": "/src/components/core/loquix-search-input.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-search-panel.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-search-panel",
+          "declaration": {
+            "name": "LoquixSearchPanel",
+            "module": "/src/components/core/loquix-search-panel.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "LoquixSearchPanel",
+          "declaration": {
+            "name": "LoquixSearchPanel",
+            "module": "src/components/core/define-search-panel.ts"
           }
         }
       ]
@@ -11145,6 +11214,1117 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/loquix-search-answer.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSearchAnswer",
+          "cssParts": [
+            {
+              "description": "Outer answer block.",
+              "name": "container"
+            },
+            {
+              "description": "Header row.",
+              "name": "header"
+            },
+            {
+              "description": "AI icon.",
+              "name": "icon"
+            },
+            {
+              "description": "Header title.",
+              "name": "title"
+            },
+            {
+              "description": "Answer content area.",
+              "name": "body"
+            },
+            {
+              "description": "In-progress generation indicator.",
+              "name": "generating"
+            },
+            {
+              "description": "Footer metadata/actions row.",
+              "name": "footer"
+            },
+            {
+              "description": "Generated-by metadata.",
+              "name": "meta"
+            },
+            {
+              "description": "Cited source chips.",
+              "name": "sources"
+            },
+            {
+              "description": "Single cited source chip.",
+              "name": "source"
+            },
+            {
+              "description": "Built-in and slotted actions group.",
+              "name": "actions"
+            },
+            {
+              "description": "Built-in action button.",
+              "name": "action"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Answer body. Use this when inline citation chips are needed.",
+              "name": ""
+            },
+            {
+              "description": "Optional extra footer actions.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "content",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Plain-text answer body. Ignored when the default slot has content.",
+              "attribute": "content"
+            },
+            {
+              "kind": "field",
+              "name": "state",
+              "type": {
+                "text": "SearchAnswerState"
+              },
+              "default": "'complete'",
+              "description": "Answer lifecycle state.",
+              "attribute": "state",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Heading override.",
+              "attribute": "heading"
+            },
+            {
+              "kind": "field",
+              "name": "model",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Model name shown in the footer.",
+              "attribute": "model"
+            },
+            {
+              "kind": "field",
+              "name": "generatedIn",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Generation duration label, such as \"1.8s\".",
+              "attribute": "generated-in"
+            },
+            {
+              "kind": "field",
+              "name": "sources",
+              "type": {
+                "text": "Source[]"
+              },
+              "default": "[]",
+              "description": "Cited sources shown as footer chips. Property-only; no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "showCopy",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Show built-in Copy action.",
+              "attribute": "show-copy"
+            },
+            {
+              "kind": "field",
+              "name": "showRegenerate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Show built-in Regenerate action.",
+              "attribute": "show-regenerate"
+            },
+            {
+              "kind": "field",
+              "name": "sourcesLabel",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible label override for cited sources.",
+              "attribute": "sources-label"
+            },
+            {
+              "kind": "field",
+              "name": "_defaultSlotNodes",
+              "type": {
+                "text": "Node[]"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hasSlotContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "_onSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_copyText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_onCopy",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_onRegenerate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderMeta",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderSources",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderGenerating",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderActions",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the built-in copy action is clicked. Detail: `{ content }`.",
+              "name": "loquix-copy"
+            },
+            {
+              "description": "When the built-in regenerate action is clicked.",
+              "name": "loquix-regenerate"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "content",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Plain-text answer body. Ignored when the default slot has content.",
+              "fieldName": "content"
+            },
+            {
+              "name": "state",
+              "type": {
+                "text": "SearchAnswerState"
+              },
+              "default": "'complete'",
+              "description": "Answer lifecycle state.",
+              "fieldName": "state"
+            },
+            {
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Heading override.",
+              "fieldName": "heading"
+            },
+            {
+              "name": "model",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Model name shown in the footer.",
+              "fieldName": "model"
+            },
+            {
+              "name": "generated-in",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Generation duration label, such as \"1.8s\".",
+              "fieldName": "generatedIn"
+            },
+            {
+              "name": "show-copy",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Show built-in Copy action.",
+              "fieldName": "showCopy"
+            },
+            {
+              "name": "show-regenerate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Show built-in Regenerate action.",
+              "fieldName": "showRegenerate"
+            },
+            {
+              "name": "sources-label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible label override for cited sources.",
+              "fieldName": "sourcesLabel"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-search-answer",
+          "customElement": true,
+          "summary": "AI-generated answer block for smart search results, with citations and footer actions."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSearchAnswer",
+          "declaration": {
+            "name": "LoquixSearchAnswer",
+            "module": "src/components/core/loquix-search-answer.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-search-dialog.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSearchDialog",
+          "cssParts": [
+            {
+              "description": "The search input shown inline on the page.",
+              "name": "trigger"
+            },
+            {
+              "description": "The native `<dialog>` element.",
+              "name": "dialog"
+            },
+            {
+              "description": "Dialog header row.",
+              "name": "header"
+            },
+            {
+              "description": "Dialog heading text.",
+              "name": "heading"
+            },
+            {
+              "description": "Dialog close button.",
+              "name": "close-button"
+            },
+            {
+              "description": "Dialog search input area.",
+              "name": "query"
+            },
+            {
+              "description": "Dialog source progress/filter area.",
+              "name": "sources"
+            },
+            {
+              "description": "Scrollable answer/results area.",
+              "name": "body"
+            },
+            {
+              "description": "Dialog footer area.",
+              "name": "footer"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Prefix content for the page-level trigger input.",
+              "name": "trigger-prefix"
+            },
+            {
+              "description": "Prefix content for the dialog search input.",
+              "name": "dialog-prefix"
+            },
+            {
+              "description": "Optional custom answer content replacing the built-in `loquix-search-answer`.",
+              "name": "answer"
+            },
+            {
+              "description": "Optional trailing footer actions.",
+              "name": "footer-actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the search modal is open.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Current search query.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "SearchInputMode"
+              },
+              "default": "'auto'",
+              "description": "Search routing mode for both inputs.",
+              "attribute": "mode",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "SearchInputSize"
+              },
+              "default": "'md'",
+              "description": "Size of the page-level trigger input.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "state",
+              "type": {
+                "text": "SearchInputState"
+              },
+              "default": "'idle'",
+              "description": "Lifecycle state shown in the dialog input and source strip.",
+              "attribute": "state",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Placeholder text for both inputs.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "kbd",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Keyboard hint shown in the trigger and footer examples.",
+              "attribute": "kbd"
+            },
+            {
+              "kind": "field",
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Dialog heading text.",
+              "attribute": "heading"
+            },
+            {
+              "kind": "field",
+              "name": "askLabel",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Smart ask button label.",
+              "attribute": "ask-label"
+            },
+            {
+              "kind": "field",
+              "name": "closeOnOutsideClick",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether clicking the backdrop closes the dialog.",
+              "attribute": "close-on-outside-click"
+            },
+            {
+              "kind": "field",
+              "name": "hideAnswer",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in AI answer region.",
+              "attribute": "hide-answer"
+            },
+            {
+              "kind": "field",
+              "name": "hideResults",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in search results region.",
+              "attribute": "hide-results"
+            },
+            {
+              "kind": "field",
+              "name": "hideFooter",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in footer.",
+              "attribute": "hide-footer"
+            },
+            {
+              "kind": "field",
+              "name": "answerContent",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "AI answer plain-text content. Ignored when the `answer` slot is provided.",
+              "attribute": "answer-content"
+            },
+            {
+              "kind": "field",
+              "name": "answerHeading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "AI answer heading override.",
+              "attribute": "answer-heading"
+            },
+            {
+              "kind": "field",
+              "name": "answerState",
+              "type": {
+                "text": "SearchAnswerState"
+              },
+              "default": "'complete'",
+              "description": "AI answer lifecycle state.",
+              "attribute": "answer-state",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "model",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Model label shown in the answer footer.",
+              "attribute": "model"
+            },
+            {
+              "kind": "field",
+              "name": "generatedIn",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Generation timing label shown in the answer footer.",
+              "attribute": "generated-in"
+            },
+            {
+              "kind": "field",
+              "name": "answerSources",
+              "type": {
+                "text": "Source[]"
+              },
+              "default": "[]",
+              "description": "Sources cited by the built-in answer. Property-only; no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "sources",
+              "type": {
+                "text": "SearchSource[]"
+              },
+              "default": "[]",
+              "description": "Connected search sources. Property-only; no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "activeSource",
+              "type": {
+                "text": "string"
+              },
+              "default": "'all'",
+              "description": "Active source filter id. Use `all` for all sources.",
+              "attribute": "active-source"
+            },
+            {
+              "kind": "field",
+              "name": "runningTotal",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Result count shown in progress mode.",
+              "attribute": "running-total"
+            },
+            {
+              "kind": "field",
+              "name": "results",
+              "type": {
+                "text": "SearchResult[]"
+              },
+              "default": "[]",
+              "description": "Search results rendered by the built-in result list. Property-only; no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "resultsLayout",
+              "type": {
+                "text": "SearchResultsLayout"
+              },
+              "default": "'blended'",
+              "description": "Built-in results layout.",
+              "attribute": "results-layout"
+            },
+            {
+              "kind": "field",
+              "name": "shortcuts",
+              "type": {
+                "text": "SearchShortcut[]"
+              },
+              "default": "[]",
+              "description": "Keyboard shortcuts rendered in the built-in footer."
+            },
+            {
+              "kind": "field",
+              "name": "_dialog",
+              "type": {
+                "text": "HTMLDialogElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_dialogInput",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hasAnswerSlotContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_ignoreNextTriggerFocus",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_ignoreTriggerFocusTimer",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_closeTimer",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_closing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Open the search modal."
+            },
+            {
+              "kind": "method",
+              "name": "hide",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Close the search modal."
+            },
+            {
+              "kind": "method",
+              "name": "_focusDialogInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<{ value: string }>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_suppressNextTriggerFocus",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_cancelPendingClose",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_startCloseAnimation",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleTriggerOpen",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleDialogClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleDialogClose",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleDialogCancel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_sourceVariant",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "'progress' | 'filters'"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderTrigger",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderAnswer",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_handleAnswerSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderResults",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the modal opens. Detail: `{ value }`.",
+              "name": "loquix-search-dialog-open"
+            },
+            {
+              "description": "When the modal closes. Detail: `{ value }`.",
+              "name": "loquix-search-dialog-close"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the search modal is open.",
+              "fieldName": "open"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Current search query.",
+              "fieldName": "value"
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "SearchInputMode"
+              },
+              "default": "'auto'",
+              "description": "Search routing mode for both inputs.",
+              "fieldName": "mode"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "SearchInputSize"
+              },
+              "default": "'md'",
+              "description": "Size of the page-level trigger input.",
+              "fieldName": "size"
+            },
+            {
+              "name": "state",
+              "type": {
+                "text": "SearchInputState"
+              },
+              "default": "'idle'",
+              "description": "Lifecycle state shown in the dialog input and source strip.",
+              "fieldName": "state"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Placeholder text for both inputs.",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "kbd",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Keyboard hint shown in the trigger and footer examples.",
+              "fieldName": "kbd"
+            },
+            {
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Dialog heading text.",
+              "fieldName": "heading"
+            },
+            {
+              "name": "ask-label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Smart ask button label.",
+              "fieldName": "askLabel"
+            },
+            {
+              "name": "close-on-outside-click",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether clicking the backdrop closes the dialog.",
+              "fieldName": "closeOnOutsideClick"
+            },
+            {
+              "name": "hide-answer",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in AI answer region.",
+              "fieldName": "hideAnswer"
+            },
+            {
+              "name": "hide-results",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in search results region.",
+              "fieldName": "hideResults"
+            },
+            {
+              "name": "hide-footer",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in footer.",
+              "fieldName": "hideFooter"
+            },
+            {
+              "name": "answer-content",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "AI answer plain-text content. Ignored when the `answer` slot is provided.",
+              "fieldName": "answerContent"
+            },
+            {
+              "name": "answer-heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "AI answer heading override.",
+              "fieldName": "answerHeading"
+            },
+            {
+              "name": "answer-state",
+              "type": {
+                "text": "SearchAnswerState"
+              },
+              "default": "'complete'",
+              "description": "AI answer lifecycle state.",
+              "fieldName": "answerState"
+            },
+            {
+              "name": "model",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Model label shown in the answer footer.",
+              "fieldName": "model"
+            },
+            {
+              "name": "generated-in",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Generation timing label shown in the answer footer.",
+              "fieldName": "generatedIn"
+            },
+            {
+              "name": "active-source",
+              "type": {
+                "text": "string"
+              },
+              "default": "'all'",
+              "description": "Active source filter id. Use `all` for all sources.",
+              "fieldName": "activeSource"
+            },
+            {
+              "name": "running-total",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Result count shown in progress mode.",
+              "fieldName": "runningTotal"
+            },
+            {
+              "name": "results-layout",
+              "type": {
+                "text": "SearchResultsLayout"
+              },
+              "default": "'blended'",
+              "description": "Built-in results layout.",
+              "fieldName": "resultsLayout"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-search-dialog",
+          "customElement": true,
+          "summary": "Drop-in smart search input that opens a modal with AI answer, sources, and results."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSearchDialog",
+          "declaration": {
+            "name": "LoquixSearchDialog",
+            "module": "src/components/core/loquix-search-dialog.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/loquix-search-footer.ts",
       "declarations": [
         {
@@ -11649,6 +12829,723 @@
           "declaration": {
             "name": "LoquixSearchInput",
             "module": "src/components/core/loquix-search-input.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-search-panel.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSearchPanel",
+          "cssParts": [
+            {
+              "description": "Outer anchored search surface.",
+              "name": "container"
+            },
+            {
+              "description": "Search input area.",
+              "name": "query"
+            },
+            {
+              "description": "The inline search input.",
+              "name": "input"
+            },
+            {
+              "description": "Expandable panel region.",
+              "name": "panel"
+            },
+            {
+              "description": "Source progress/filter area.",
+              "name": "sources"
+            },
+            {
+              "description": "Answer/results area.",
+              "name": "body"
+            },
+            {
+              "description": "Query suggestion area.",
+              "name": "suggestions"
+            },
+            {
+              "description": "Footer area.",
+              "name": "footer"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Prefix content for the inline search input.",
+              "name": "prefix"
+            },
+            {
+              "description": "Optional pre-search suggestions, commonly `loquix-suggestion-chips`.",
+              "name": "suggestions"
+            },
+            {
+              "description": "Optional custom answer content replacing the built-in `loquix-search-answer`.",
+              "name": "answer"
+            },
+            {
+              "description": "Optional trailing footer actions.",
+              "name": "footer-actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the anchored panel is open.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Current search query.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "SearchInputMode"
+              },
+              "default": "'auto'",
+              "description": "Search routing mode.",
+              "attribute": "mode",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "SearchInputSize"
+              },
+              "default": "'md'",
+              "description": "Size of the inline input.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "SearchPanelVariant"
+              },
+              "default": "'detached'",
+              "description": "Overlay composition. `integrated` draws the expanded surface around the input.",
+              "attribute": "variant",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "state",
+              "type": {
+                "text": "SearchInputState"
+              },
+              "default": "'idle'",
+              "description": "Lifecycle state shown in the input and source strip.",
+              "attribute": "state",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Placeholder text for the input.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "kbd",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Keyboard hint shown in the input.",
+              "attribute": "kbd"
+            },
+            {
+              "kind": "field",
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible label for the expanded panel region.",
+              "attribute": "heading"
+            },
+            {
+              "kind": "field",
+              "name": "askLabel",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Smart ask button label.",
+              "attribute": "ask-label"
+            },
+            {
+              "kind": "field",
+              "name": "closeOnOutsideClick",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether clicking outside the component closes the panel.",
+              "attribute": "close-on-outside-click"
+            },
+            {
+              "kind": "field",
+              "name": "hideAnswer",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in AI answer region.",
+              "attribute": "hide-answer"
+            },
+            {
+              "kind": "field",
+              "name": "hideResults",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in search results region.",
+              "attribute": "hide-results"
+            },
+            {
+              "kind": "field",
+              "name": "hideFooter",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in footer.",
+              "attribute": "hide-footer"
+            },
+            {
+              "kind": "field",
+              "name": "answerContent",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "AI answer plain-text content. Ignored when the `answer` slot is provided.",
+              "attribute": "answer-content"
+            },
+            {
+              "kind": "field",
+              "name": "answerHeading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "AI answer heading override.",
+              "attribute": "answer-heading"
+            },
+            {
+              "kind": "field",
+              "name": "answerState",
+              "type": {
+                "text": "SearchAnswerState"
+              },
+              "default": "'complete'",
+              "description": "AI answer lifecycle state.",
+              "attribute": "answer-state",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "model",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Model label shown in the answer footer.",
+              "attribute": "model"
+            },
+            {
+              "kind": "field",
+              "name": "generatedIn",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Generation timing label shown in the answer footer.",
+              "attribute": "generated-in"
+            },
+            {
+              "kind": "field",
+              "name": "answerSources",
+              "type": {
+                "text": "Source[]"
+              },
+              "default": "[]",
+              "description": "Sources cited by the built-in answer. Property-only; no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "sources",
+              "type": {
+                "text": "SearchSource[]"
+              },
+              "default": "[]",
+              "description": "Connected search sources. Property-only; no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "activeSource",
+              "type": {
+                "text": "string"
+              },
+              "default": "'all'",
+              "description": "Active source filter id. Use `all` for all sources.",
+              "attribute": "active-source"
+            },
+            {
+              "kind": "field",
+              "name": "runningTotal",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Result count shown in progress mode.",
+              "attribute": "running-total"
+            },
+            {
+              "kind": "field",
+              "name": "results",
+              "type": {
+                "text": "SearchResult[]"
+              },
+              "default": "[]",
+              "description": "Search results rendered by the built-in result list. Property-only; no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "resultsLayout",
+              "type": {
+                "text": "SearchResultsLayout"
+              },
+              "default": "'blended'",
+              "description": "Built-in results layout.",
+              "attribute": "results-layout"
+            },
+            {
+              "kind": "field",
+              "name": "shortcuts",
+              "type": {
+                "text": "SearchShortcut[]"
+              },
+              "default": "[]",
+              "description": "Keyboard shortcuts rendered in the built-in footer."
+            },
+            {
+              "kind": "field",
+              "name": "_hasAnswerSlotContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_hasSuggestionsSlotContent",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_outsideClickTimer",
+              "type": {
+                "text": "number | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Open the anchored search panel."
+            },
+            {
+              "kind": "method",
+              "name": "hide",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Close the anchored search panel."
+            },
+            {
+              "kind": "method",
+              "name": "_handleActivation",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<{ value: string }>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "_handleDocumentPointerDown",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_setupOutsidePointerDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_teardownOutsidePointerDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_sourceVariant",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "'progress' | 'filters'"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderAnswer",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_handleAnswerSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleSuggestionsSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderResults",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "description": "When the anchored panel opens. Detail: `{ value }`.",
+              "name": "loquix-search-panel-open"
+            },
+            {
+              "description": "When the anchored panel closes. Detail: `{ value }`.",
+              "name": "loquix-search-panel-close"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the anchored panel is open.",
+              "fieldName": "open"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Current search query.",
+              "fieldName": "value"
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "SearchInputMode"
+              },
+              "default": "'auto'",
+              "description": "Search routing mode.",
+              "fieldName": "mode"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "SearchInputSize"
+              },
+              "default": "'md'",
+              "description": "Size of the inline input.",
+              "fieldName": "size"
+            },
+            {
+              "name": "variant",
+              "type": {
+                "text": "SearchPanelVariant"
+              },
+              "default": "'detached'",
+              "description": "Overlay composition. `integrated` draws the expanded surface around the input.",
+              "fieldName": "variant"
+            },
+            {
+              "name": "state",
+              "type": {
+                "text": "SearchInputState"
+              },
+              "default": "'idle'",
+              "description": "Lifecycle state shown in the input and source strip.",
+              "fieldName": "state"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Placeholder text for the input.",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "kbd",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Keyboard hint shown in the input.",
+              "fieldName": "kbd"
+            },
+            {
+              "name": "heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible label for the expanded panel region.",
+              "fieldName": "heading"
+            },
+            {
+              "name": "ask-label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Smart ask button label.",
+              "fieldName": "askLabel"
+            },
+            {
+              "name": "close-on-outside-click",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether clicking outside the component closes the panel.",
+              "fieldName": "closeOnOutsideClick"
+            },
+            {
+              "name": "hide-answer",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in AI answer region.",
+              "fieldName": "hideAnswer"
+            },
+            {
+              "name": "hide-results",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in search results region.",
+              "fieldName": "hideResults"
+            },
+            {
+              "name": "hide-footer",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the built-in footer.",
+              "fieldName": "hideFooter"
+            },
+            {
+              "name": "answer-content",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "AI answer plain-text content. Ignored when the `answer` slot is provided.",
+              "fieldName": "answerContent"
+            },
+            {
+              "name": "answer-heading",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "AI answer heading override.",
+              "fieldName": "answerHeading"
+            },
+            {
+              "name": "answer-state",
+              "type": {
+                "text": "SearchAnswerState"
+              },
+              "default": "'complete'",
+              "description": "AI answer lifecycle state.",
+              "fieldName": "answerState"
+            },
+            {
+              "name": "model",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Model label shown in the answer footer.",
+              "fieldName": "model"
+            },
+            {
+              "name": "generated-in",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Generation timing label shown in the answer footer.",
+              "fieldName": "generatedIn"
+            },
+            {
+              "name": "active-source",
+              "type": {
+                "text": "string"
+              },
+              "default": "'all'",
+              "description": "Active source filter id. Use `all` for all sources.",
+              "fieldName": "activeSource"
+            },
+            {
+              "name": "running-total",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Result count shown in progress mode.",
+              "fieldName": "runningTotal"
+            },
+            {
+              "name": "results-layout",
+              "type": {
+                "text": "SearchResultsLayout"
+              },
+              "default": "'blended'",
+              "description": "Built-in results layout.",
+              "fieldName": "resultsLayout"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-search-panel",
+          "customElement": true,
+          "summary": "Inline smart search input that opens an anchored answer/results overlay."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSearchPanel",
+          "declaration": {
+            "name": "LoquixSearchPanel",
+            "module": "src/components/core/loquix-search-panel.ts"
           }
         }
       ]

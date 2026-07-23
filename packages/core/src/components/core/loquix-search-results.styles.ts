@@ -38,7 +38,8 @@ const styles = css`
     width: 100%;
     min-height: 42px;
     padding: 10px 14px;
-    border-bottom: 1px solid var(--loquix-search-section-border-color, var(--loquix-border-color, #e5e7eb));
+    border-bottom: 1px solid
+      var(--loquix-search-section-border-color, var(--loquix-border-color, #e5e7eb));
     background: var(--loquix-search-section-header-bg, var(--loquix-surface-secondary-bg, #f9fafb));
     color: var(--loquix-text-color, #111827);
     cursor: pointer;
@@ -52,7 +53,10 @@ const styles = css`
   }
 
   .summary:hover {
-    background: var(--loquix-search-section-header-hover-bg, var(--loquix-overlay-subtle, rgba(0, 0, 0, 0.04)));
+    background: var(
+      --loquix-search-section-header-hover-bg,
+      var(--loquix-overlay-subtle, rgba(0, 0, 0, 0.04))
+    );
   }
 
   .summary:focus-visible {

@@ -128,6 +128,12 @@ export type SearchInputState = 'idle' | 'searching';
 /** Search input size preset. */
 export type SearchInputSize = 'md' | 'lg';
 
+/** Search panel overlay composition. */
+export type SearchPanelVariant = 'detached' | 'integrated';
+
+/** AI answer lifecycle state. */
+export type SearchAnswerState = 'complete' | 'generating';
+
 /** Search results layout. */
 export type SearchResultsLayout = 'blended' | 'sectioned';
 

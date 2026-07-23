@@ -19,7 +19,9 @@ const result: SearchResult = {
 
 describe('loquix-search-result', () => {
   it('renders result object content', async () => {
-    const el = await fixture<LoquixSearchResult>(html`<loquix-search-result></loquix-search-result>`);
+    const el = await fixture<LoquixSearchResult>(
+      html`<loquix-search-result></loquix-search-result>`,
+    );
     el.result = result;
     await el.updateComplete;
     expect(getShadowPart(el, 'rank')!.textContent?.trim()).to.equal('1.');
@@ -29,7 +31,9 @@ describe('loquix-search-result', () => {
   });
 
   it('renders safe URLs as anchors', async () => {
-    const el = await fixture<LoquixSearchResult>(html`<loquix-search-result></loquix-search-result>`);
+    const el = await fixture<LoquixSearchResult>(
+      html`<loquix-search-result></loquix-search-result>`,
+    );
     el.result = result;
     await el.updateComplete;
     const row = getShadowPart(el, 'row') as HTMLAnchorElement;
@@ -39,7 +43,9 @@ describe('loquix-search-result', () => {
   });
 
   it('renders unsafe URLs as buttons', async () => {
-    const el = await fixture<LoquixSearchResult>(html`<loquix-search-result></loquix-search-result>`);
+    const el = await fixture<LoquixSearchResult>(
+      html`<loquix-search-result></loquix-search-result>`,
+    );
     el.result = { ...result, url: 'javascript:alert(1)' };
     await el.updateComplete;
     const row = getShadowPart(el, 'row')!;
@@ -47,7 +53,9 @@ describe('loquix-search-result', () => {
   });
 
   it('dispatches cancelable result-click before navigation', async () => {
-    const el = await fixture<LoquixSearchResult>(html`<loquix-search-result></loquix-search-result>`);
+    const el = await fixture<LoquixSearchResult>(
+      html`<loquix-search-result></loquix-search-result>`,
+    );
     el.result = result;
     await el.updateComplete;
     el.addEventListener('loquix-search-result-click', e => e.preventDefault());
@@ -59,7 +67,9 @@ describe('loquix-search-result', () => {
   });
 
   it('event detail carries result and index', async () => {
-    const el = await fixture<LoquixSearchResult>(html`<loquix-search-result></loquix-search-result>`);
+    const el = await fixture<LoquixSearchResult>(
+      html`<loquix-search-result></loquix-search-result>`,
+    );
     el.result = result;
     await el.updateComplete;
 
@@ -67,7 +77,9 @@ describe('loquix-search-result', () => {
       el,
       'loquix-search-result-click',
     );
-    getShadowPart(el, 'row')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    getShadowPart(el, 'row')!.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true }),
+    );
     const event = await eventPromise;
     expect(event.detail.index).to.equal(1);
     expect(event.detail.result.id).to.equal('r-1');

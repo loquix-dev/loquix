@@ -103,7 +103,11 @@ const styles = css`
     );
     background: var(
       --loquix-search-sources-pill-hover-bg,
-      color-mix(in srgb, var(--loquix-ai-color-subtle, #ede9fe) 34%, var(--loquix-surface-bg, #ffffff))
+      color-mix(
+        in srgb,
+        var(--loquix-ai-color-subtle, #ede9fe) 34%,
+        var(--loquix-surface-bg, #ffffff)
+      )
     );
   }
 

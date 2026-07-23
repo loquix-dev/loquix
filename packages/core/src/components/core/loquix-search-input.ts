@@ -202,7 +202,9 @@ export class LoquixSearchInput extends LitElement {
             </button>`
           : nothing}
         ${this.state !== 'searching' && this.mode === 'smart' && !this._shouldShowAsk
-          ? html`<span class="sparkle" aria-hidden="true"><slot name="sparkle">${sparkleSvg}</slot></span>`
+          ? html`<span class="sparkle" aria-hidden="true"
+              ><slot name="sparkle">${sparkleSvg}</slot></span
+            >`
           : nothing}
         ${this._shouldShowAsk
           ? html`<button

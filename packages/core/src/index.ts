@@ -67,6 +67,8 @@ export type {
   SearchInputMode,
   SearchInputState,
   SearchInputSize,
+  SearchPanelVariant,
+  SearchAnswerState,
   SearchResultsLayout,
   SearchSourcesVariant,
   SearchSourceStatus,
@@ -131,6 +133,10 @@ export type {
   LoquixSearchAskDetail,
   LoquixSearchResultClickDetail,
   LoquixSearchSourceSelectDetail,
+  LoquixSearchDialogOpenDetail,
+  LoquixSearchDialogCloseDetail,
+  LoquixSearchPanelOpenDetail,
+  LoquixSearchPanelCloseDetail,
 } from './events/index.js';
 
 // === Localization ===
@@ -212,6 +218,9 @@ export { LoquixSourceList } from './components/core/loquix-source-list.js';
 // Smart Search components
 export { LoquixSearchInput } from './components/core/loquix-search-input.js';
 export { LoquixSearchFooter } from './components/core/loquix-search-footer.js';
+export { LoquixSearchDialog } from './components/core/loquix-search-dialog.js';
+export { LoquixSearchPanel } from './components/core/loquix-search-panel.js';
+export { LoquixSearchAnswer } from './components/core/loquix-search-answer.js';
 export { LoquixSearchSources } from './components/core/loquix-search-sources.js';
 export { LoquixSearchResult } from './components/core/loquix-search-result.js';
 export { LoquixSearchResults } from './components/core/loquix-search-results.js';
@@ -268,6 +277,8 @@ import './components/core/define-source-list.js';
 // Smart Search registrations
 import './components/core/define-search-input.js';
 import './components/core/define-search-footer.js';
+import './components/core/define-search-dialog.js';
+import './components/core/define-search-answer.js';
 import './components/core/define-search-sources.js';
 import './components/core/define-search-result.js';
 import './components/core/define-search-results.js';

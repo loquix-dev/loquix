@@ -82,11 +82,15 @@ export class LoquixSearchResults extends LitElement {
             : nothing}
           <span class="source-name">${sourceName}</span>
           <span part="count" class="count">${countLabel}</span>
-          ${group.source?.duration ? html`<span class="duration">${group.source.duration}</span>` : nothing}
+          ${group.source?.duration
+            ? html`<span class="duration">${group.source.duration}</span>`
+            : nothing}
           <span class="chevron">${chevronSvg}</span>
         </summary>
         <div part="section-items" class="items">
-          ${group.results.map((result, index) => this._renderResult({ ...result, rank: undefined }, index))}
+          ${group.results.map((result, index) =>
+            this._renderResult({ ...result, rank: undefined }, index),
+          )}
         </div>
       </details>
     `;

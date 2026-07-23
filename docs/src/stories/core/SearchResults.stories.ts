@@ -81,20 +81,22 @@ export const Sectioned: Story = {
 };
 
 export const SingleResult: Story = {
-  render: () => html`<div style="max-width:620px">
-    <loquix-search-result
-      rank="1"
-      source-name="Docs"
-      source-icon="D"
-      title="Refund Policy"
-      url="https://docs.example.com/policies/refunds"
-      display-url="docs.example.com/policies/refunds"
-      snippet="Customers can request a refund within 30 days of purchase."
-      citation-ref="1"
-    ></loquix-search-result>
-  </div>`,
+  render: () =>
+    html`<div style="max-width:620px">
+      <loquix-search-result
+        rank="1"
+        source-name="Docs"
+        source-icon="D"
+        title="Refund Policy"
+        url="https://docs.example.com/policies/refunds"
+        display-url="docs.example.com/policies/refunds"
+        snippet="Customers can request a refund within 30 days of purchase."
+        citation-ref="1"
+      ></loquix-search-result>
+    </div>`,
 };
 
 export const Empty: Story = {
-  render: () => html`<div style="max-width:620px"><loquix-search-results></loquix-search-results></div>`,
+  render: () =>
+    html`<div style="max-width:620px"><loquix-search-results></loquix-search-results></div>`,
 };

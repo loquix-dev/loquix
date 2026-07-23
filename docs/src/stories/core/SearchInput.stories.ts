@@ -96,7 +96,11 @@ export const Personalities: Story = {
   render: () => html`
     <div style="display:flex;flex-direction:column;gap:18px;max-width:560px">
       <loquix-search-input mode="plain" placeholder="Search..." kbd="Cmd K"></loquix-search-input>
-      <loquix-search-input mode="smart" placeholder="Search or ask anything..." kbd="Cmd K"></loquix-search-input>
+      <loquix-search-input
+        mode="smart"
+        placeholder="Search or ask anything..."
+        kbd="Cmd K"
+      ></loquix-search-input>
       <loquix-search-input
         mode="auto"
         value="What's our refund policy"

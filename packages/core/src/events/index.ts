@@ -253,6 +253,22 @@ export interface LoquixSearchSourceSelectDetail {
   source?: SearchSource;
 }
 
+export interface LoquixSearchDialogOpenDetail {
+  value: string;
+}
+
+export interface LoquixSearchDialogCloseDetail {
+  value: string;
+}
+
+export interface LoquixSearchPanelOpenDetail {
+  value: string;
+}
+
+export interface LoquixSearchPanelCloseDetail {
+  value: string;
+}
+
 // === Scroll events ===
 
 export interface LoquixScrollBottomDetail {}
@@ -330,5 +346,9 @@ declare global {
     'loquix-search-ask': CustomEvent<LoquixSearchAskDetail>;
     'loquix-search-result-click': CustomEvent<LoquixSearchResultClickDetail>;
     'loquix-search-source-select': CustomEvent<LoquixSearchSourceSelectDetail>;
+    'loquix-search-dialog-open': CustomEvent<LoquixSearchDialogOpenDetail>;
+    'loquix-search-dialog-close': CustomEvent<LoquixSearchDialogCloseDetail>;
+    'loquix-search-panel-open': CustomEvent<LoquixSearchPanelOpenDetail>;
+    'loquix-search-panel-close': CustomEvent<LoquixSearchPanelCloseDetail>;
   }
 }

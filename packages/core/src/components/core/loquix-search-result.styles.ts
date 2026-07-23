@@ -31,7 +31,10 @@ const styles = css`
   }
 
   .row:hover {
-    background: var(--loquix-search-result-hover-bg, var(--loquix-overlay-subtle, rgba(0, 0, 0, 0.04)));
+    background: var(
+      --loquix-search-result-hover-bg,
+      var(--loquix-overlay-subtle, rgba(0, 0, 0, 0.04))
+    );
   }
 
   .row:focus-visible {

@@ -214,6 +214,11 @@ export interface LoquixTranslations {
   'searchInput.askLabel': string;
   'searchInput.clearLabel': string;
   'searchFooter.ariaLabel': string;
+  'searchAnswer.title': string;
+  'searchAnswer.generatedBy': string;
+  'searchAnswer.copyLabel': string;
+  'searchAnswer.regenerateLabel': string;
+  'searchAnswer.sourcesLabel': string;
   'searchSources.ariaLabel': string;
   'searchSources.searchingSources': string;
   'searchSources.resultsSoFar': string;
@@ -223,4 +228,7 @@ export interface LoquixTranslations {
   'searchResults.unknownSource': string;
   'searchResults.resultCount': string;
   'searchResults.resultCountOne': string;
+  'searchDialog.heading': string;
+  'searchDialog.closeLabel': string;
+  'searchPanel.heading': string;
 }

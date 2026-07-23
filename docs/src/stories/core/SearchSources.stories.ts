@@ -94,7 +94,8 @@ export const Filters: Story = {
 };
 
 export const MixedStatuses: Story = {
-  render: () => html`<div style="width:520px">${makeSources(mixedSources, { runningTotal: 7 })}</div>`,
+  render: () =>
+    html`<div style="width:520px">${makeSources(mixedSources, { runningTotal: 7 })}</div>`,
 };
 
 export const WithSearchInput: Story = {

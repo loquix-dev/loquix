@@ -86,7 +86,8 @@ export class LoquixSearchSources extends LitElement {
   }
 
   private _renderSourceStatus(source: SearchSource) {
-    if (source.status === 'running') return html`<span class="mini-spinner" aria-hidden="true"></span>`;
+    if (source.status === 'running')
+      return html`<span class="mini-spinner" aria-hidden="true"></span>`;
     if (source.status === 'error') {
       return html`<span class="status">${this._localize.term('searchSources.errorLabel')}</span>`;
     }
@@ -104,7 +105,12 @@ export class LoquixSearchSources extends LitElement {
     `;
   }
 
-  private _renderFilterButton(sourceId: string, label: string, count?: number, source?: SearchSource) {
+  private _renderFilterButton(
+    sourceId: string,
+    label: string,
+    count?: number,
+    source?: SearchSource,
+  ) {
     const selected = this.activeSource === sourceId;
     return html`
       <button
@@ -146,7 +152,9 @@ export class LoquixSearchSources extends LitElement {
   private _renderProgress() {
     return html`
       ${this._renderHeader()}
-      <div part="list" class="list">${this.sources.map(source => this._renderProgressPill(source))}</div>
+      <div part="list" class="list">
+        ${this.sources.map(source => this._renderProgressPill(source))}
+      </div>
     `;
   }
 
@@ -162,7 +170,9 @@ export class LoquixSearchSources extends LitElement {
               totalCount,
             )
           : nothing}
-        ${this.sources.map(source => this._renderFilterButton(source.id, source.name, source.count, source))}
+        ${this.sources.map(source =>
+          this._renderFilterButton(source.id, source.name, source.count, source),
+        )}
       </div>
     `;
   }
