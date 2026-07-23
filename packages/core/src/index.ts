@@ -63,6 +63,15 @@ export type {
   ToolCallStatus,
   SourceListLayout,
   Source,
+  // Smart Search types
+  SearchInputMode,
+  SearchInputState,
+  SearchInputSize,
+  SearchResultsLayout,
+  SearchSourceStatus,
+  SearchSource,
+  SearchResult,
+  SearchShortcut,
 } from './types/index.js';
 
 // === Events ===
@@ -116,6 +125,10 @@ export type {
   LoquixToolGroupToggleDetail,
   LoquixCitationClickDetail,
   LoquixSourceClickDetail,
+  // Smart Search events
+  LoquixSearchSubmitDetail,
+  LoquixSearchAskDetail,
+  LoquixSearchResultClickDetail,
 } from './events/index.js';
 
 // === Localization ===
@@ -194,6 +207,11 @@ export { LoquixToolCall } from './components/core/loquix-tool-call.js';
 export { LoquixToolCallList } from './components/core/loquix-tool-call-list.js';
 export { LoquixCitationPopover } from './components/core/loquix-citation-popover.js';
 export { LoquixSourceList } from './components/core/loquix-source-list.js';
+// Smart Search components
+export { LoquixSearchInput } from './components/core/loquix-search-input.js';
+export { LoquixSearchFooter } from './components/core/loquix-search-footer.js';
+export { LoquixSearchResult } from './components/core/loquix-search-result.js';
+export { LoquixSearchResults } from './components/core/loquix-search-results.js';
 
 // === Side-effect registrations (auto-define all tags) ===
 import './components/core/define-message-avatar.js';
@@ -244,3 +262,8 @@ import './components/core/define-tool-call.js';
 import './components/core/define-tool-call-list.js';
 import './components/core/define-citation-popover.js';
 import './components/core/define-source-list.js';
+// Smart Search registrations
+import './components/core/define-search-input.js';
+import './components/core/define-search-footer.js';
+import './components/core/define-search-result.js';
+import './components/core/define-search-results.js';

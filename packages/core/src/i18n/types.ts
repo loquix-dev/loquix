@@ -207,4 +207,15 @@ export interface LoquixTranslations {
   'sourceList.heading': string;
   'sourceList.headingOne': string;
   'sourceList.openLabel': string;
+
+  // === loquix-search-* ===
+  'searchInput.placeholder': string;
+  'searchInput.plainPlaceholder': string;
+  'searchInput.askLabel': string;
+  'searchInput.clearLabel': string;
+  'searchFooter.ariaLabel': string;
+  'searchResults.empty': string;
+  'searchResults.unknownSource': string;
+  'searchResults.resultCount': string;
+  'searchResults.resultCountOne': string;
 }

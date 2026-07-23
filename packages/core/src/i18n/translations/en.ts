@@ -205,4 +205,15 @@ export const en: LoquixTranslations = {
   'sourceList.heading': '{count} sources',
   'sourceList.headingOne': '1 source',
   'sourceList.openLabel': 'Open source {index}',
+
+  // === loquix-search-* ===
+  'searchInput.placeholder': 'Search or ask anything...',
+  'searchInput.plainPlaceholder': 'Search...',
+  'searchInput.askLabel': 'Ask AI',
+  'searchInput.clearLabel': 'Clear search',
+  'searchFooter.ariaLabel': 'Search keyboard shortcuts',
+  'searchResults.empty': 'No results found.',
+  'searchResults.unknownSource': 'Unknown source',
+  'searchResults.resultCount': '{count} results',
+  'searchResults.resultCountOne': '1 result',
 };

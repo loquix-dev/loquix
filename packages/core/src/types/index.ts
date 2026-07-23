@@ -117,6 +117,69 @@ export interface Source {
   favicon?: string;
 }
 
+// === Smart Search ===
+
+/** Search input routing mode. */
+export type SearchInputMode = 'plain' | 'smart' | 'auto';
+
+/** Search input visual/lifecycle state. */
+export type SearchInputState = 'idle' | 'searching';
+
+/** Search input size preset. */
+export type SearchInputSize = 'md' | 'lg';
+
+/** Search results layout. */
+export type SearchResultsLayout = 'blended' | 'sectioned';
+
+/** Search source lifecycle for progress/filter surfaces. */
+export type SearchSourceStatus = 'idle' | 'running' | 'done' | 'error';
+
+/** Source metadata attached to smart search results. */
+export interface SearchSource {
+  /** Stable source id, such as "docs" or "slack". */
+  id: string;
+  /** Human-readable source name. */
+  name: string;
+  /** Small icon/emoji/letter rendered before the source name. */
+  icon?: string;
+  /** Current source status during fan-out search. */
+  status?: SearchSourceStatus;
+  /** Result count returned by this source. */
+  count?: number;
+  /** Optional timing label, such as "240ms". */
+  duration?: string;
+}
+
+/** A single smart search result row. */
+export interface SearchResult {
+  /** Stable result id. */
+  id?: string;
+  /** 1-based rank in the current list. */
+  rank?: number;
+  /** Source the result came from. */
+  source?: SearchSource;
+  /** Result title. */
+  title: string;
+  /** Destination URL. Only http(s) URLs are rendered as anchors. */
+  url?: string;
+  /** Display URL/short path shown in the metadata row. */
+  displayUrl?: string;
+  /** Short excerpt or match snippet. */
+  snippet?: string;
+  /** Additional metadata, such as "updated yesterday". */
+  meta?: string;
+  /** Optional citation number this result supports in an AI answer. */
+  citationRef?: number;
+}
+
+/** Keyboard shortcut item displayed in a smart search footer. */
+export interface SearchShortcut {
+  /** Key or key chord, such as "Enter" or "Cmd Enter". */
+  key: string;
+  /** Human-readable action label, such as "Search" or "Ask AI". */
+  label: string;
+}
+
 // === Onboarding types (Phase 2) ===
 
 /** A suggestion item for chips, welcome screens, and follow-ups */

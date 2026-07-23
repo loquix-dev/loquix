@@ -3,6 +3,8 @@ import type {
   FeedbackReason,
   UncertaintyKind,
   Source,
+  SearchInputMode,
+  SearchResult,
   Suggestion,
   Template,
   GalleryItem,
@@ -228,6 +230,23 @@ export interface LoquixSourceClickDetail {
   source: Source;
 }
 
+// === Smart Search events ===
+
+export interface LoquixSearchSubmitDetail {
+  query: string;
+  mode: Extract<SearchInputMode, 'plain'>;
+}
+
+export interface LoquixSearchAskDetail {
+  query: string;
+  mode: Extract<SearchInputMode, 'smart'>;
+}
+
+export interface LoquixSearchResultClickDetail {
+  result: SearchResult;
+  index?: number;
+}
+
 // === Scroll events ===
 
 export interface LoquixScrollBottomDetail {}
@@ -301,5 +320,8 @@ declare global {
     'loquix-tool-group-toggle': CustomEvent<LoquixToolGroupToggleDetail>;
     'loquix-citation-click': CustomEvent<LoquixCitationClickDetail>;
     'loquix-source-click': CustomEvent<LoquixSourceClickDetail>;
+    'loquix-search-submit': CustomEvent<LoquixSearchSubmitDetail>;
+    'loquix-search-ask': CustomEvent<LoquixSearchAskDetail>;
+    'loquix-search-result-click': CustomEvent<LoquixSearchResultClickDetail>;
   }
 }

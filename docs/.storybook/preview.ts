@@ -52,6 +52,11 @@ import '@loquix/core/define/define-tool-call';
 import '@loquix/core/define/define-tool-call-list';
 import '@loquix/core/define/define-citation-popover';
 import '@loquix/core/define/define-source-list';
+// Smart Search
+import '@loquix/core/define/define-search-input';
+import '@loquix/core/define/define-search-footer';
+import '@loquix/core/define/define-search-result';
+import '@loquix/core/define/define-search-results';
 
 const preview: Preview = {
   globalTypes: {

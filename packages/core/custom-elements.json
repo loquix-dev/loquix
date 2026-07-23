@@ -544,6 +544,66 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/core/define-search-footer.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-search-footer",
+          "declaration": {
+            "name": "LoquixSearchFooter",
+            "module": "/src/components/core/loquix-search-footer.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-search-input.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-search-input",
+          "declaration": {
+            "name": "LoquixSearchInput",
+            "module": "/src/components/core/loquix-search-input.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-search-result.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-search-result",
+          "declaration": {
+            "name": "LoquixSearchResult",
+            "module": "/src/components/core/loquix-search-result.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/define-search-results.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "loquix-search-results",
+          "declaration": {
+            "name": "LoquixSearchResults",
+            "module": "/src/components/core/loquix-search-results.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/core/define-source-list.ts",
       "declarations": [],
       "exports": [
@@ -11056,6 +11116,975 @@
           "declaration": {
             "name": "LoquixScrollAnchor",
             "module": "src/components/core/loquix-scroll-anchor.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-search-footer.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSearchFooter",
+          "cssParts": [
+            {
+              "description": "The outer footer container.",
+              "name": "footer"
+            },
+            {
+              "description": "The shortcut list.",
+              "name": "shortcuts"
+            },
+            {
+              "description": "A single shortcut item.",
+              "name": "shortcut"
+            },
+            {
+              "description": "Shortcut key/chord.",
+              "name": "key"
+            },
+            {
+              "description": "Shortcut action label.",
+              "name": "label"
+            },
+            {
+              "description": "Optional trailing actions slot container.",
+              "name": "actions"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Optional trailing controls or status text.",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "shortcuts",
+              "type": {
+                "text": "SearchShortcut[]"
+              },
+              "default": "[]",
+              "description": "Keyboard shortcuts to render. Property-only — no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible label override.",
+              "attribute": "label"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible label override.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-search-footer",
+          "customElement": true,
+          "summary": "Footer row for search panels and command palettes with keyboard shortcuts."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSearchFooter",
+          "declaration": {
+            "name": "LoquixSearchFooter",
+            "module": "src/components/core/loquix-search-footer.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-search-input.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSearchInput",
+          "cssParts": [
+            {
+              "description": "Outer input shell.",
+              "name": "container"
+            },
+            {
+              "description": "Prefix icon slot container.",
+              "name": "prefix"
+            },
+            {
+              "description": "The native `<input>` element.",
+              "name": "input"
+            },
+            {
+              "description": "The clear query button.",
+              "name": "clear-button"
+            },
+            {
+              "description": "The smart search affordance.",
+              "name": "ask-button"
+            },
+            {
+              "description": "Keyboard shortcut hint.",
+              "name": "kbd"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Optional replacement for the search icon.",
+              "name": "prefix"
+            },
+            {
+              "description": "Optional replacement for the smart-mode sparkle icon.",
+              "name": "sparkle"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "type": {
+                "text": "SearchInputMode"
+              },
+              "default": "'auto'",
+              "description": "Search routing mode.",
+              "attribute": "mode",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "SearchInputSize"
+              },
+              "default": "'md'",
+              "description": "Visual size preset.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "state",
+              "type": {
+                "text": "SearchInputState"
+              },
+              "default": "'idle'",
+              "description": "Lifecycle state.",
+              "attribute": "state",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Current search query.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Placeholder text.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "kbd",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Keyboard hint shown at the end of the input.",
+              "attribute": "kbd"
+            },
+            {
+              "kind": "field",
+              "name": "hideKbdWhenAsk",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Hide inline keyboard hint when the Ask AI affordance is visible.",
+              "attribute": "hide-kbd-when-ask"
+            },
+            {
+              "kind": "field",
+              "name": "clearable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Show a compact clear button when the input has a value.",
+              "attribute": "clearable"
+            },
+            {
+              "kind": "field",
+              "name": "askLabel",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Label for the smart search button.",
+              "attribute": "ask-label"
+            },
+            {
+              "kind": "field",
+              "name": "showAskAffordance",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Force the smart affordance to be visible.",
+              "attribute": "show-ask-affordance"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the input is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "_input",
+              "type": {
+                "text": "HTMLInputElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_focused",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_placeholder",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "_shouldShowAsk",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "_looksLikeSmartQuery",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_clearValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_submitPlain",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_submitSmart",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "description": "Fired as the value changes. Detail: `{ value }`.",
+              "name": "loquix-change"
+            },
+            {
+              "description": "Fired for plain search submit. Detail: `{ query, mode: 'plain' }`.",
+              "name": "loquix-search-submit"
+            },
+            {
+              "description": "Fired for AI search submit. Detail: `{ query, mode: 'smart' }`.",
+              "name": "loquix-search-ask"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "mode",
+              "type": {
+                "text": "SearchInputMode"
+              },
+              "default": "'auto'",
+              "description": "Search routing mode.",
+              "fieldName": "mode"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "SearchInputSize"
+              },
+              "default": "'md'",
+              "description": "Visual size preset.",
+              "fieldName": "size"
+            },
+            {
+              "name": "state",
+              "type": {
+                "text": "SearchInputState"
+              },
+              "default": "'idle'",
+              "description": "Lifecycle state.",
+              "fieldName": "state"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Current search query.",
+              "fieldName": "value"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Placeholder text.",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "kbd",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Keyboard hint shown at the end of the input.",
+              "fieldName": "kbd"
+            },
+            {
+              "name": "hide-kbd-when-ask",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Hide inline keyboard hint when the Ask AI affordance is visible.",
+              "fieldName": "hideKbdWhenAsk"
+            },
+            {
+              "name": "clearable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Show a compact clear button when the input has a value.",
+              "fieldName": "clearable"
+            },
+            {
+              "name": "ask-label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Label for the smart search button.",
+              "fieldName": "askLabel"
+            },
+            {
+              "name": "show-ask-affordance",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Force the smart affordance to be visible.",
+              "fieldName": "showAskAffordance"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the input is disabled.",
+              "fieldName": "disabled"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-search-input",
+          "customElement": true,
+          "summary": "Single-line search input that can route plain searches and AI questions."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSearchInput",
+          "declaration": {
+            "name": "LoquixSearchInput",
+            "module": "src/components/core/loquix-search-input.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-search-result.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSearchResult",
+          "cssParts": [
+            {
+              "description": "The clickable row element.",
+              "name": "row"
+            },
+            {
+              "description": "Rank column.",
+              "name": "rank"
+            },
+            {
+              "description": "Source label.",
+              "name": "source"
+            },
+            {
+              "description": "Result title.",
+              "name": "title"
+            },
+            {
+              "description": "Result snippet.",
+              "name": "snippet"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "result",
+              "type": {
+                "text": "SearchResult | undefined"
+              },
+              "description": "Full result object. Property-only — no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "rank",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "1-based rank override.",
+              "attribute": "rank"
+            },
+            {
+              "kind": "field",
+              "name": "sourceName",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Source name fallback when `result` is not supplied.",
+              "attribute": "source-name"
+            },
+            {
+              "kind": "field",
+              "name": "sourceIcon",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Source icon fallback when `result` is not supplied.",
+              "attribute": "source-icon"
+            },
+            {
+              "kind": "field",
+              "name": "title",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Result title fallback when `result` is not supplied.",
+              "attribute": "title"
+            },
+            {
+              "kind": "field",
+              "name": "url",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Result URL fallback when `result` is not supplied.",
+              "attribute": "url"
+            },
+            {
+              "kind": "field",
+              "name": "displayUrl",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Display URL fallback when `result` is not supplied.",
+              "attribute": "display-url"
+            },
+            {
+              "kind": "field",
+              "name": "snippet",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Snippet fallback when `result` is not supplied.",
+              "attribute": "snippet"
+            },
+            {
+              "kind": "field",
+              "name": "meta",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Metadata fallback when `result` is not supplied.",
+              "attribute": "meta"
+            },
+            {
+              "kind": "field",
+              "name": "citationRef",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Citation reference fallback when `result` is not supplied.",
+              "attribute": "citation-ref"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the row is disabled.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "_resolvedResult",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "SearchResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_handleClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                },
+                {
+                  "name": "result",
+                  "type": {
+                    "text": "SearchResult"
+                  }
+                },
+                {
+                  "name": "safeUrl",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderRow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "result",
+                  "type": {
+                    "text": "SearchResult"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "description": "Cancelable. Detail: `{ result, index }`.",
+              "name": "loquix-search-result-click"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "rank",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "1-based rank override.",
+              "fieldName": "rank"
+            },
+            {
+              "name": "source-name",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Source name fallback when `result` is not supplied.",
+              "fieldName": "sourceName"
+            },
+            {
+              "name": "source-icon",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Source icon fallback when `result` is not supplied.",
+              "fieldName": "sourceIcon"
+            },
+            {
+              "name": "title",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Result title fallback when `result` is not supplied.",
+              "fieldName": "title"
+            },
+            {
+              "name": "url",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Result URL fallback when `result` is not supplied.",
+              "fieldName": "url"
+            },
+            {
+              "name": "display-url",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Display URL fallback when `result` is not supplied.",
+              "fieldName": "displayUrl"
+            },
+            {
+              "name": "snippet",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Snippet fallback when `result` is not supplied.",
+              "fieldName": "snippet"
+            },
+            {
+              "name": "meta",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Metadata fallback when `result` is not supplied.",
+              "fieldName": "meta"
+            },
+            {
+              "name": "citation-ref",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": "Citation reference fallback when `result` is not supplied.",
+              "fieldName": "citationRef"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the row is disabled.",
+              "fieldName": "disabled"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-search-result",
+          "customElement": true,
+          "summary": "Single smart search result row with source, title, URL, snippet, and citation reference."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSearchResult",
+          "declaration": {
+            "name": "LoquixSearchResult",
+            "module": "src/components/core/loquix-search-result.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/core/loquix-search-results.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "LoquixSearchResults",
+          "cssParts": [
+            {
+              "description": "The outer results wrapper.",
+              "name": "container"
+            },
+            {
+              "description": "Empty state text.",
+              "name": "empty"
+            },
+            {
+              "description": "A grouped source section.",
+              "name": "section"
+            },
+            {
+              "description": "A source section header.",
+              "name": "section-header"
+            },
+            {
+              "description": "Result rows inside a section.",
+              "name": "section-items"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "_localize",
+              "privacy": "private",
+              "default": "new LocalizeController(this)"
+            },
+            {
+              "kind": "field",
+              "name": "results",
+              "type": {
+                "text": "SearchResult[]"
+              },
+              "default": "[]",
+              "description": "Results to render. Property-only — no JSON attribute parsing."
+            },
+            {
+              "kind": "field",
+              "name": "layout",
+              "type": {
+                "text": "SearchResultsLayout"
+              },
+              "default": "'blended'",
+              "description": "Results layout.",
+              "attribute": "layout",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Empty-state text override.",
+              "attribute": "empty-text"
+            },
+            {
+              "kind": "method",
+              "name": "_groupResults",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "SearchResultGroup[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "_renderResult",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "result",
+                  "type": {
+                    "text": "SearchResult"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderBlended",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "_renderSection",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "group",
+                  "type": {
+                    "text": "SearchResultGroup"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_renderSectioned",
+              "privacy": "private"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "layout",
+              "type": {
+                "text": "SearchResultsLayout"
+              },
+              "default": "'blended'",
+              "description": "Results layout.",
+              "fieldName": "layout"
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Empty-state text override.",
+              "fieldName": "emptyText"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "loquix-search-results",
+          "customElement": true,
+          "summary": "Smart search result container with blended and source-sectioned layouts."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "LoquixSearchResults",
+          "declaration": {
+            "name": "LoquixSearchResults",
+            "module": "src/components/core/loquix-search-results.ts"
           }
         }
       ]

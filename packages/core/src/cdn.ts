@@ -6,14 +6,14 @@
  *
  * This bundle:
  * - Injects design tokens (CSS variables + light theme) into <head>
- * - Registers all 35 custom elements
+ * - Registers all custom elements
  * - Bundles lit + @floating-ui/dom (no external dependencies)
  */
 
 // Inject tokens first
 import './tokens-inject.js';
 
-// Register all 35 components (side-effect imports)
+// Register core components (side-effect imports)
 import './components/core/define-message-avatar.js';
 import './components/core/define-typing-indicator.js';
 import './components/core/define-disclosure-badge.js';
@@ -49,6 +49,10 @@ import './components/core/define-filter-bar.js';
 import './components/core/define-drop-zone.js';
 import './components/core/define-scroll-anchor.js';
 import './components/core/define-message-attachments.js';
+import './components/core/define-search-input.js';
+import './components/core/define-search-footer.js';
+import './components/core/define-search-result.js';
+import './components/core/define-search-results.js';
 
 // Re-export everything for window.Loquix access
 export * from './index.js';
