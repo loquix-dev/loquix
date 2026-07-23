@@ -66,6 +66,26 @@ describe('loquix-search-result', () => {
     expect(click.defaultPrevented).to.be.true;
   });
 
+  it('prevents click handling when disabled', async () => {
+    const el = await fixture<LoquixSearchResult>(
+      html`<loquix-search-result disabled></loquix-search-result>`,
+    );
+    el.result = result;
+    await el.updateComplete;
+
+    let clicked = false;
+    el.addEventListener('loquix-search-result-click', () => {
+      clicked = true;
+    });
+
+    const row = getShadowPart(el, 'row')!;
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+    row.dispatchEvent(click);
+
+    expect(clicked).to.be.false;
+    expect(click.defaultPrevented).to.be.true;
+  });
+
   it('event detail carries result and index', async () => {
     const el = await fixture<LoquixSearchResult>(
       html`<loquix-search-result></loquix-search-result>`,

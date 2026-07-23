@@ -85,6 +85,21 @@ describe('loquix-search-answer', () => {
     expect(event.detail.content).to.equal('Copy this answer');
   });
 
+  it('dispatches copy events with normalized slotted text', async () => {
+    const el = await fixture<LoquixSearchAnswer>(html`
+      <loquix-search-answer>
+        Refunds
+        <strong>take 5 days</strong>
+      </loquix-search-answer>
+    `);
+    await el.updateComplete;
+
+    const eventPromise = waitForEvent<LoquixCopyDetail>(el, 'loquix-copy');
+    (getShadowParts(el, 'action')[0] as HTMLButtonElement).click();
+    const event = await eventPromise;
+    expect(event.detail.content).to.equal('Refunds take 5 days');
+  });
+
   it('dispatches regenerate events', async () => {
     const el = await fixture<LoquixSearchAnswer>(
       html`<loquix-search-answer content="Answer"></loquix-search-answer>`,

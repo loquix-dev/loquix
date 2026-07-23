@@ -7,7 +7,7 @@
 
 **Web Components for AI Chat Interfaces**
 
-A framework-agnostic UI kit of 40 production-ready components for building AI and LLM chat interfaces. Built with [Lit](https://lit.dev/) 3.x, TypeScript strict mode, and Shadow DOM encapsulation.
+A framework-agnostic UI kit of 50+ production-ready components for building AI and LLM chat interfaces. Built with [Lit](https://lit.dev/) 3.x, TypeScript strict mode, and Shadow DOM encapsulation.
 
 <p align="center">
   <img src="docs/assets/demo.gif" alt="Loquix Interactive Chat Demo" width="480" />
@@ -15,9 +15,9 @@ A framework-agnostic UI kit of 40 production-ready components for building AI an
 
 ## Why Loquix
 
-Every team building an AI product ends up implementing the same chat UI from scratch: message bubbles, streaming indicators, file uploads, model selectors, feedback buttons, parameter panels. It takes weeks of work, and the result is rarely accessible or themeable.
+Every team building an AI product ends up implementing the same chat UI from scratch: message bubbles, streaming indicators, file uploads, model selectors, smart search surfaces, feedback buttons, parameter panels. It takes weeks of work, and the result is rarely accessible or themeable.
 
-Loquix provides a complete set of composable Web Components that cover the entire AI chat experience. Drop in a `<loquix-chat-container>` with a message list, composer, and header — and you have a full-featured chat UI with streaming support, file attachments, inline editing, and user feedback out of the box.
+Loquix provides a complete set of composable Web Components that cover the entire AI chat experience. Drop in a `<loquix-chat-container>` with a message list, composer, and header — or a `<loquix-search-dialog>` for AI-powered knowledge search — and you have full-featured AI UI with streaming support, citations, file attachments, inline editing, and user feedback out of the box.
 
 Because these are standard Web Components, they work with any framework — or no framework at all.
 
@@ -246,9 +246,57 @@ document.addEventListener('loquix-mode-change', e => {
 });
 ```
 
+### Smart Search
+
+Add AI-powered search with source filters, citations, generated answers, and an optional drop-in modal:
+
+```html
+<loquix-search-dialog
+  value="What's our refund policy?"
+  mode="auto"
+  heading="Search knowledge"
+  model="GPT-4 Turbo"
+  kbd="Cmd K"
+></loquix-search-dialog>
+```
+
+```js
+import '@loquix/core/define/define-search-dialog';
+
+const search = document.querySelector('loquix-search-dialog');
+
+search.sources = [
+  { id: 'docs', name: 'Docs', icon: 'D', status: 'done', count: 5 },
+  { id: 'slack', name: 'Slack', icon: '#', status: 'done', count: 8 },
+];
+
+search.answerSources = [
+  {
+    title: 'Refund Policy',
+    url: 'https://docs.example.com/policies/refunds',
+    host: 'docs.example.com',
+  },
+];
+
+search.results = [
+  {
+    title: 'Refund Policy',
+    displayUrl: 'docs.example.com/policies/refunds',
+    snippet: 'Customers can request a refund within 30 days of purchase.',
+    citationRef: 1,
+  },
+];
+
+document.addEventListener('loquix-search-ask', e => {
+  search.state = 'searching';
+  search.answerState = 'generating';
+  // Run your search / RAG request, then set answerContent, sources, and results.
+});
+```
+
 ## Features
 
-### 40 Production-Ready Components
+### 50+ Production-Ready Components
 
 From message bubbles and avatars to model selectors and parameter tuning panels. Every component you need for a modern AI chat interface, designed to work together or independently.
 
@@ -259,6 +307,10 @@ Built for real-time AI responses. Streaming cursor variants (caret, block), anim
 ### File Attachments
 
 Complete file handling pipeline: drag-and-drop upload zones, progress tracking with status indicators, paste-to-upload from clipboard, MIME type validation, file size limits, and image previews with URL sanitization.
+
+### Smart Search
+
+Composable AI search primitives for RAG and knowledge workflows: search input modes, source progress and filters, result lists, generated answers with citations, anchored panels, and a ready-made modal dialog.
 
 ### Theming
 
@@ -291,6 +343,8 @@ Strict mode throughout. Full type definitions for all components, events, contro
 | **AI Controls**       | `generation-controls` `typing-indicator` `mode-selector` `model-selector` `parameter-panel`   |
 | **Reasoning & Trust** | `reasoning-block` `tool-call` `tool-call-list` `citation-popover` `source-list`               |
 | **File Handling**     | `attachment-panel` `attachment-chip` `drop-zone`                                              |
+| **Smart Search**      | `search-input` `search-sources` `search-result` `search-results` `search-answer`              |
+|                       | `search-footer` `search-dialog` `search-panel`                                                |
 | **Navigation & UI**   | `scroll-anchor` `nudge-banner` `caveat-notice` `disclosure-badge` `filter-bar`                |
 | **Templates**         | `template-card` `template-picker` `welcome-screen`                                            |
 
@@ -393,7 +447,18 @@ Development is organized into phases, from core chat primitives to advanced AI i
 - [ ] `variations-carousel` — multiple response variants with diff highlighting
 - [ ] `branches-nav` — conversation branch tree navigation
 
-### Phase 5 — Advanced
+### Phase 5 — Smart Search
+
+- [x] `search-input` — plain, smart, and auto search input modes with prefix/footer composition
+- [x] `search-sources` — source progress and filter chips with result counts
+- [x] `search-result` — single result row with source, metadata, URL, snippet, and citation reference
+- [x] `search-results` — blended and sectioned result layouts
+- [x] `search-answer` — generated answer block with citations, copy/regenerate actions, and generating state
+- [x] `search-footer` — keyboard shortcut footer for search surfaces
+- [x] `search-dialog` — drop-in modal search experience
+- [x] `search-panel` — anchored and integrated inline search panel
+
+### Phase 6 — Advanced
 
 - [ ] `memory-panel` — AI memory management (global/project/session scoping)
 - [ ] `prompt-enhancer` — pre-send prompt improvement with diff view
@@ -422,7 +487,7 @@ Detailed plans for these packages will be published as the core library stabiliz
 - [x] Shared controllers — keyboard, resize, autoscroll, streaming, upload, agent
 - [x] i18n — `LocalizeController` with pluggable translation providers
 - [x] Storybook — interactive stories with `@storybook/addon-a11y` (axe-core)
-- [x] Test suite — 896 tests on Chromium + WebKit via Web Test Runner
+- [x] Test suite — 1,100+ tests on Chromium + WebKit via Web Test Runner
 - [x] CDN bundle — single-file IIFE build for prototyping
 - [x] Custom Elements Manifest — machine-readable component metadata
 - [x] Vite library build with multi-entry exports

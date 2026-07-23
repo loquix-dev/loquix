@@ -85,6 +85,149 @@ describe('loquix-search-dialog', () => {
     expect((event as CustomEvent).detail.value).to.equal('refunds');
   });
 
+  it('starts close animation when open is set to false externally', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const dialog = el.shadowRoot!.querySelector('dialog')!;
+    expect(dialog.open).to.be.true;
+
+    el.open = false;
+    await el.updateComplete;
+    await el.updateComplete;
+
+    expect(dialog.classList.contains('is-closing')).to.be.true;
+  });
+
+  it('closes immediately when reduced motion is preferred', async () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) =>
+      ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener() {},
+        removeListener() {},
+        addEventListener() {},
+        removeEventListener() {},
+        dispatchEvent() {
+          return false;
+        },
+      }) as MediaQueryList) as typeof window.matchMedia;
+
+    try {
+      const el = await fixture<LoquixSearchDialog>(
+        html`<loquix-search-dialog open></loquix-search-dialog>`,
+      );
+      await el.updateComplete;
+      const dialog = el.shadowRoot!.querySelector('dialog')!;
+
+      el.hide();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(dialog.open).to.be.false;
+    } finally {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
+  it('closes when the dialog backdrop is clicked', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const dialog = el.shadowRoot!.querySelector('dialog')!;
+    dialog.getBoundingClientRect = () =>
+      ({
+        x: 10,
+        y: 10,
+        top: 10,
+        right: 110,
+        bottom: 110,
+        left: 10,
+        width: 100,
+        height: 100,
+        toJSON() {
+          return {};
+        },
+      }) as DOMRect;
+
+    dialog.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 0, clientY: 0 }));
+    await el.updateComplete;
+
+    expect(el.open).to.be.false;
+  });
+
+  it('keeps open when clicking inside the dialog body', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const dialog = el.shadowRoot!.querySelector('dialog')!;
+    dialog.getBoundingClientRect = () =>
+      ({
+        x: 10,
+        y: 10,
+        top: 10,
+        right: 110,
+        bottom: 110,
+        left: 10,
+        width: 100,
+        height: 100,
+        toJSON() {
+          return {};
+        },
+      }) as DOMRect;
+
+    dialog.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 50, clientY: 50 }));
+    await el.updateComplete;
+
+    expect(el.open).to.be.true;
+  });
+
+  it('ignores backdrop clicks when outside close is disabled', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open .closeOnOutsideClick=${false}></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const dialog = el.shadowRoot!.querySelector('dialog')!;
+    dialog.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 0, clientY: 0 }));
+    await el.updateComplete;
+
+    expect(el.open).to.be.true;
+  });
+
+  it('closes when native dialog close fires while open', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    el.shadowRoot!.querySelector('dialog')!.dispatchEvent(new Event('close'));
+    await el.updateComplete;
+
+    expect(el.open).to.be.false;
+  });
+
+  it('prevents native cancel and closes', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const cancel = new Event('cancel', { cancelable: true });
+    el.shadowRoot!.querySelector('dialog')!.dispatchEvent(cancel);
+    await el.updateComplete;
+
+    expect(cancel.defaultPrevented).to.be.true;
+    expect(el.open).to.be.false;
+  });
+
   it('does not reopen from focus returning to trigger after close', async () => {
     const el = await fixture<LoquixSearchDialog>(
       html`<loquix-search-dialog></loquix-search-dialog>`,
