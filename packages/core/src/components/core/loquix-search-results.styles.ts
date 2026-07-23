@@ -85,7 +85,7 @@ const styles = css`
 
   .duration {
     margin-left: auto;
-    color: var(--loquix-text-tertiary-color, #9ca3af);
+    color: var(--loquix-search-section-duration-color, var(--loquix-text-secondary-color, #4b5563));
     font-variant-numeric: tabular-nums;
   }
 

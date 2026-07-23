@@ -37,7 +37,7 @@ const styles = css`
   .running-count {
     flex: 0 0 auto;
     margin-inline-start: auto;
-    color: var(--loquix-search-sources-count-color, var(--loquix-text-tertiary-color, #9ca3af));
+    color: var(--loquix-search-sources-count-color, var(--loquix-text-secondary-color, #4b5563));
     font-size: 0.75rem;
   }
 
@@ -186,7 +186,7 @@ const styles = css`
   }
 
   .pill.is-active .count {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(17, 24, 39, 0.2);
   }
 
   .mini-spinner {

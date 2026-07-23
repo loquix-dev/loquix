@@ -16,7 +16,7 @@ const styles = css`
     padding: var(--loquix-search-footer-padding, 8px 10px);
     border-top: 1px solid
       var(--loquix-search-footer-border-color, var(--loquix-border-color, #e5e7eb));
-    color: var(--loquix-search-footer-color, var(--loquix-text-tertiary-color, #9ca3af));
+    color: var(--loquix-search-footer-color, var(--loquix-text-secondary-color, #4b5563));
     font-size: var(--loquix-search-footer-font-size, 0.6875rem);
   }
 
@@ -46,7 +46,7 @@ const styles = css`
       var(--loquix-search-footer-key-border-color, var(--loquix-border-color, #e5e7eb));
     border-radius: 5px;
     background: var(--loquix-search-footer-key-bg, var(--loquix-surface-bg, #ffffff));
-    color: var(--loquix-search-footer-key-color, var(--loquix-text-secondary-color, #6b7280));
+    color: var(--loquix-search-footer-key-color, var(--loquix-text-secondary-color, #4b5563));
     font-family: var(--loquix-code-font-family, ui-monospace, SFMono-Regular, Menlo, monospace);
     font-size: 0.6875rem;
     font-weight: 500;

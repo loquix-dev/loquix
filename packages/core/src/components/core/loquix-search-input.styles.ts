@@ -177,7 +177,7 @@ const styles = css`
       var(--loquix-search-input-kbd-border-color, var(--loquix-border-color, #e5e7eb));
     border-radius: 5px;
     background: var(--loquix-search-input-kbd-bg, var(--loquix-surface-secondary-bg, #f9fafb));
-    color: var(--loquix-search-input-kbd-color, var(--loquix-text-tertiary-color, #9ca3af));
+    color: var(--loquix-search-input-kbd-color, var(--loquix-text-secondary-color, #4b5563));
     font-family: var(--loquix-code-font-family, ui-monospace, SFMono-Regular, Menlo, monospace);
     font-size: 0.6875rem;
     line-height: 1;

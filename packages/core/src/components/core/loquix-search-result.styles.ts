@@ -45,7 +45,7 @@ const styles = css`
   .rank {
     flex: 0 0 22px;
     padding-top: 3px;
-    color: var(--loquix-search-result-rank-color, var(--loquix-text-tertiary-color, #9ca3af));
+    color: var(--loquix-search-result-rank-color, var(--loquix-text-secondary-color, #4b5563));
     font-size: 0.6875rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
@@ -92,9 +92,9 @@ const styles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--loquix-search-result-url-color, var(--loquix-text-secondary-color, #4b5563));
     font-family: var(--loquix-code-font-family, ui-monospace, SFMono-Regular, Menlo, monospace);
     font-size: 0.65625rem;
-    opacity: 0.74;
   }
 
   .citation {
