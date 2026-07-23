@@ -1,5 +1,20 @@
 # @loquix/react
 
+## 0.4.0
+
+### Minor Changes
+
+- Add smart search primitives for AI-powered knowledge search workflows.
+  - Add search input, footer, dialog, anchored panel, generated answer, source filters, result row, and result list components.
+  - Add smart search lifecycle states, source/result data types, keyboard footer metadata, and typed search events.
+  - Add Storybook docs, recipe examples, accessibility coverage, and behavioral tests for the new search surfaces.
+  - Add React wrappers for all smart search components.
+
+### Patch Changes
+
+- Updated dependencies
+  - @loquix/core@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
