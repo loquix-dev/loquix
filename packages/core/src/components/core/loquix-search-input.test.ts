@@ -78,6 +78,19 @@ describe('loquix-search-input', () => {
     expect(ask!.querySelector('svg')).to.equal(null);
   });
 
+  it('does not show Ask AI affordance in plain mode even when forced', async () => {
+    const el = await fixture<LoquixSearchInput>(
+      html`<loquix-search-input
+        mode="plain"
+        show-ask-affordance
+        value="What is our refund policy"
+      ></loquix-search-input>`,
+    );
+    await el.updateComplete;
+    const ask = getShadowPart(el, 'ask-button');
+    expect(ask === null, 'ask button must not render in plain mode').to.be.true;
+  });
+
   it('hides inline kbd when Ask AI affordance is visible by default', async () => {
     const el = await fixture<LoquixSearchInput>(
       html`<loquix-search-input

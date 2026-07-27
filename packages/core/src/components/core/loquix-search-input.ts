@@ -84,7 +84,7 @@ export class LoquixSearchInput extends LitElement {
   @property({ type: String, attribute: 'ask-label' })
   askLabel?: string;
 
-  /** Force the smart affordance to be visible. */
+  /** Force the smart affordance to be visible. Ignored when `mode` is `plain`. */
   @property({ type: Boolean, attribute: 'show-ask-affordance' })
   showAskAffordance = false;
 
@@ -107,6 +107,9 @@ export class LoquixSearchInput extends LitElement {
 
   private get _shouldShowAsk(): boolean {
     if (this.disabled || this.state === 'searching') return false;
+    // Plain mode routes every submit to plain search, so the ask button would
+    // fire a smart submit the host never opted into.
+    if (this.mode === 'plain') return false;
     if (this.showAskAffordance) return true;
     return this.mode === 'auto' && this._looksLikeSmartQuery(this.value);
   }
