@@ -1,4 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
+import type { LitElement } from 'lit';
 import { waitForEvent } from '../../test-utils.js';
 import './define-search-panel.js';
 import type { LoquixSearchPanel } from './loquix-search-panel.js';
@@ -214,6 +215,29 @@ describe('loquix-search-panel', () => {
     const answer = el.shadowRoot!.querySelector('loquix-search-answer') as HTMLElement;
     expect(answer).to.exist;
     expect(answer.getAttribute('state')).to.equal('generating');
+  });
+
+  it('shows the Ask AI affordance on the inline input by default', async () => {
+    const el = await fixture<LoquixSearchPanel>(html`<loquix-search-panel></loquix-search-panel>`);
+    await el.updateComplete;
+
+    const input = el.shadowRoot!.querySelector('loquix-search-input[part="input"]') as LitElement;
+    await input.updateComplete;
+
+    expect(input.shadowRoot!.querySelector('[part~="ask-button"]')).to.exist;
+  });
+
+  it('does not show the Ask AI affordance on the inline input in plain mode', async () => {
+    const el = await fixture<LoquixSearchPanel>(
+      html`<loquix-search-panel mode="plain"></loquix-search-panel>`,
+    );
+    await el.updateComplete;
+
+    const input = el.shadowRoot!.querySelector('loquix-search-input[part="input"]') as LitElement;
+    await input.updateComplete;
+
+    const ask = input.shadowRoot!.querySelector('[part~="ask-button"]');
+    expect(ask === null, 'ask button must not render in plain mode').to.be.true;
   });
 
   it('syncs value from the input change event', async () => {

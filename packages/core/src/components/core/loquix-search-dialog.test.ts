@@ -1,4 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
+import type { LitElement } from 'lit';
 import { waitForEvent } from '../../test-utils.js';
 import './define-search-dialog.js';
 import type { LoquixSearchDialog } from './loquix-search-dialog.js';
@@ -308,6 +309,31 @@ describe('loquix-search-dialog', () => {
     const answer = el.shadowRoot!.querySelector('loquix-search-answer') as HTMLElement;
     expect(answer).to.exist;
     expect(answer.getAttribute('state')).to.equal('generating');
+  });
+
+  it('shows the Ask AI affordance on the dialog input by default', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const dialogInput = el.shadowRoot!.querySelector('.dialog-input') as LitElement;
+    await dialogInput.updateComplete;
+
+    expect(dialogInput.shadowRoot!.querySelector('[part~="ask-button"]')).to.exist;
+  });
+
+  it('does not show the Ask AI affordance on the dialog input in plain mode', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open mode="plain"></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const dialogInput = el.shadowRoot!.querySelector('.dialog-input') as LitElement;
+    await dialogInput.updateComplete;
+
+    const ask = dialogInput.shadowRoot!.querySelector('[part~="ask-button"]');
+    expect(ask === null, 'ask button must not render in plain mode').to.be.true;
   });
 
   it('syncs value from the dialog input change event', async () => {

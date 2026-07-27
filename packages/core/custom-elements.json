@@ -12567,7 +12567,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Force the smart affordance to be visible.",
+              "description": "Force the smart affordance to be visible. Ignored when `mode` is `plain`.",
               "attribute": "show-ask-affordance"
             },
             {
@@ -12800,7 +12800,7 @@
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Force the smart affordance to be visible.",
+              "description": "Force the smart affordance to be visible. Ignored when `mode` is `plain`.",
               "fieldName": "showAskAffordance"
             },
             {
