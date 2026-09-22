@@ -17,7 +17,7 @@ export default {
     include: ['src/**/*.ts'],
     exclude: [
       'src/**/*.test.ts',
-      'src/test-utils.ts',
+      'src/test-helpers.ts',
       '**/node_modules/**',
     ],
     threshold: {

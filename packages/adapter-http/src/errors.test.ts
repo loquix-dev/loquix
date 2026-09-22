@@ -93,15 +93,40 @@ describe('cancellation', () => {
     await reader.read();
     controller.abort();
 
-    let rejected = false;
+    let caught: unknown;
     try {
       await reader.read();
-    } catch {
-      rejected = true;
+    } catch (error) {
+      caught = error;
     }
 
-    expect(rejected, 'an aborted send must surface on the stream').to.be.true;
+    expect(caught).to.be.instanceOf(DOMException);
+    expect((caught as DOMException).name).to.equal('AbortError');
     expect(cancelled).to.equal(1);
+  });
+
+  it('cancels the underlying body after [DONE], even if the server never closes it', async () => {
+    let cancelled = 0;
+    const body = new ReadableStream<Uint8Array>({
+      start(bodyController) {
+        const encoder = new TextEncoder();
+        bodyController.enqueue(encoder.encode('data: hello\n\n'));
+        bodyController.enqueue(encoder.encode('data: [DONE]\n\n'));
+        // Deliberately never closed: a server can hold the connection open
+        // past the logical end of the reply, and the decoder must not depend
+        // on it closing to stop reading.
+      },
+      cancel() {
+        cancelled += 1;
+      },
+    });
+    const { fetch } = fakeFetch(body);
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('hello');
+    expect(cancelled, 'a body the server left open must still be cancelled').to.equal(1);
   });
 });
 
@@ -120,5 +145,32 @@ describe('parse hook', () => {
     const response = await provider.send([userMessage('hi')], {});
 
     expect(await readAll(response.stream)).to.equal('x');
+  });
+
+  it('errors the stream with the exact error a throwing hook raises', async () => {
+    const { fetch } = fakeFetch(sseBody('anything'));
+    const boom = new Error('consumer parse hook exploded');
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: () => {
+        throw boom;
+      },
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    let caught: unknown;
+    try {
+      await readAll(response.stream);
+    } catch (error) {
+      caught = error;
+    }
+
+    // The default parser swallows one malformed line so a network hiccup does
+    // not fail the whole response. A throwing hook is different: it is the
+    // consumer's own code, so its exception must come out unwrapped rather
+    // than being treated like a parse failure and silently dropped.
+    expect(caught).to.equal(boom);
   });
 });
