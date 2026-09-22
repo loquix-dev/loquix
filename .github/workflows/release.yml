@@ -54,6 +54,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
+      - name: Wait for the registry to serve the published version
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          # changeset publish returns as soon as npm accepts the upload, but the
+          # registry replica a consumer hits can still be serving the previous
+          # version for up to a minute. Dispatching before then makes the website
+          # deploy fail on ERR_PNPM_NO_MATCHING_VERSION.
+          VERSION='${{ fromJSON(steps.changesets.outputs.publishedPackages)[0].version }}'
+
+          for attempt in $(seq 1 30); do
+            if npm view "@loquix/core@$VERSION" version --prefer-online >/dev/null 2>&1; then
+              echo "@loquix/core@$VERSION is resolvable after $attempt attempt(s)"
+              exit 0
+            fi
+            sleep 10
+          done
+
+          echo "::error::@loquix/core@$VERSION was still not resolvable after five minutes"
+          exit 1
+
       - name: Trigger website deploy
         if: steps.changesets.outputs.published == 'true'
         uses: peter-evans/repository-dispatch@v3
