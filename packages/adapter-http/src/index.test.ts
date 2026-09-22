@@ -11,4 +11,13 @@ describe('createHttpAgentProvider', () => {
     const provider = createHttpAgentProvider({ url: '/api/chat', name: 'My backend' });
     expect(provider.name).to.equal('My backend');
   });
+
+  it('rejects an unknown transport at construction', () => {
+    expect(() =>
+      createHttpAgentProvider({
+        url: '/api/chat',
+        transport: 'xml' as unknown as 'sse',
+      }),
+    ).to.throw(/transport/i);
+  });
 });

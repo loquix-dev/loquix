@@ -33,8 +33,10 @@ describe('errors', () => {
     expect((caught as HttpAgentError).status).to.equal(500);
   });
 
-  it('rejects with an HttpAgentError when the response has no body', async () => {
-    const { fetch } = fakeFetch(null);
+  it('rejects with an HttpAgentError carrying the real status when the response has no body', async () => {
+    // A no-content success status (204) is a realistic case for "no body" — the
+    // error must report what the server actually said, not a fabricated 502.
+    const { fetch } = fakeFetch(null, { status: 204 });
     const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
 
     let caught: unknown;
@@ -45,7 +47,8 @@ describe('errors', () => {
     }
 
     expect(caught).to.be.instanceOf(HttpAgentError);
-    expect((caught as HttpAgentError).status).to.equal(502);
+    expect((caught as HttpAgentError).status).to.equal(204);
+    expect((caught as Error).message).to.contain('204');
   });
 });
 

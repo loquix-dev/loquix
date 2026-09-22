@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { createHttpAgentProvider } from './index.js';
-import { fakeFetch, sseBody, userMessage } from './test-helpers.js';
+import { fakeFetch, sseBody, ndjsonBody, userMessage } from './test-helpers.js';
 
 describe('request', () => {
   it('posts JSON with the messages and the send options', async () => {
@@ -105,5 +105,40 @@ describe('request', () => {
       Object.keys(headers).filter(key => key.toLowerCase() === 'content-type'),
     ).to.have.lengthOf(1);
     expect(headers['content-type']).to.equal('text/plain');
+  });
+
+  it('derives an Accept header from the sse transport', async () => {
+    const { fetch, calls } = fakeFetch(sseBody('[DONE]'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    await provider.send([userMessage('a')], {});
+
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(headers.accept).to.equal('text/event-stream');
+  });
+
+  it('derives a different Accept header for the ndjson transport', async () => {
+    const { fetch, calls } = fakeFetch(ndjsonBody({ text: 'x' }));
+    const provider = createHttpAgentProvider({ url: '/api/chat', transport: 'ndjson', fetch });
+
+    await provider.send([userMessage('a')], {});
+
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(headers.accept).to.equal('application/x-ndjson');
+  });
+
+  it('lets a caller-supplied Accept header override the transport default', async () => {
+    const { fetch, calls } = fakeFetch(sseBody('[DONE]'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      headers: { Accept: 'application/json' },
+      fetch,
+    });
+
+    await provider.send([userMessage('a')], {});
+
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(Object.keys(headers).filter(key => key.toLowerCase() === 'accept')).to.have.lengthOf(1);
+    expect(headers.accept).to.equal('application/json');
   });
 });

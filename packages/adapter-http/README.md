@@ -31,10 +31,25 @@ reads the response as server-sent events. Set `transport: 'ndjson'` or
 `transport: 'text'` to match your backend, or supply `body`, `headers`,
 `parse`, and `fetch` to adjust the request and the streamed payload.
 
+**Note on `sse` and JSON payloads:** the default `sse` parser returns each
+frame's `data:` payload verbatim — it does not parse JSON, unlike `ndjson`,
+which extracts a `text`/`content`/`delta` field automatically. If your
+backend sends SSE frames like `data: {"text":"Hi"}`, the Quick Start above
+will render that raw JSON string in the chat. Add a `parse` hook to extract
+the field yourself:
+
+```ts
+const provider = createHttpAgentProvider({
+  url: '/api/chat',
+  parse: chunk => (JSON.parse(chunk) as { text: string }).text,
+});
+```
+
 ## Documentation
 
-See [loquix.dev](https://loquix.dev) for the full guide, including transport
-options, custom parsing, and error handling.
+See the [package source and tests](https://github.com/loquix-dev/loquix/tree/main/packages/adapter-http)
+in the Loquix repository for the full set of options, transport behavior, and
+error handling.
 
 ## Security
 

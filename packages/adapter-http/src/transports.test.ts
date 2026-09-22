@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { createHttpAgentProvider } from './index.js';
+import { createHttpAgentProvider, HttpAgentError } from './index.js';
 import { fakeFetch, sseBody, textBody, ndjsonBody, readAll, userMessage } from './test-helpers.js';
 
 describe('sse transport', () => {
@@ -10,6 +10,20 @@ describe('sse transport', () => {
     const response = await provider.send([userMessage('hi')], {});
 
     expect(await readAll(response.stream)).to.equal('Hello');
+  });
+
+  it('passes a JSON payload through raw, without parsing it', async () => {
+    // The default SSE parser returns the `data:` payload verbatim — unlike
+    // ndjson, it never tries to extract a `text`/`content`/`delta` field. A
+    // backend that sends `data: {"text":"Hi"}` gets the literal JSON string
+    // out the other end; it is up to the caller to supply a `parse` hook if
+    // they want it decoded.
+    const { fetch } = fakeFetch(sseBody('{"text":"Hi"}', '[DONE]'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('{"text":"Hi"}');
   });
 
   it('stops at [DONE] and ignores anything after it', async () => {
@@ -134,5 +148,116 @@ describe('text transport', () => {
     const response = await provider.send([userMessage('hi')], {});
 
     expect(await readAll(response.stream)).to.equal('raw text');
+  });
+
+  it('does not treat [DONE] as a sentinel — it is ordinary content', async () => {
+    // Unlike sse/ndjson, a caller choosing `text` asked for the bytes exactly
+    // as sent. `[DONE]` must pass through like anything else and must not
+    // terminate the stream early.
+    const { fetch } = fakeFetch(textBody('before ', '[DONE]', ' after'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', transport: 'text', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('before [DONE] after');
+  });
+
+  it('runs each chunk through a parse hook when one is given', async () => {
+    const { fetch } = fakeFetch(textBody('raw1', 'raw2'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      transport: 'text',
+      fetch,
+      parse: chunk => chunk.toUpperCase(),
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('RAW1RAW2');
+  });
+
+  it('skips a chunk when the parse hook returns null', async () => {
+    const { fetch } = fakeFetch(textBody('keep', 'DROP', 'keep2'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      transport: 'text',
+      fetch,
+      parse: chunk => (chunk === 'DROP' ? null : chunk),
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('keepkeep2');
+  });
+});
+
+describe('transport mismatch', () => {
+  it('errors instead of a blank message when a text/plain body is read as sse', async () => {
+    const { fetch } = fakeFetch(textBody('plain text response, no SSE framing at all'), {
+      headers: { 'content-type': 'text/plain' },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    let caught: unknown;
+    try {
+      await readAll(response.stream);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).to.be.instanceOf(HttpAgentError);
+    expect((caught as HttpAgentError).message).to.contain('sse');
+    expect((caught as HttpAgentError).message).to.contain('text/plain');
+  });
+
+  it('errors instead of a blank message when SSE frames are read as ndjson', async () => {
+    const { fetch } = fakeFetch(sseBody('hello', '[DONE]'), {
+      headers: { 'content-type': 'text/event-stream' },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', transport: 'ndjson', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    let caught: unknown;
+    try {
+      await readAll(response.stream);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).to.be.instanceOf(HttpAgentError);
+    expect((caught as HttpAgentError).message).to.contain('ndjson');
+  });
+
+  it('errors instead of a blank message on a 200 whose body is a bare JSON error object', async () => {
+    // A backend that reports failure with a 200 status is common, and the
+    // default sse parser finds no `data:` line in a bare JSON object, so this
+    // would otherwise close as a silent, content-free stream.
+    const { fetch } = fakeFetch(textBody('{"error":"rate limited"}'), {
+      headers: { 'content-type': 'application/json' },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    let caught: unknown;
+    try {
+      await readAll(response.stream);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).to.be.instanceOf(HttpAgentError);
+  });
+
+  it('does not error on a genuinely empty body', async () => {
+    const { fetch } = fakeFetch(textBody());
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
   });
 });

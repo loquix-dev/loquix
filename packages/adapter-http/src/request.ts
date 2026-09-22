@@ -1,5 +1,11 @@
 import type { AgentMessage, AgentSendOptions } from '@loquix/core';
-import type { HttpAgentProviderOptions } from './types.js';
+import type { HttpAgentProviderOptions, HttpTransport } from './types.js';
+
+const ACCEPT_BY_TRANSPORT: Record<HttpTransport, string> = {
+  sse: 'text/event-stream',
+  ndjson: 'application/x-ndjson',
+  text: 'text/plain',
+};
 
 export function defaultBody(messages: AgentMessage[], options: AgentSendOptions): unknown {
   return {
@@ -50,10 +56,15 @@ export async function performRequest(
     ? options.body(messages, sendOptions)
     : defaultBody(messages, sendOptions);
   const doFetch = options.fetch ?? globalThis.fetch;
+  const transport = options.transport ?? 'sse';
 
   return doFetch(url, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', ...lowerExtra },
+    headers: {
+      'content-type': 'application/json',
+      accept: ACCEPT_BY_TRANSPORT[transport],
+      ...lowerExtra,
+    },
     body: JSON.stringify(payload),
     credentials: options.credentials ?? 'same-origin',
     signal: sendOptions.signal,

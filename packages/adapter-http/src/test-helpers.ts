@@ -33,7 +33,7 @@ export interface FakeFetchResult {
 
 export function fakeFetch(
   body: ReadableStream<Uint8Array> | null | (() => ReadableStream<Uint8Array>),
-  init: { status?: number; json?: unknown } = {},
+  init: { status?: number; json?: unknown; headers?: Record<string, string> } = {},
 ): FakeFetchResult {
   const calls: Array<{ url: string; init: RequestInit }> = [];
   const status = init.status ?? 200;
@@ -47,7 +47,7 @@ export function fakeFetch(
   const impl = (async (url: string, requestInit: RequestInit) => {
     calls.push({ url, init: requestInit });
     if (init.json !== undefined) {
-      return new Response(JSON.stringify(init.json), { status });
+      return new Response(JSON.stringify(init.json), { status, headers: init.headers });
     }
 
     const out = typeof body === 'function' ? body() : body;
@@ -63,7 +63,7 @@ export function fakeFetch(
         ? out.pipeThrough(new TransformStream(), { signal: requestInit.signal })
         : out;
 
-    return new Response(wired, { status });
+    return new Response(wired, { status, headers: init.headers });
   }) as unknown as typeof globalThis.fetch;
 
   return { fetch: impl, calls };

@@ -1,3 +1,4 @@
+import { HttpAgentError } from './request.js';
 import type { HttpTransport } from './types.js';
 
 const DONE = '[DONE]';
@@ -35,18 +36,39 @@ export function decode(
   body: ReadableStream<Uint8Array>,
   transport: HttpTransport,
   parse?: (chunk: string) => string | null,
+  contentType?: string | null,
 ): ReadableStream<string> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
   const separator = transport === 'sse' ? /\r?\n\r?\n/ : /\r?\n/;
   let buffer = '';
   let finished = false;
+  // A transport mismatch (SSE read as ndjson, a 200 whose body is a bare JSON
+  // error object, ...) parses cleanly to nothing every time, which otherwise
+  // closes as an ordinary empty stream — a blank assistant message with no
+  // diagnostic. Distinguish that from a genuinely empty body: only a body that
+  // *received* bytes but never produced a single chunk is a mismatch.
+  let receivedBytes = false;
+  let enqueuedAny = false;
 
   const toText = (frame: string): string | null => {
     const payload = transport === 'sse' ? readSseFrame(frame) : frame;
     if (payload === null) return null;
     if (payload === DONE) return DONE;
     return parse ? parse(payload) : defaultParse(payload, transport);
+  };
+
+  const failIfMismatched = (controller: ReadableStreamDefaultController<string>): boolean => {
+    if (!receivedBytes || enqueuedAny) return false;
+    controller.error(
+      new HttpAgentError(
+        502,
+        `HTTP adapter: the response body never produced a chunk for transport "${transport}" ` +
+          `(content-type: ${contentType ?? 'unknown'}). This usually means the transport option ` +
+          `doesn't match what the server actually sent.`,
+      ),
+    );
+    return true;
   };
 
   return new ReadableStream<string>({
@@ -61,16 +83,28 @@ export function decode(
           buffer += decoder.decode();
 
           if (transport === 'text') {
-            if (buffer) controller.enqueue(buffer);
+            if (buffer) {
+              const text = parse ? parse(buffer) : buffer;
+              if (text !== null) {
+                controller.enqueue(text);
+                enqueuedAny = true;
+              }
+            }
           } else if (buffer.trim()) {
             const text = toText(buffer);
-            if (text && text !== DONE) controller.enqueue(text);
+            if (text && text !== DONE) {
+              controller.enqueue(text);
+              enqueuedAny = true;
+            }
           }
+
+          if (failIfMismatched(controller)) return;
 
           controller.close();
           return;
         }
 
+        if (value.length > 0) receivedBytes = true;
         buffer += decoder.decode(value, { stream: true });
 
         if (transport === 'text') {
@@ -78,9 +112,14 @@ export function decode(
           // of a multibyte character. Enqueuing '' is harmless downstream but
           // shows up as a phantom chunk in tests.
           if (buffer) {
-            controller.enqueue(buffer);
+            const chunk = buffer;
             buffer = '';
-            return;
+            const text = parse ? parse(chunk) : chunk;
+            if (text !== null) {
+              controller.enqueue(text);
+              enqueuedAny = true;
+              return;
+            }
           }
           continue;
         }
@@ -103,6 +142,7 @@ export function decode(
 
           if (text) {
             controller.enqueue(text);
+            enqueuedAny = true;
             emitted = true;
           }
 
