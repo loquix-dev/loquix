@@ -1,0 +1,34 @@
+{
+  "name": "@loquix/adapter-http",
+  "version": "0.0.0",
+  "description": "Turn an HTTP endpoint into a Loquix AgentProvider",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "wtr",
+    "test:coverage": "wtr --coverage",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "@loquix/core": ">=0.5.0"
+  },
+  "devDependencies": {
+    "@loquix/core": "workspace:*",
+    "@open-wc/testing": "^4.0.0",
+    "@web/dev-server-esbuild": "^1.0.5",
+    "@web/test-runner": "^0.19.0",
+    "@web/test-runner-playwright": "^0.11.0",
+    "playwright": "^1.58.2",
+    "typescript": "^5.7.0"
+  }
+}
