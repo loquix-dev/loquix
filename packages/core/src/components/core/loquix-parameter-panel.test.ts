@@ -173,6 +173,26 @@ describe('loquix-parameter-panel', () => {
     expect(el.activePreset).to.equal('creative');
   });
 
+  it('keeps values a preset does not mention', async () => {
+    const partialPreset: ParameterPreset[] = [
+      { id: 'warm', label: 'Warm', values: { temperature: 1.2 } },
+    ];
+    const el = await fixture<LoquixParameterPanel>(
+      html`<loquix-parameter-panel
+        .parameters=${mockParams}
+        .presets=${partialPreset}
+        .values=${{ temperature: 0.7, stream: true, max_tokens: 4096 }}
+      ></loquix-parameter-panel>`,
+    );
+
+    getShadowParts(el, 'preset')[0].click();
+    await el.updateComplete;
+
+    expect(el.values.temperature).to.equal(1.2);
+    expect(el.values.stream).to.be.true;
+    expect(el.values.max_tokens).to.equal(4096);
+  });
+
   it('shows advanced toggle when advanced params exist', async () => {
     const el = await fixture<LoquixParameterPanel>(
       html`<loquix-parameter-panel .parameters=${advancedParams}></loquix-parameter-panel>`,
