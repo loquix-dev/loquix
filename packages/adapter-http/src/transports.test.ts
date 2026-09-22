@@ -316,4 +316,67 @@ describe('transport mismatch', () => {
 
     expect(await readAll(response.stream)).to.equal('');
   });
+
+  // "Produced no chunk" is not itself evidence of a mismatch: these four are
+  // all correctly-framed, default-parsed responses that legitimately carry no
+  // text. Recognizing the frame shape (a `data:`/`event:`/`id:`/`retry:`/`:`
+  // line for sse, valid JSON for ndjson) is what must keep them clean.
+
+  it('does not error on an sse body of only keep-alive comment frames', async () => {
+    const { fetch } = fakeFetch(textBody(': keepalive\n\n: keepalive\n\n'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
+  });
+
+  it('does not error on an ndjson body of only metadata objects', async () => {
+    const { fetch } = fakeFetch(ndjsonBody({ type: 'tool_use' }, { type: 'ping' }));
+    const provider = createHttpAgentProvider({ url: '/api/chat', transport: 'ndjson', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
+  });
+
+  it('does not error on an ndjson body of only { text: null }', async () => {
+    const { fetch } = fakeFetch(ndjsonBody({ text: null }));
+    const provider = createHttpAgentProvider({ url: '/api/chat', transport: 'ndjson', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
+  });
+
+  it('does not error on an ndjson body of only blank lines', async () => {
+    const { fetch } = fakeFetch(textBody('\n\n\n'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', transport: 'ndjson', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
+  });
+
+  it('errors on an ndjson body of only malformed JSON — a fair diagnosis', async () => {
+    // Unlike the four cases above, no line here is recognizable as JSON at
+    // all, so this is genuinely evidence of a framing mismatch rather than a
+    // turn that happened to carry no text.
+    const { fetch } = fakeFetch(textBody('not json\nalso not json\n'), {
+      headers: { 'content-type': 'application/x-ndjson' },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', transport: 'ndjson', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    let caught: unknown;
+    try {
+      await readAll(response.stream);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).to.be.instanceOf(HttpAgentError);
+    expect((caught as HttpAgentError).message).to.contain('ndjson');
+  });
 });

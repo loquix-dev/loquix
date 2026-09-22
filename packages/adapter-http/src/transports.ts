@@ -32,6 +32,37 @@ function defaultParse(payload: string, transport: HttpTransport): string | null 
   }
 }
 
+const SSE_LINE_PREFIXES = ['data:', 'event:', 'id:', 'retry:', ':'];
+
+type FrameShape = 'ignorable' | 'recognized' | 'unrecognized';
+
+/**
+ * Judge whether a frame has the shape the configured transport actually
+ * defines — not whether it carried text. A heartbeat comment, a metadata-only
+ * ndjson object, or `{"text":null}` are all correctly-framed and must never
+ * be mistaken for a mismatch; only a frame that matches *none* of the
+ * transport's own grammar is evidence the transport option is wrong. `text`
+ * never reaches this: with no `parse` hook it always enqueues.
+ */
+function classifyFrame(frame: string, transport: HttpTransport): FrameShape {
+  if (transport === 'sse') {
+    const lines = frame.split(/\r?\n/).filter(line => line.length > 0);
+    if (lines.length === 0) return 'ignorable';
+    return lines.some(line => SSE_LINE_PREFIXES.some(prefix => line.startsWith(prefix)))
+      ? 'recognized'
+      : 'unrecognized';
+  }
+
+  // ndjson
+  if (!frame.trim()) return 'ignorable';
+  try {
+    JSON.parse(frame);
+    return 'recognized';
+  } catch {
+    return 'unrecognized';
+  }
+}
+
 export interface DecodeMeta {
   /** The response's real HTTP status, carried into a mismatch error rather than a fabricated one. */
   status: number;
@@ -52,10 +83,16 @@ export function decode(
   // A transport mismatch (SSE read as ndjson, a 200 whose body is a bare JSON
   // error object, ...) parses cleanly to nothing every time, which otherwise
   // closes as an ordinary empty stream — a blank assistant message with no
-  // diagnostic. Distinguish that from a genuinely empty body: only a body that
-  // *received* bytes but never produced a single chunk is a candidate mismatch.
+  // diagnostic. But "produced no chunk" is not itself the signal: a heartbeat
+  // frame, a metadata-only ndjson object, or `{"text":null}` are all
+  // correctly-framed and legitimately carry no text. The signal is whether
+  // the decoder ever recognized a single frame of the *configured shape* —
+  // that is what actually distinguishes "nothing to say this turn" from
+  // "this isn't sse/ndjson at all".
   let receivedBytes = false;
   let enqueuedAny = false;
+  let recognizedAny = false;
+  let sawUnrecognized = false;
   // A caller's own `parse` hook can legitimately yield nothing for a turn —
   // filtering out tool-call/metadata/heartbeat frames is a normal use of the
   // hook, not evidence of a framing mismatch. Likewise, a `[DONE]` sentinel
@@ -70,8 +107,16 @@ export function decode(
     return parse ? parse(payload) : defaultParse(payload, transport);
   };
 
+  const classify = (frame: string): void => {
+    if (transport === 'text') return;
+    const shape = classifyFrame(frame, transport);
+    if (shape === 'recognized') recognizedAny = true;
+    else if (shape === 'unrecognized') sawUnrecognized = true;
+  };
+
   const failIfMismatched = (controller: ReadableStreamDefaultController<string>): boolean => {
     if (!receivedBytes || enqueuedAny || parse || sawDone) return false;
+    if (!sawUnrecognized || recognizedAny) return false;
     controller.error(
       new HttpAgentError(
         meta.status,
@@ -103,6 +148,7 @@ export function decode(
               }
             }
           } else if (buffer.trim()) {
+            classify(buffer);
             const text = toText(buffer);
             if (text === DONE) {
               sawDone = true;
@@ -147,6 +193,7 @@ export function decode(
           const frame = buffer.slice(0, match.index);
           buffer = buffer.slice(match.index + match[0].length);
 
+          classify(frame);
           const text = toText(frame);
 
           if (text === DONE) {
