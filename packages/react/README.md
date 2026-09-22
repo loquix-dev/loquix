@@ -2,7 +2,7 @@
 
 React wrappers for [@loquix/core](https://www.npmjs.com/package/@loquix/core) Web Components.
 
-Built with [@lit/react](https://www.npmjs.com/package/@lit/react) — provides proper React integration with full prop/event binding for all 50+ Loquix components.
+Built with [@lit/react](https://www.npmjs.com/package/@lit/react) — provides proper React integration with full prop and event binding for all 53 Loquix components.
 
 ## Installation
 
@@ -33,7 +33,7 @@ function App() {
 
 ### Core Chat
 
-`MessageAvatar` · `TypingIndicator` · `DisclosureBadge` · `CaveatNotice` · `ActionButton` · `ActionCopy` · `ActionFeedback` · `ActionEdit` · `MessageActions` · `MessageContent` · `GenerationControls` · `PromptInput` · `ChatComposer` · `MessageItem` · `MessageList` · `ChatHeader` · `ChatContainer`
+`MessageAvatar` · `TypingIndicator` · `DisclosureBadge` · `CaveatNotice` · `ActionButton` · `ActionCopy` · `ActionFeedback` · `ActionEdit` · `MessageActions` · `MessageContent` · `GenerationControls` · `PromptInput` · `ChatComposer` · `MessageItem` · `MessageList` · `ScrollAnchor` · `ChatHeader` · `ChatContainer`
 
 ### Wayfinding
 
@@ -41,11 +41,15 @@ function App() {
 
 ### Tuning & Configuration
 
-`ComposerToolbar` · `DropdownSelect` · `AttachmentChip` · `ModeSelector` · `ModelSelector` · `AttachmentPanel` · `ParameterPanel` · `FilterBar` · `MessageAttachments`
+`ComposerToolbar` · `DropdownSelect` · `AttachmentChip` · `AttachmentPanel` · `DropZone` · `ModeSelector` · `ModelSelector` · `ParameterPanel` · `FilterBar` · `MessageAttachments`
 
 ### Reasoning & Tool Use
 
 `ReasoningBlock` · `ToolCall` · `ToolCallList` · `CitationPopover` · `SourceList` · `ConfidenceIndicator` · `UncertaintyMarker` · `DisagreementMarker`
+
+### Feedback
+
+`FeedbackForm` · `CorrectionInput`
 
 ### Smart Search
 

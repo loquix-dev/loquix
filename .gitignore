@@ -11,3 +11,6 @@ storybook-static/
 .env
 .env.local
 yarn.lock
+
+# local agent/editor scratch
+.claude/
