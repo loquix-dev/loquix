@@ -1,5 +1,31 @@
 # @loquix/react
 
+## 0.5.0
+
+### Minor Changes
+
+- b6cca1c: Add the missing `DropZone` and `ScrollAnchor` wrappers.
+
+  They were the only two components without one, so `@loquix/react` covered 51 of
+  the 53 elements `@loquix/core` exports while describing itself as covering all of
+  them. Reaching either from React meant dropping to the custom element and wiring
+  `ref` and `addEventListener` by hand.
+
+  `DropZone` maps `loquix-drop` to `onDrop` and `ScrollAnchor` maps
+  `loquix-scroll-anchor-click` to `onScrollAnchorClick`. Note that `onDrop` on this
+  wrapper is the component's files event rather than React's native drag handler —
+  the same shadowing the existing `ActionCopy` wrapper applies to `onCopy`.
+
+### Patch Changes
+
+- Updated dependencies [4d85316]
+- Updated dependencies [22d0182]
+- Updated dependencies [61eee81]
+- Updated dependencies [f037b3f]
+- Updated dependencies [a0f0121]
+- Updated dependencies [a0f0121]
+  - @loquix/core@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes
