@@ -100,7 +100,7 @@ export class LoquixExampleGallery extends LitElement {
 
       <div
         class="gallery--${this.variant}"
-        style=${this.variant === 'grid' ? `--loquix-gallery-columns: ${this.columns}` : ''}
+        style=${this.variant === 'grid' ? `--_columns: ${this.columns}` : ''}
       >
         ${filtered.map(
           item => html`

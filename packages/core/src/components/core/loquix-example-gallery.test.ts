@@ -119,13 +119,25 @@ describe('loquix-example-gallery', () => {
     expect(getShadowParts(el, 'item')).to.have.lengthOf(3);
   });
 
-  it('applies columns CSS custom property for grid variant', async () => {
+  it('applies the columns property for grid variant', async () => {
     const el = await fixture<LoquixExampleGallery>(
       html`<loquix-example-gallery .items=${mockItems} .columns=${4}></loquix-example-gallery>`,
     );
     const grid = el.shadowRoot!.querySelector('.gallery--grid') as HTMLElement;
     expect(grid).to.exist;
-    expect(grid.getAttribute('style')).to.contain('--loquix-gallery-columns: 4');
+    expect(getComputedStyle(grid).gridTemplateColumns.split(' ')).to.have.lengthOf(4);
+  });
+
+  it('lets --loquix-gallery-columns override the columns property', async () => {
+    const el = await fixture<LoquixExampleGallery>(
+      html`<loquix-example-gallery .items=${mockItems} .columns=${4}></loquix-example-gallery>`,
+    );
+    const grid = el.shadowRoot!.querySelector('.gallery--grid') as HTMLElement;
+
+    el.style.setProperty('--loquix-gallery-columns', '2');
+    await el.updateComplete;
+
+    expect(getComputedStyle(grid).gridTemplateColumns.split(' ')).to.have.lengthOf(2);
   });
 
   it('does not set columns style for list variant', async () => {
@@ -140,7 +152,7 @@ describe('loquix-example-gallery', () => {
     expect(list).to.exist;
     // list variant should have empty or no style for columns
     const style = list.getAttribute('style') ?? '';
-    expect(style).to.not.contain('--loquix-gallery-columns');
+    expect(style).to.not.contain('--_columns');
   });
 
   it('fires loquix-gallery-select with full item detail', async () => {

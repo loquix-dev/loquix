@@ -61,7 +61,9 @@ export default css`
   /* Grid variant */
   .gallery--grid {
     display: grid;
-    grid-template-columns: repeat(var(--loquix-gallery-columns, 3), 1fr);
+    /* The columns property feeds --_columns so that a consumer setting the
+       public --loquix-gallery-columns still wins over it. */
+    grid-template-columns: repeat(var(--loquix-gallery-columns, var(--_columns, 3)), 1fr);
     gap: var(--loquix-gallery-gap, 12px);
   }
 
