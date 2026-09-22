@@ -37,22 +37,40 @@ export function fakeFetch(
 ): FakeFetchResult {
   const calls: Array<{ url: string; init: RequestInit }> = [];
   const status = init.status ?? 200;
+  // A real server hands every request its own response body. This fake is given
+  // only one body up front, so it must fork it per call rather than handing the
+  // same stream object to two `send()`s — the decoder locks whatever stream it
+  // reads from the instant it starts pulling, even if the caller never drains
+  // the result, so a second call reusing the original object would find it
+  // already disturbed. `tee()` gives each call an independent branch that still
+  // sees the same bytes in the same chunks, so chunk-boundary tests (a payload
+  // arriving split across two `enqueue` calls) still see that split.
+  let remaining = body;
 
   const impl = (async (url: string, requestInit: RequestInit) => {
     calls.push({ url, init: requestInit });
     if (init.json !== undefined) {
       return new Response(JSON.stringify(init.json), { status });
     }
+
+    let out: ReadableStream<Uint8Array> | null = null;
+    if (remaining) {
+      const [branch, rest] = remaining.tee();
+      remaining = rest;
+      out = branch;
+    }
+
     // A real fetch errors the body stream when its signal aborts. Reproduce that
     // by piping through the signal rather than cancelling the body directly:
-    // `new Response(body).body` IS `body`, the decoder has already locked it, and
-    // cancelling a locked stream rejects — which would make the abort test hang
-    // rather than fail. Taking the signal from the request also proves the
-    // adapter forwarded it.
+    // cancelling a tee'd branch only cancels that branch (the other branch, and
+    // the underlying source, keep going), so an abort would never surface as an
+    // error on this branch — pipeThrough's signal option is what actually errors
+    // the branch the decoder is reading. Taking the signal from the request also
+    // proves the adapter forwarded it.
     const wired =
-      body && requestInit?.signal
-        ? body.pipeThrough(new TransformStream(), { signal: requestInit.signal })
-        : body;
+      out && requestInit?.signal
+        ? out.pipeThrough(new TransformStream(), { signal: requestInit.signal })
+        : out;
 
     return new Response(wired, { status });
   }) as unknown as typeof globalThis.fetch;
