@@ -95,8 +95,13 @@ export class LoquixSearchInput extends LitElement {
   @query('input')
   private _input!: HTMLInputElement;
 
+  @query('.clear')
+  private _clearButton?: HTMLButtonElement;
+
   @state()
   private _focused = false;
+
+  private _suppressFocusPropagation = false;
 
   private get _placeholder(): string {
     if (this.placeholder !== undefined) return this.placeholder;
@@ -130,11 +135,29 @@ export class LoquixSearchInput extends LitElement {
     this.dispatchEvent(createLoquixEvent('loquix-change', { value: this.value }));
   }
 
-  private _clearValue(): void {
+  private _clearValue(event: Event): void {
     if (this.disabled || !this.value) return;
+    // Hosts such as loquix-search-dialog and loquix-search-panel open on a click
+    // anywhere in this input, so clearing must not read as a request to open.
+    event.stopPropagation();
     this.value = '';
     this.dispatchEvent(createLoquixEvent('loquix-change', { value: this.value }));
-    this.updateComplete.then(() => this._input?.focus());
+    this._suppressFocusPropagation = true;
+    void this.updateComplete.then(() => {
+      try {
+        this._input?.focus();
+      } finally {
+        this._suppressFocusPropagation = false;
+      }
+    });
+  }
+
+  private _handleFocusIn(event: Event): void {
+    // Those same hosts also open on focusin. Neither the clear button taking focus
+    // nor the refocus that follows a clear is the user asking for the surface.
+    if (this._suppressFocusPropagation || event.target === this._clearButton) {
+      event.stopPropagation();
+    }
   }
 
   private _handleKeyDown(e: KeyboardEvent): void {
@@ -171,7 +194,7 @@ export class LoquixSearchInput extends LitElement {
     const showKbd = !!this.kbd && !(this.hideKbdWhenAsk && this._shouldShowAsk);
 
     return html`
-      <div part="container" class=${containerClass}>
+      <div part="container" class=${containerClass} @focusin=${this._handleFocusIn}>
         <span part="prefix" class="icon" aria-hidden="true">
           ${this.state === 'searching'
             ? html`<span class="spinner"></span>`

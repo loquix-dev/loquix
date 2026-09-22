@@ -70,7 +70,7 @@ describe('loquix-citation-popover', () => {
     expect(popover.textContent).to.contain('We show that combining');
   });
 
-  it('mouseleave on chip closes popover', async () => {
+  it('mouseleave on chip closes popover after the grace period', async () => {
     const el = await fixture<LoquixCitationPopover>(
       html`<loquix-citation-popover index="1"></loquix-citation-popover>`,
     );
@@ -80,7 +80,30 @@ describe('loquix-citation-popover', () => {
     await el.updateComplete;
     getChip(el).dispatchEvent(new MouseEvent('mouseleave'));
     await el.updateComplete;
+    expect(getPopover(el).hidden, 'still open during the grace period').to.be.false;
+
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await el.updateComplete;
     expect(getPopover(el).hidden).to.be.true;
+  });
+
+  it('stays open when the pointer moves from the chip onto the popover', async () => {
+    const el = await fixture<LoquixCitationPopover>(
+      html`<loquix-citation-popover index="1"></loquix-citation-popover>`,
+    );
+    el.source = sampleSource;
+    await el.updateComplete;
+    getChip(el).dispatchEvent(new MouseEvent('mouseenter'));
+    await el.updateComplete;
+
+    // The popover sits 8px away from the chip, so the pointer crosses a gap:
+    // mouseleave on the chip lands before mouseenter on the popover.
+    getChip(el).dispatchEvent(new MouseEvent('mouseleave'));
+    getPopover(el).dispatchEvent(new MouseEvent('mouseenter'));
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await el.updateComplete;
+
+    expect(getPopover(el).hidden).to.be.false;
   });
 
   it('focus shows the popover; Escape closes it', async () => {

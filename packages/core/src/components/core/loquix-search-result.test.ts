@@ -105,6 +105,25 @@ describe('loquix-search-result', () => {
     expect(event.detail.result.id).to.equal('r-1');
   });
 
+  it('reports no index for an unnumbered row', async () => {
+    const el = await fixture<LoquixSearchResult>(
+      html`<loquix-search-result></loquix-search-result>`,
+    );
+    el.rank = null;
+    el.result = { ...result, rank: null };
+    await el.updateComplete;
+
+    const eventPromise = waitForEvent<LoquixSearchResultClickDetail>(
+      el,
+      'loquix-search-result-click',
+    );
+    getShadowPart(el, 'row')!.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true }),
+    );
+    const event = await eventPromise;
+    expect(event.detail.index).to.equal(undefined);
+  });
+
   it('supports attribute fallbacks', async () => {
     const el = await fixture<LoquixSearchResult>(
       html`<loquix-search-result

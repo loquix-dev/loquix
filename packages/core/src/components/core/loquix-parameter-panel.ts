@@ -100,7 +100,9 @@ export class LoquixParameterPanel extends LitElement {
   private _handlePresetSelect(preset: ParameterPreset): void {
     if (this.disabled) return;
     this.activePreset = preset.id;
-    this.values = { ...preset.values };
+    // Merge rather than replace: a preset names the parameters it cares about,
+    // and the rest must keep the values the user already chose.
+    this.values = { ...this.values, ...preset.values };
     this.dispatchEvent(
       createLoquixEvent<LoquixPresetChangeDetail>('loquix-preset-change', {
         preset: preset.id,

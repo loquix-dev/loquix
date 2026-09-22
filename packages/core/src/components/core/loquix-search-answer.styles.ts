@@ -145,7 +145,7 @@ const styles = css`
     border: 1px solid
       var(--loquix-search-answer-source-border-color, var(--loquix-border-color, #e5e7eb));
     border-radius: 999px;
-    background: var(--loquix-search-answer-source-bg, rgba(255, 255, 255, 0.72));
+    background: var(--loquix-search-answer-source-bg, var(--loquix-surface-secondary-bg, #f9fafb));
     color: var(--loquix-search-answer-source-color, var(--loquix-text-secondary-color, #4b5563));
     font-size: 0.75rem;
     line-height: 1;
@@ -177,7 +177,7 @@ const styles = css`
     border: 1px solid
       var(--loquix-search-answer-action-border-color, var(--loquix-border-color, #e5e7eb));
     border-radius: 7px;
-    background: var(--loquix-search-answer-action-bg, rgba(255, 255, 255, 0.78));
+    background: var(--loquix-search-answer-action-bg, var(--loquix-surface-secondary-bg, #f9fafb));
     color: var(--loquix-search-answer-action-color, var(--loquix-text-secondary-color, #4b5563));
     font: inherit;
     font-size: 0.75rem;

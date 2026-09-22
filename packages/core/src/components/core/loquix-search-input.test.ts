@@ -120,6 +120,68 @@ describe('loquix-search-input', () => {
     expect(clear.getAttribute('aria-hidden')).to.equal('true');
   });
 
+  it('does not let the clear button click reach the host element', async () => {
+    const el = await fixture<LoquixSearchInput>(
+      html`<loquix-search-input value="refund policy"></loquix-search-input>`,
+    );
+    await el.updateComplete;
+    let hostClicks = 0;
+    el.addEventListener('click', () => (hostClicks += 1));
+
+    (getShadowPart(el, 'clear-button') as HTMLButtonElement).click();
+    await el.updateComplete;
+
+    expect(el.value).to.equal('');
+    expect(hostClicks, 'clear click must not bubble past the input').to.equal(0);
+  });
+
+  it('does not let the post-clear refocus reach the host element', async () => {
+    const el = await fixture<LoquixSearchInput>(
+      html`<loquix-search-input value="refund policy"></loquix-search-input>`,
+    );
+    await el.updateComplete;
+    let hostFocusIns = 0;
+    el.addEventListener('focusin', () => (hostFocusIns += 1));
+
+    (getShadowPart(el, 'clear-button') as HTMLButtonElement).click();
+    await el.updateComplete;
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const input = el.shadowRoot!.querySelector('input');
+    expect(el.shadowRoot!.activeElement, 'input should be refocused after clearing').to.equal(
+      input,
+    );
+    expect(hostFocusIns, 'post-clear refocus must not bubble past the input').to.equal(0);
+  });
+
+  it('does not let the clear button taking focus reach the host element', async () => {
+    const el = await fixture<LoquixSearchInput>(
+      html`<loquix-search-input value="refund policy"></loquix-search-input>`,
+    );
+    await el.updateComplete;
+    let hostFocusIns = 0;
+    el.addEventListener('focusin', () => (hostFocusIns += 1));
+
+    (getShadowPart(el, 'clear-button') as HTMLButtonElement).focus();
+    await el.updateComplete;
+
+    expect(hostFocusIns, 'clear button focus must not bubble past the input').to.equal(0);
+  });
+
+  it('still propagates focusin from ordinary user focus', async () => {
+    const el = await fixture<LoquixSearchInput>(
+      html`<loquix-search-input value="refund policy"></loquix-search-input>`,
+    );
+    await el.updateComplete;
+    let hostFocusIns = 0;
+    el.addEventListener('focusin', () => (hostFocusIns += 1));
+
+    el.shadowRoot!.querySelector('input')!.focus();
+    await el.updateComplete;
+
+    expect(hostFocusIns).to.equal(1);
+  });
+
   it('reserves clear button space while empty', async () => {
     const el = await fixture<LoquixSearchInput>(html`<loquix-search-input></loquix-search-input>`);
     await el.updateComplete;

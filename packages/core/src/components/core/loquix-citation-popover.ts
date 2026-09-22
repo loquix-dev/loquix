@@ -7,6 +7,10 @@ import { createLoquixEvent } from '../../events/index.js';
 import { safeHttpUrl } from '../../utility/safe-url.js';
 import styles from './loquix-citation-popover.styles.js';
 
+/** Grace period before a pointer-driven close, so the pointer can cross the
+    offset gap between the chip and the popover. */
+const HIDE_DELAY_MS = 120;
+
 let _idCounter = 0;
 const nextId = (): number => ++_idCounter;
 
@@ -87,6 +91,8 @@ export class LoquixCitationPopover extends LitElement {
   @state()
   private _open = false;
 
+  private _hideTimer?: ReturnType<typeof setTimeout>;
+
   @state()
   private _placement: 'top' | 'bottom' = 'top';
 
@@ -105,6 +111,7 @@ export class LoquixCitationPopover extends LitElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    this._cancelPendingHide();
     this._teardownAutoUpdate();
   }
 
@@ -146,6 +153,7 @@ export class LoquixCitationPopover extends LitElement {
   // ---------------------------------------------------------------------------
 
   private _show = async (): Promise<void> => {
+    this._cancelPendingHide();
     if (this._open) return;
     this._open = true;
     await this.updateComplete;
@@ -157,10 +165,28 @@ export class LoquixCitationPopover extends LitElement {
   };
 
   private _hide = (): void => {
+    this._cancelPendingHide();
     if (!this._open) return;
     this._open = false;
     this._teardownAutoUpdate();
   };
+
+  /**
+   * Pointer-driven close. The popover is offset from the chip, so the pointer
+   * crosses a gap where neither element is hovered on its way over. Closing
+   * immediately there would make the popover unreachable, even though it
+   * carries its own hover handlers. Escape and blur still close at once.
+   */
+  private _hideSoon = (): void => {
+    this._cancelPendingHide();
+    this._hideTimer = setTimeout(this._hide, HIDE_DELAY_MS);
+  };
+
+  private _cancelPendingHide(): void {
+    if (this._hideTimer === undefined) return;
+    clearTimeout(this._hideTimer);
+    this._hideTimer = undefined;
+  }
 
   private _onChipKeydown = (e: KeyboardEvent): void => {
     if (e.key === 'Enter') {
@@ -206,7 +232,7 @@ export class LoquixCitationPopover extends LitElement {
         aria-describedby=${tooltipId}
         aria-expanded=${this._open ? 'true' : 'false'}
         @mouseenter=${this._show}
-        @mouseleave=${this._hide}
+        @mouseleave=${this._hideSoon}
         @focus=${this._show}
         @blur=${this._hide}
         @keydown=${this._onChipKeydown}
@@ -222,7 +248,7 @@ export class LoquixCitationPopover extends LitElement {
         role="tooltip"
         ?hidden=${!this._open}
         @mouseenter=${this._show}
-        @mouseleave=${this._hide}
+        @mouseleave=${this._hideSoon}
       >
         <span part="favicon" class="pop-favicon">
           ${safeFavicon
