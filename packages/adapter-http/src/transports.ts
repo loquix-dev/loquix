@@ -32,11 +32,17 @@ function defaultParse(payload: string, transport: HttpTransport): string | null 
   }
 }
 
+export interface DecodeMeta {
+  /** The response's real HTTP status, carried into a mismatch error rather than a fabricated one. */
+  status: number;
+  contentType?: string | null;
+}
+
 export function decode(
   body: ReadableStream<Uint8Array>,
   transport: HttpTransport,
-  parse?: (chunk: string) => string | null,
-  contentType?: string | null,
+  parse: ((chunk: string) => string | null) | undefined,
+  meta: DecodeMeta,
 ): ReadableStream<string> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
@@ -47,9 +53,15 @@ export function decode(
   // error object, ...) parses cleanly to nothing every time, which otherwise
   // closes as an ordinary empty stream — a blank assistant message with no
   // diagnostic. Distinguish that from a genuinely empty body: only a body that
-  // *received* bytes but never produced a single chunk is a mismatch.
+  // *received* bytes but never produced a single chunk is a candidate mismatch.
   let receivedBytes = false;
   let enqueuedAny = false;
+  // A caller's own `parse` hook can legitimately yield nothing for a turn —
+  // filtering out tool-call/metadata/heartbeat frames is a normal use of the
+  // hook, not evidence of a framing mismatch. Likewise, a `[DONE]` sentinel
+  // (even with no preceding content) proves the adapter's own default framing
+  // matched what the server sent. Either one rules the mismatch check out.
+  let sawDone = false;
 
   const toText = (frame: string): string | null => {
     const payload = transport === 'sse' ? readSseFrame(frame) : frame;
@@ -59,12 +71,12 @@ export function decode(
   };
 
   const failIfMismatched = (controller: ReadableStreamDefaultController<string>): boolean => {
-    if (!receivedBytes || enqueuedAny) return false;
+    if (!receivedBytes || enqueuedAny || parse || sawDone) return false;
     controller.error(
       new HttpAgentError(
-        502,
-        `HTTP adapter: the response body never produced a chunk for transport "${transport}" ` +
-          `(content-type: ${contentType ?? 'unknown'}). This usually means the transport option ` +
+        meta.status,
+        `HTTP ${meta.status}: the response body never produced a chunk for transport "${transport}" ` +
+          `(content-type: ${meta.contentType ?? 'unknown'}). This usually means the transport option ` +
           `doesn't match what the server actually sent.`,
       ),
     );
@@ -85,14 +97,16 @@ export function decode(
           if (transport === 'text') {
             if (buffer) {
               const text = parse ? parse(buffer) : buffer;
-              if (text !== null) {
+              if (text) {
                 controller.enqueue(text);
                 enqueuedAny = true;
               }
             }
           } else if (buffer.trim()) {
             const text = toText(buffer);
-            if (text && text !== DONE) {
+            if (text === DONE) {
+              sawDone = true;
+            } else if (text) {
               controller.enqueue(text);
               enqueuedAny = true;
             }
@@ -108,14 +122,16 @@ export function decode(
         buffer += decoder.decode(value, { stream: true });
 
         if (transport === 'text') {
-          // A chunk can decode to nothing: an empty body part, or the first half
-          // of a multibyte character. Enqueuing '' is harmless downstream but
-          // shows up as a phantom chunk in tests.
+          // A chunk can decode to nothing (an empty body part, or the first
+          // half of a multibyte character), and a parse hook can likewise
+          // reduce a chunk to ''. Neither should reach the consumer as a
+          // phantom empty chunk, so both are filtered the same way the
+          // sse/ndjson path filters an empty payload.
           if (buffer) {
             const chunk = buffer;
             buffer = '';
             const text = parse ? parse(chunk) : chunk;
-            if (text !== null) {
+            if (text) {
               controller.enqueue(text);
               enqueuedAny = true;
               return;
@@ -134,6 +150,7 @@ export function decode(
           const text = toText(frame);
 
           if (text === DONE) {
+            sawDone = true;
             finished = true;
             controller.close();
             void reader.cancel().catch(() => {});

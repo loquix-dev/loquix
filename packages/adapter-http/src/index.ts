@@ -35,12 +35,10 @@ export function createHttpAgentProvider(options: HttpAgentProviderOptions): Agen
 
       return {
         id: nextId(),
-        stream: decode(
-          response.body,
-          transport,
-          options.parse,
-          response.headers.get('content-type'),
-        ),
+        stream: decode(response.body, transport, options.parse, {
+          status: response.status,
+          contentType: response.headers.get('content-type'),
+        }),
       };
     },
   };

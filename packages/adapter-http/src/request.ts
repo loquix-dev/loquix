@@ -1,10 +1,13 @@
 import type { AgentMessage, AgentSendOptions } from '@loquix/core';
 import type { HttpAgentProviderOptions, HttpTransport } from './types.js';
 
+// The wildcard fallback keeps this a hint to proxies/servers doing content
+// negotiation rather than a hard constraint: a server that would 406 a bare
+// `Accept: text/event-stream` still has a fallback to match against.
 const ACCEPT_BY_TRANSPORT: Record<HttpTransport, string> = {
-  sse: 'text/event-stream',
-  ndjson: 'application/x-ndjson',
-  text: 'text/plain',
+  sse: 'text/event-stream, */*;q=0.1',
+  ndjson: 'application/x-ndjson, */*;q=0.1',
+  text: 'text/plain, */*;q=0.1',
 };
 
 export function defaultBody(messages: AgentMessage[], options: AgentSendOptions): unknown {

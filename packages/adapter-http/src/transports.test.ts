@@ -192,6 +192,31 @@ describe('text transport', () => {
 });
 
 describe('transport mismatch', () => {
+  it('errors with the real response status, not a fabricated one', async () => {
+    // A mismatch is a permanent client-side configuration mistake, not an
+    // upstream failure — the response itself said 200. Fabricating a 5xx
+    // would make `if (err.status >= 500) retry()` retry forever on something
+    // a retry can never fix.
+    const { fetch } = fakeFetch(textBody('plain text response, no SSE framing at all'), {
+      status: 200,
+      headers: { 'content-type': 'text/plain' },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    let caught: unknown;
+    try {
+      await readAll(response.stream);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).to.be.instanceOf(HttpAgentError);
+    expect((caught as HttpAgentError).status).to.equal(200);
+    expect((caught as HttpAgentError).message).to.contain('200');
+  });
+
   it('errors instead of a blank message when a text/plain body is read as sse', async () => {
     const { fetch } = fakeFetch(textBody('plain text response, no SSE framing at all'), {
       headers: { 'content-type': 'text/plain' },
@@ -254,6 +279,37 @@ describe('transport mismatch', () => {
 
   it('does not error on a genuinely empty body', async () => {
     const { fetch } = fakeFetch(textBody());
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
+  });
+
+  it('does not error when a parse hook filters every chunk out', async () => {
+    // Filtering out tool-call/metadata/heartbeat frames and keeping only
+    // prose is a normal use of `parse`. A turn where the model only emitted
+    // a tool call legitimately produces zero text, and that is the
+    // consumer's own decision — not evidence the transport is misconfigured.
+    const { fetch } = fakeFetch(sseBody('{"type":"tool_call"}'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: () => null,
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
+  });
+
+  it('does not error on a content-free [DONE] with no trailing separator', async () => {
+    // A server that closes right after `data: [DONE]`, with no blank line
+    // ever completing the frame and no content beforehand, must still close
+    // cleanly: the sentinel proves the default sse framing matched, so this
+    // is reached only through the end-of-stream flush path, not the mid-loop
+    // frame-by-frame path that normally recognizes [DONE].
+    const { fetch } = fakeFetch(textBody('data: [DONE]'));
     const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
 
     const response = await provider.send([userMessage('hi')], {});

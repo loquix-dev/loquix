@@ -114,7 +114,7 @@ describe('request', () => {
     await provider.send([userMessage('a')], {});
 
     const headers = calls[0].init.headers as Record<string, string>;
-    expect(headers.accept).to.equal('text/event-stream');
+    expect(headers.accept).to.equal('text/event-stream, */*;q=0.1');
   });
 
   it('derives a different Accept header for the ndjson transport', async () => {
@@ -124,7 +124,7 @@ describe('request', () => {
     await provider.send([userMessage('a')], {});
 
     const headers = calls[0].init.headers as Record<string, string>;
-    expect(headers.accept).to.equal('application/x-ndjson');
+    expect(headers.accept).to.equal('application/x-ndjson, */*;q=0.1');
   });
 
   it('lets a caller-supplied Accept header override the transport default', async () => {
