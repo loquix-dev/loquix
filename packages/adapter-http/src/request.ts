@@ -10,6 +10,28 @@ export function defaultBody(messages: AgentMessage[], options: AgentSendOptions)
   };
 }
 
+export class HttpAgentError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = 'HttpAgentError';
+    this.status = status;
+  }
+}
+
+export async function errorFromResponse(response: Response): Promise<HttpAgentError> {
+  let detail = response.statusText || 'request failed';
+  try {
+    const body = (await response.json()) as Record<string, unknown>;
+    const message = body.message ?? body.error;
+    if (typeof message === 'string') detail = message;
+  } catch {
+    // A non-JSON error body is normal; the status carries the meaning.
+  }
+  return new HttpAgentError(response.status, `HTTP ${response.status}: ${detail}`);
+}
+
 export async function performRequest(
   options: HttpAgentProviderOptions,
   messages: AgentMessage[],
