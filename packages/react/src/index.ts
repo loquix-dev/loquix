@@ -14,6 +14,7 @@ export { PromptInput } from './components/PromptInput.js';
 export { ChatComposer } from './components/ChatComposer.js';
 export { MessageItem } from './components/MessageItem.js';
 export { MessageList } from './components/MessageList.js';
+export { ScrollAnchor } from './components/ScrollAnchor.js';
 export { ChatHeader } from './components/ChatHeader.js';
 export { ChatContainer } from './components/ChatContainer.js';
 
@@ -29,6 +30,7 @@ export { ExampleGallery } from './components/ExampleGallery.js';
 // Phase 3 — Tuning & Shared
 export { ComposerToolbar } from './components/ComposerToolbar.js';
 export { DropdownSelect } from './components/DropdownSelect.js';
+export { DropZone } from './components/DropZone.js';
 export { AttachmentChip } from './components/AttachmentChip.js';
 export { ModeSelector } from './components/ModeSelector.js';
 export { ModelSelector } from './components/ModelSelector.js';
