@@ -76,7 +76,9 @@ describe('sse transport', () => {
   });
 
   it('gives every response a distinct id', async () => {
-    const { fetch } = fakeFetch(sseBody('[DONE]'));
+    // Two sends through one provider, so the body has to be a factory: each call
+    // needs its own stream.
+    const { fetch } = fakeFetch(() => sseBody('[DONE]'));
     const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
 
     const first = await provider.send([userMessage('a')], {});
