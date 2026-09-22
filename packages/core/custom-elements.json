@@ -3853,6 +3853,14 @@
             },
             {
               "kind": "field",
+              "name": "_hideTimer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
               "name": "_placement",
               "type": {
                 "text": "'top' | 'bottom'"
@@ -3924,6 +3932,22 @@
               "kind": "field",
               "name": "_hide",
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_hideSoon",
+              "privacy": "private",
+              "description": "Pointer-driven close. The popover is offset from the chip, so the pointer\ncrosses a gap where neither element is hovered on its way over. Closing\nimmediately there would make the popover unreachable, even though it\ncarries its own hover handlers. Escape and blur still close at once."
+            },
+            {
+              "kind": "method",
+              "name": "_cancelPendingHide",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "field",
