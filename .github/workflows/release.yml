@@ -55,6 +55,7 @@ jobs:
           NPM_CONFIG_PROVENANCE: true
 
       - name: Wait for the registry to serve the published versions
+        id: published
         if: steps.changesets.outputs.published == 'true'
         env:
           PUBLISHED: ${{ steps.changesets.outputs.publishedPackages }}
@@ -88,8 +89,20 @@ jobs:
             exit 1
           done
 
+          # The website pins @loquix/core specifically, so it needs that package's
+          # version rather than whichever entry happens to come first. A release
+          # that does not include core must not dispatch at all: passing another
+          # package's version would install a real but older core and commit the
+          # downgrade.
+          core_version=$(echo "$PUBLISHED" | jq -r '.[] | select(.name == "@loquix/core") | .version')
+          echo "core_version=$core_version" >> "$GITHUB_OUTPUT"
+
+          if [ -z "$core_version" ]; then
+            echo "@loquix/core was not part of this release; skipping the website deploy"
+          fi
+
       - name: Trigger website deploy
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.changesets.outputs.published == 'true' && steps.published.outputs.core_version != ''
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.WEBSITE_DEPLOY_TOKEN }}
@@ -97,6 +110,6 @@ jobs:
           event-type: loquix-released
           client-payload: |
             {
-              "version": "${{ fromJSON(steps.changesets.outputs.publishedPackages)[0].version }}",
+              "version": "${{ steps.published.outputs.core_version }}",
               "ref": "${{ github.sha }}"
             }
