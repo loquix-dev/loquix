@@ -67,4 +67,43 @@ describe('request', () => {
 
     expect(calls[0].init.signal).to.equal(controller.signal);
   });
+
+  it('defaults credentials to same-origin', async () => {
+    const { fetch, calls } = fakeFetch(sseBody('[DONE]'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    await provider.send([userMessage('a')], {});
+
+    expect(calls[0].init.credentials).to.equal('same-origin');
+  });
+
+  it('lets an explicit credentials option override the default', async () => {
+    const { fetch, calls } = fakeFetch(sseBody('[DONE]'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      credentials: 'include',
+      fetch,
+    });
+
+    await provider.send([userMessage('a')], {});
+
+    expect(calls[0].init.credentials).to.equal('include');
+  });
+
+  it('lets a differently-cased caller header override the default content-type', async () => {
+    const { fetch, calls } = fakeFetch(sseBody('[DONE]'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      headers: { 'Content-Type': 'text/plain' },
+      fetch,
+    });
+
+    await provider.send([userMessage('a')], {});
+
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(
+      Object.keys(headers).filter(key => key.toLowerCase() === 'content-type'),
+    ).to.have.lengthOf(1);
+    expect(headers['content-type']).to.equal('text/plain');
+  });
 });

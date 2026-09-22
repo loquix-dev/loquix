@@ -18,6 +18,12 @@ export async function performRequest(
   const url = typeof options.url === 'function' ? options.url(messages, sendOptions) : options.url;
   const extra =
     typeof options.headers === 'function' ? await options.headers() : (options.headers ?? {});
+  // Header names are case-insensitive in HTTP; lowercase the caller's keys before
+  // merging so e.g. `Content-Type` overrides our `content-type` default instead of
+  // sitting beside it as a second, distinct property.
+  const lowerExtra = Object.fromEntries(
+    Object.entries(extra).map(([key, value]) => [key.toLowerCase(), value]),
+  );
   const payload = options.body
     ? options.body(messages, sendOptions)
     : defaultBody(messages, sendOptions);
@@ -25,7 +31,7 @@ export async function performRequest(
 
   return doFetch(url, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', ...extra },
+    headers: { 'content-type': 'application/json', ...lowerExtra },
     body: JSON.stringify(payload),
     credentials: options.credentials ?? 'same-origin',
     signal: sendOptions.signal,
