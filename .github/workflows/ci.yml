@@ -48,6 +48,9 @@ jobs:
       - name: Build React wrappers
         run: pnpm --filter @loquix/react build
 
+      - name: Build HTTP adapter
+        run: pnpm --filter @loquix/adapter-http build
+
       - name: Run tests with coverage
         run: pnpm test:coverage
 
