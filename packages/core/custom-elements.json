@@ -11593,6 +11593,14 @@
               "name": "body"
             },
             {
+              "description": "Built-in or slotted answer region.",
+              "name": "answer"
+            },
+            {
+              "description": "Built-in results region, including its empty state.",
+              "name": "results"
+            },
+            {
               "description": "Dialog footer area.",
               "name": "footer"
             }
@@ -11855,6 +11863,15 @@
               "default": "'blended'",
               "description": "Built-in results layout.",
               "attribute": "results-layout"
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Empty/error message for the built-in results list. When set, the results\nregion stays visible with an empty `results` array so the message shows.",
+              "attribute": "empty-text"
             },
             {
               "kind": "field",
@@ -12301,6 +12318,14 @@
               "default": "'blended'",
               "description": "Built-in results layout.",
               "fieldName": "resultsLayout"
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Empty/error message for the built-in results list. When set, the results\nregion stays visible with an empty `results` array so the message shows.",
+              "fieldName": "emptyText"
             }
           ],
           "superclass": {
@@ -12591,7 +12616,24 @@
             },
             {
               "kind": "field",
+              "name": "_clearButton",
+              "type": {
+                "text": "HTMLButtonElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
               "name": "_focused",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_suppressFocusPropagation",
               "type": {
                 "text": "boolean"
               },
@@ -12660,7 +12702,33 @@
                 "type": {
                   "text": "void"
                 }
-              }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_handleFocusIn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
             },
             {
               "kind": "method",
@@ -12865,6 +12933,14 @@
             {
               "description": "Answer/results area.",
               "name": "body"
+            },
+            {
+              "description": "Built-in or slotted answer region.",
+              "name": "answer"
+            },
+            {
+              "description": "Built-in results region, including its empty state.",
+              "name": "results"
             },
             {
               "description": "Query suggestion area.",
@@ -13144,6 +13220,15 @@
               "default": "'blended'",
               "description": "Built-in results layout.",
               "attribute": "results-layout"
+            },
+            {
+              "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Empty/error message for the built-in results list. When set, the results\nregion stays visible with an empty `results` array so the message shows.",
+              "attribute": "empty-text"
             },
             {
               "kind": "field",
@@ -13528,6 +13613,14 @@
               "default": "'blended'",
               "description": "Built-in results layout.",
               "fieldName": "resultsLayout"
+            },
+            {
+              "name": "empty-text",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Empty/error message for the built-in results list. When set, the results\nregion stays visible with an empty `results` array so the message shows.",
+              "fieldName": "emptyText"
             }
           ],
           "superclass": {
@@ -13593,9 +13686,9 @@
               "kind": "field",
               "name": "rank",
               "type": {
-                "text": "number | undefined"
+                "text": "number | null | undefined"
               },
-              "description": "1-based rank override.",
+              "description": "1-based rank override. Use `null` to render the row without a number.",
               "attribute": "rank"
             },
             {
@@ -13751,9 +13844,9 @@
             {
               "name": "rank",
               "type": {
-                "text": "number | undefined"
+                "text": "number | null | undefined"
               },
-              "description": "1-based rank override.",
+              "description": "1-based rank override. Use `null` to render the row without a number.",
               "fieldName": "rank"
             },
             {

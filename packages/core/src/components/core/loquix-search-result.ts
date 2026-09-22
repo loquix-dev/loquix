@@ -2,6 +2,7 @@ import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { property } from 'lit/decorators.js';
 import type { SearchResult } from '../../types/index.js';
 import { createLoquixEvent } from '../../events/index.js';
+import type { LoquixSearchResultClickDetail } from '../../events/index.js';
 import { safeHttpUrl } from '../../utility/safe-url.js';
 import styles from './loquix-search-result.styles.js';
 
@@ -24,9 +25,9 @@ export class LoquixSearchResult extends LitElement {
   @property({ attribute: false })
   result?: SearchResult;
 
-  /** 1-based rank override. */
+  /** 1-based rank override. Use `null` to render the row without a number. */
   @property({ type: Number })
-  rank?: number;
+  rank?: number | null;
 
   /** Source name fallback when `result` is not supplied. */
   @property({ type: String, attribute: 'source-name' })
@@ -85,7 +86,7 @@ export class LoquixSearchResult extends LitElement {
     const result = this.result ? { ...base, ...this.result } : base;
     return {
       ...result,
-      rank: result.rank ?? this.rank,
+      rank: result.rank === null ? null : (result.rank ?? this.rank),
     };
   }
 
@@ -94,9 +95,9 @@ export class LoquixSearchResult extends LitElement {
       e.preventDefault();
       return;
     }
-    const ev = createLoquixEvent(
+    const ev = createLoquixEvent<LoquixSearchResultClickDetail>(
       'loquix-search-result-click',
-      { result, index: result.rank ?? this.rank },
+      { result, index: result.rank ?? this.rank ?? undefined },
       { cancelable: true },
     );
     this.dispatchEvent(ev);

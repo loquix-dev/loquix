@@ -260,6 +260,58 @@ describe('loquix-search-dialog', () => {
     expect(el.open).to.be.false;
   });
 
+  it('stays closed when the trigger clear button is clicked', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog value="refund policy"></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const trigger = el.shadowRoot!.querySelector(
+      'loquix-search-input[part="trigger"]',
+    ) as LitElement;
+    await trigger.updateComplete;
+    const clear = trigger.shadowRoot!.querySelector('[part~="clear-button"]') as HTMLButtonElement;
+
+    clear.click();
+    await el.updateComplete;
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await el.updateComplete;
+
+    expect(el.value, 'clear button should still clear the query').to.equal('');
+    expect(el.open, 'clearing the trigger must not open the dialog').to.be.false;
+  });
+
+  it('forwards empty-text to the built-in results list', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open empty-text="Service is too busy."></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const list = el.shadowRoot!.querySelector('loquix-search-results') as HTMLElement;
+    expect(list).to.exist;
+    expect(list.getAttribute('empty-text')).to.equal('Service is too busy.');
+  });
+
+  it('shows the results region for an empty message without results', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open empty-text="Service is too busy."></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const region = el.shadowRoot!.querySelector('.results') as HTMLElement;
+    expect(region.hidden, 'results region must be visible to show the empty state').to.be.false;
+  });
+
+  it('hides the results region when there are no results and no empty message', async () => {
+    const el = await fixture<LoquixSearchDialog>(
+      html`<loquix-search-dialog open></loquix-search-dialog>`,
+    );
+    await el.updateComplete;
+
+    const region = el.shadowRoot!.querySelector('.results') as HTMLElement;
+    expect(region.hidden).to.be.true;
+  });
+
   it('renders provided sources, answer, results, and shortcuts', async () => {
     const el = await fixture<LoquixSearchDialog>(html`
       <loquix-search-dialog

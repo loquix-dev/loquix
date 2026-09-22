@@ -163,8 +163,11 @@ export interface SearchSource {
 export interface SearchResult {
   /** Stable result id. */
   id?: string;
-  /** 1-based rank in the current list. */
-  rank?: number;
+  /**
+   * 1-based rank in the current list. Omit to number the row by its position;
+   * use `null` to opt the row out of numbering entirely.
+   */
+  rank?: number | null;
   /** Source the result came from. */
   source?: SearchSource;
   /** Result title. */

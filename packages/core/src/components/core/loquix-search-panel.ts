@@ -35,6 +35,8 @@ import './define-search-results.js';
  * @csspart panel - Expandable panel region.
  * @csspart sources - Source progress/filter area.
  * @csspart body - Answer/results area.
+ * @csspart answer - Built-in or slotted answer region.
+ * @csspart results - Built-in results region, including its empty state.
  * @csspart suggestions - Query suggestion area.
  * @csspart footer - Footer area.
  *
@@ -150,6 +152,13 @@ export class LoquixSearchPanel extends LitElement {
   /** Built-in results layout. */
   @property({ type: String, attribute: 'results-layout' })
   resultsLayout: SearchResultsLayout = 'blended';
+
+  /**
+   * Empty/error message for the built-in results list. When set, the results
+   * region stays visible with an empty `results` array so the message shows.
+   */
+  @property({ type: String, attribute: 'empty-text' })
+  emptyText?: string;
 
   /** Keyboard shortcuts rendered in the built-in footer. */
   @property({ attribute: false })
@@ -291,9 +300,10 @@ export class LoquixSearchPanel extends LitElement {
     if (this.hideResults) return nothing;
 
     return html`
-      <div part="results" class="results" ?hidden=${this.results.length === 0}>
+      <div part="results" class="results" ?hidden=${this.results.length === 0 && !this.emptyText}>
         <loquix-search-results
           layout=${this.resultsLayout}
+          empty-text=${this.emptyText ?? nothing}
           .results=${this.results}
         ></loquix-search-results>
       </div>

@@ -59,7 +59,9 @@ export class LoquixSearchResults extends LitElement {
   }
 
   private _renderResult(result: SearchResult, index: number) {
-    const rank = result.rank ?? index + 1;
+    // `null` is an explicit opt-out of numbering; only an omitted rank falls back
+    // to the row's position in the list.
+    const rank = result.rank === null ? null : (result.rank ?? index + 1);
     return html`<loquix-search-result .result=${{ ...result, rank }}></loquix-search-result>`;
   }
 
@@ -89,7 +91,7 @@ export class LoquixSearchResults extends LitElement {
         </summary>
         <div part="section-items" class="items">
           ${group.results.map((result, index) =>
-            this._renderResult({ ...result, rank: undefined }, index),
+            this._renderResult({ ...result, rank: result.rank === null ? null : undefined }, index),
           )}
         </div>
       </details>

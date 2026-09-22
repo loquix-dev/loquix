@@ -159,6 +159,56 @@ describe('loquix-search-panel', () => {
     expect(el.open).to.be.false;
   });
 
+  it('stays closed when the input clear button is clicked', async () => {
+    const el = await fixture<LoquixSearchPanel>(
+      html`<loquix-search-panel value="refund policy"></loquix-search-panel>`,
+    );
+    await el.updateComplete;
+
+    const input = el.shadowRoot!.querySelector('loquix-search-input[part="input"]') as LitElement;
+    await input.updateComplete;
+    const clear = input.shadowRoot!.querySelector('[part~="clear-button"]') as HTMLButtonElement;
+
+    clear.click();
+    await el.updateComplete;
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await el.updateComplete;
+
+    expect(el.value, 'clear button should still clear the query').to.equal('');
+    expect(el.open, 'clearing the input must not open the panel').to.be.false;
+  });
+
+  it('forwards empty-text to the built-in results list', async () => {
+    const el = await fixture<LoquixSearchPanel>(
+      html`<loquix-search-panel open empty-text="Service is too busy."></loquix-search-panel>`,
+    );
+    await el.updateComplete;
+
+    const list = el.shadowRoot!.querySelector('loquix-search-results') as HTMLElement;
+    expect(list).to.exist;
+    expect(list.getAttribute('empty-text')).to.equal('Service is too busy.');
+  });
+
+  it('shows the results region for an empty message without results', async () => {
+    const el = await fixture<LoquixSearchPanel>(
+      html`<loquix-search-panel open empty-text="Service is too busy."></loquix-search-panel>`,
+    );
+    await el.updateComplete;
+
+    const region = el.shadowRoot!.querySelector('.results') as HTMLElement;
+    expect(region.hidden, 'results region must be visible to show the empty state').to.be.false;
+  });
+
+  it('hides the results region when there are no results and no empty message', async () => {
+    const el = await fixture<LoquixSearchPanel>(
+      html`<loquix-search-panel open></loquix-search-panel>`,
+    );
+    await el.updateComplete;
+
+    const region = el.shadowRoot!.querySelector('.results') as HTMLElement;
+    expect(region.hidden).to.be.true;
+  });
+
   it('renders provided sources, answer, results, and shortcuts', async () => {
     const el = await fixture<LoquixSearchPanel>(html`
       <loquix-search-panel
