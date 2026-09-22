@@ -1,5 +1,108 @@
 # @loquix/core
 
+## 0.5.0
+
+### Patch Changes
+
+- 4d85316: Fix the popover in `loquix-citation-popover` closing before the pointer can
+  reach it.
+
+  The popover is placed with `offset(8)`, so roughly 8px of dead space sits
+  between the chip and the panel. `mouseleave` on the chip closed the popover the
+  moment the pointer entered that gap, which meant it could never be hovered — even
+  though the panel carries its own `mouseenter` and `mouseleave` handlers, and
+  shows a trailing external-link affordance, both of which only make sense if it is
+  reachable.
+
+  Pointer-driven closing now waits 120ms, and any `mouseenter` on either the chip
+  or the popover cancels it, so crossing the gap keeps the panel open. Escape and
+  blur still close immediately. The pending timer is cleared on disconnect.
+
+  Note that this does not address the popover being painted under surrounding page
+  chrome: its `z-index` is confined to whatever stacking context the host sits in,
+  so a consumer layout that isolates the content area — for example one applying
+  `isolation: isolate` to a main column — will still draw fixed sidebars over it.
+  Escaping that needs the popover to render in the top layer, which is a larger
+  change.
+
+- 22d0182: Fix `--loquix-gallery-columns` being impossible to override on
+  `loquix-example-gallery`.
+
+  The grid read the column count from `--loquix-gallery-columns`, but the component
+  also wrote that same property inline on the grid element from the `columns`
+  property. An inline declaration beats anything a consumer can write from outside,
+  so the documented custom property silently did nothing — neither a rule on the
+  host nor an inline style on it had any effect, which ruled out the obvious use
+  for it: dropping to fewer columns in a media query.
+
+  The `columns` property now feeds a private `--_columns`, and the public property
+  takes precedence over it. Setting `columns` behaves exactly as before; setting
+  `--loquix-gallery-columns` from a stylesheet now wins. Added a regression test
+  for the override, and switched the existing columns test from asserting the
+  inline style to asserting the resolved track count.
+
+- 61eee81: Fix selecting a preset in `loquix-parameter-panel` discarding every parameter the
+  preset does not mention.
+
+  `_handlePresetSelect` replaced the whole map with `{ ...preset.values }`. A
+  preset that tunes only `temperature` therefore dropped the user's `max_tokens`,
+  `stream`, and anything else they had set, and those controls silently fell back
+  to their defaults on the next render. Presets that happened to list every
+  parameter hid the problem, which is why the existing tests — which only assert
+  the event detail and `activePreset` — did not catch it.
+
+  Preset values are now merged over the current ones, so a preset changes what it
+  names and leaves the rest alone. A preset that does list every parameter behaves
+  exactly as before. Added a regression test covering a partial preset.
+
+- f037b3f: Fix source chips and footer actions in `loquix-search-answer` being unreadable on
+  dark themes.
+
+  Both backgrounds fell back to a near-opaque white — `rgba(255, 255, 255, 0.72)`
+  for `.source` and `rgba(255, 255, 255, 0.78)` for `.action`. Unlike the
+  neighbouring `border-color` and `color` declarations, which chain through
+  `--loquix-border-color` and `--loquix-text-secondary-color`, these two skipped
+  the theme token and went straight to a literal. No theme defines
+  `--loquix-search-answer-source-bg` or `--loquix-search-answer-action-bg`, so the
+  light fallback won everywhere: on the dark theme the chips rendered as light
+  surfaces carrying the dark theme's grey text, measuring 1.38:1 against a
+  required 4.5:1.
+
+  Both now fall back to `--loquix-surface-secondary-bg`, matching the pattern used
+  by the surrounding properties. The dark theme reaches 5.78:1 and the light theme
+  4.63:1, both above the 4.5:1 threshold. The light theme changes only in that the
+  chips become opaque rather than 72% white over the answer tint. The two
+  component-level custom properties still override as before.
+
+- a0f0121: Fix the clear button opening the search surface in `loquix-search-dialog` and
+  `loquix-search-panel`.
+
+  Clicking the clear button on a closed `loquix-search-dialog` trigger cleared the
+  query and opened the modal, because `loquix-search-input` let the click bubble to
+  the host — which opens on `click` — and then refocused the input, which the host
+  also treats as an open request via `focusin`. `loquix-search-panel` had both
+  paths too. Hosts could not work around it: cancelling the click during capture
+  also cancelled the clear.
+
+  `loquix-search-input` now keeps the clear interaction to itself. It stops the
+  clear click from propagating, and stops the `focusin` raised by the clear button
+  taking focus and by the refocus that follows a clear. Ordinary focus, `input`,
+  and `loquix-change` events are unaffected.
+
+- a0f0121: Let `loquix-search-dialog` and `loquix-search-panel` show an empty or error state.
+
+  Both wrapped their built-in `loquix-search-results` in a region hidden whenever
+  `results` was empty, and neither forwarded `empty-text`. So the empty state that
+  `loquix-search-results` already renders could never be seen through the dialog or
+  the panel, and a message like "Service is too busy. Try again." had to be faked as
+  a result row — which then got a rank number rendered in front of it.
+
+  Both components now accept `empty-text` / `emptyText`, forward it to the results
+  list, and keep the results region visible when an empty message is set with no
+  results. `rank: null` on a `SearchResult` also opts a row out of numbering, in
+  blended and sectioned layouts. Behaviour with no results and no empty message is
+  unchanged: the region stays hidden.
+
 ## 0.4.1
 
 ### Patch Changes
