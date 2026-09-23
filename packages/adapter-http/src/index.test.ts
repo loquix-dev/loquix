@@ -20,4 +20,14 @@ describe('createHttpAgentProvider', () => {
       }),
     ).to.throw(/transport/i);
   });
+
+  it('rejects transport: "text" combined with parse at construction', () => {
+    expect(() =>
+      createHttpAgentProvider({
+        url: '/api/chat',
+        transport: 'text',
+        parse: chunk => chunk,
+      }),
+    ).to.throw(/parse/i);
+  });
 });

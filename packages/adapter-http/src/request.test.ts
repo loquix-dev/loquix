@@ -58,6 +58,22 @@ describe('request', () => {
     expect(JSON.parse(calls[0].init.body as string)).to.deep.equal({ prompt: 'only this' });
   });
 
+  it('sends a string body builder result as-is, instead of JSON-encoding it a second time', async () => {
+    // Measured: `body: () => '{"already":"json"}'` used to be run through
+    // `JSON.stringify` again, wrapping it in quotes and escaping its own
+    // quotes — never what a caller returning a pre-serialized string meant.
+    const { fetch, calls } = fakeFetch(sseBody('[DONE]'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      body: () => 'already-serialized, not JSON at all',
+      fetch,
+    });
+
+    await provider.send([userMessage('a')], {});
+
+    expect(calls[0].init.body).to.equal('already-serialized, not JSON at all');
+  });
+
   it('passes the abort signal through', async () => {
     const { fetch, calls } = fakeFetch(sseBody('[DONE]'));
     const provider = createHttpAgentProvider({ url: '/api/chat', fetch });

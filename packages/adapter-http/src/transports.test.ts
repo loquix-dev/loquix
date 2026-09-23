@@ -162,32 +162,22 @@ describe('text transport', () => {
     expect(await readAll(response.stream)).to.equal('before [DONE] after');
   });
 
-  it('runs each chunk through a parse hook when one is given', async () => {
-    const { fetch } = fakeFetch(textBody('raw1', 'raw2'));
-    const provider = createHttpAgentProvider({
-      url: '/api/chat',
-      transport: 'text',
-      fetch,
-      parse: chunk => chunk.toUpperCase(),
-    });
-
-    const response = await provider.send([userMessage('hi')], {});
-
-    expect(await readAll(response.stream)).to.equal('RAW1RAW2');
-  });
-
-  it('skips a chunk when the parse hook returns null', async () => {
-    const { fetch } = fakeFetch(textBody('keep', 'DROP', 'keep2'));
-    const provider = createHttpAgentProvider({
-      url: '/api/chat',
-      transport: 'text',
-      fetch,
-      parse: chunk => (chunk === 'DROP' ? null : chunk),
-    });
-
-    const response = await provider.send([userMessage('hi')], {});
-
-    expect(await readAll(response.stream)).to.equal('keepkeep2');
+  it('rejects a parse hook at construction — text chunk boundaries follow TCP segmentation', () => {
+    // Measured against a real server writing `TOK`, `EN:hi\n`, `TOKEN:there\n`:
+    // a hook stripping a `TOKEN:` prefix saw three fragments and produced
+    // "TOKEN:hi\nthere\n"; the identical body sent in one chunk produced
+    // "hi\nthere\n". Correctness depends on network timing, not on anything
+    // the caller or this library controls, so this is rejected outright
+    // rather than merely documented — loosening the restriction later would
+    // not be a breaking change, but changing established per-chunk semantics
+    // to per-body semantics later would be.
+    expect(() =>
+      createHttpAgentProvider({
+        url: '/api/chat',
+        transport: 'text',
+        parse: chunk => chunk,
+      }),
+    ).to.throw(/text.*parse|parse.*text/i);
   });
 });
 
@@ -256,10 +246,12 @@ describe('transport mismatch', () => {
     expect((caught as HttpAgentError).message).to.contain('ndjson');
   });
 
-  it('errors instead of a blank message on a 200 whose body is a bare JSON error object', async () => {
+  it('errors instead of a blank message on a 200 whose body is a bare JSON error object (sse only)', async () => {
     // A backend that reports failure with a 200 status is common, and the
     // default sse parser finds no `data:` line in a bare JSON object, so this
-    // would otherwise close as a silent, content-free stream.
+    // would otherwise close as a silent, content-free stream. This is an
+    // sse-specific diagnosis — see the ndjson test right below, where the
+    // identical body is well-formed JSON and is therefore NOT caught.
     const { fetch } = fakeFetch(textBody('{"error":"rate limited"}'), {
       headers: { 'content-type': 'application/json' },
     });
@@ -275,6 +267,48 @@ describe('transport mismatch', () => {
     }
 
     expect(caught).to.be.instanceOf(HttpAgentError);
+    expect((caught as HttpAgentError).code).to.equal('transport_mismatch');
+  });
+
+  it('does NOT catch a bare JSON error object under ndjson — an accepted, documented gap', async () => {
+    // Under ndjson, `{"error":"rate limited"}` is well-formed JSON, so it is
+    // *recognized* rather than flagged, and the stream closes blank instead of
+    // erroring. Catching this would need a heuristic that treats any top-level
+    // `error` field as a failure — already tried and reverted upstream because
+    // it false-positived on legitimate responses with their own per-item
+    // `error` field, so it is deliberately not reintroduced here.
+    const { fetch } = fakeFetch(ndjsonBody({ error: 'rate limited' }));
+    const provider = createHttpAgentProvider({ url: '/api/chat', transport: 'ndjson', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
+  });
+
+  it('names the real cause when a redirect, not the transport, produced the mismatch', async () => {
+    // A 301 that turns the original POST into a GET, landing on an HTML login
+    // page a framework happily serves as 200, looks identical to a transport
+    // mismatch from the decoder's point of view — but the transport option was
+    // never wrong.
+    const { fetch } = fakeFetch(textBody('<html><body>Please log in</body></html>'), {
+      headers: { 'content-type': 'text/html' },
+      redirected: true,
+      url: 'https://example.com/login',
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    let caught: unknown;
+    try {
+      await readAll(response.stream);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).to.be.instanceOf(HttpAgentError);
+    expect((caught as HttpAgentError).message).to.contain('redirected');
+    expect((caught as HttpAgentError).message).to.contain('https://example.com/login');
   });
 
   it('does not error on a genuinely empty body', async () => {
@@ -378,5 +412,109 @@ describe('transport mismatch', () => {
 
     expect(caught).to.be.instanceOf(HttpAgentError);
     expect((caught as HttpAgentError).message).to.contain('ndjson');
+  });
+});
+
+describe('parse frame metadata', () => {
+  it('passes the SSE event: name to the parse hook, alongside the payload', async () => {
+    // Measured: `event: error\ndata: {"message":"overloaded"}` followed by
+    // `event: message\ndata: {"text":"hello"}`, with a hook returning
+    // `j.message ?? j.text`, yields ["overloaded","hello"] — a server error
+    // rendered as assistant prose, indistinguishable from real content.
+    // LangServe (and others) put the discriminator only in `event:`.
+    const { fetch } = fakeFetch(
+      textBody(
+        'event: error\ndata: {"message":"overloaded"}\n\n',
+        'event: message\ndata: {"text":"hello"}\n\n',
+      ),
+    );
+    const seen: Array<string | undefined> = [];
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: (payload, frame) => {
+        seen.push(frame?.event);
+        if (frame?.event === 'error') return null;
+        const parsed = JSON.parse(payload) as { text?: string };
+        return parsed.text ?? null;
+      },
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('hello');
+    expect(seen).to.deep.equal(['error', 'message']);
+  });
+
+  it('leaves frame undefined for ndjson', async () => {
+    const { fetch } = fakeFetch(ndjsonBody({ text: 'hi' }));
+    let frameSeen: unknown = 'not called';
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      transport: 'ndjson',
+      fetch,
+      parse: (payload, frame) => {
+        frameSeen = frame;
+        return (JSON.parse(payload) as { text: string }).text;
+      },
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('hi');
+    expect(frameSeen).to.equal(undefined);
+  });
+
+  it('never runs the hook on a [DONE] frame, even one a hook would otherwise see', async () => {
+    let calls = 0;
+    const { fetch } = fakeFetch(sseBody('first', '[DONE]'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: payload => {
+        calls += 1;
+        return payload;
+      },
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+    await readAll(response.stream);
+
+    // "first" runs the hook once; [DONE] is intercepted before parse ever runs.
+    expect(calls).to.equal(1);
+  });
+});
+
+describe('[DONE] with trailing whitespace', () => {
+  it('treats "[DONE] " (trailing space) as the sentinel, not as content', async () => {
+    // Measured: `data: [DONE] ` with trailing whitespace neither stopped the
+    // stream nor was suppressed — it leaked into the chat as content, and
+    // whatever followed kept streaming.
+    const { fetch } = fakeFetch(sseBody('hello', '[DONE] ', 'should not appear'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('hello');
+  });
+});
+
+describe('non-string parse hook return', () => {
+  it('coerces a non-string, non-null return value with String(...) rather than enqueuing it as-is', async () => {
+    // Measured: `parse: () => 42` enqueues the number 42 as-is into a
+    // ReadableStream<string>, which breaks any consumer that assumes string
+    // chunks. We coerce rather than drop: the hook clearly meant to emit
+    // something, so treating that as silently-dropped text would hide the bug
+    // rather than surface it.
+    const { fetch } = fakeFetch(sseBody('anything'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: (() => 42) as unknown as (chunk: string) => string | null,
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('42');
   });
 });

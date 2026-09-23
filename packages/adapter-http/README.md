@@ -45,6 +45,14 @@ const provider = createHttpAgentProvider({
 });
 ```
 
+**Close the response, or send `[DONE]`.** The adapter stops reading only when
+your handler closes the response body (SSE/ndjson) or sends the `[DONE]`
+sentinel — whichever your backend does. If you're fronting a hand-rolled
+backend, make sure every code path ends the response: a handler that returns
+early without calling `res.end()` (or the equivalent in your framework) leaves
+the connection open, and the chat UI keeps showing a streaming indicator
+forever even though the model has nothing left to say.
+
 ## Documentation
 
 See the [package source and tests](https://github.com/loquix-dev/loquix/tree/main/packages/adapter-http)

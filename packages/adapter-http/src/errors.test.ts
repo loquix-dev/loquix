@@ -50,6 +50,118 @@ describe('errors', () => {
     expect((caught as HttpAgentError).status).to.equal(204);
     expect((caught as Error).message).to.contain('204');
   });
+
+  it('extracts the nested message from an OpenAI/Anthropic-style error body', async () => {
+    // Measured against a real 429: {"error":{"message":"Rate limit reached…","code":"rate_limit_exceeded"}}
+    // used to yield only "HTTP 429: Too Many Requests" because `typeof
+    // body.message === 'string'` rejected the nested object.
+    const { fetch } = fakeFetch(null, {
+      status: 429,
+      json: { error: { message: 'Rate limit reached for requests', code: 'rate_limit_exceeded' } },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    let caught: unknown;
+    try {
+      await provider.send([userMessage('hi')], {});
+    } catch (error) {
+      caught = error;
+    }
+
+    expect((caught as Error).message).to.contain('Rate limit reached for requests');
+  });
+
+  it('stringifies a FastAPI-style validation-error detail array', async () => {
+    // Measured against a real 422: {"detail":[{"loc":[...],"msg":"field required"}]}
+    // used to yield only "HTTP 422: Unprocessable Entity".
+    const { fetch } = fakeFetch(null, {
+      status: 422,
+      json: { detail: [{ loc: ['body', 'model'], msg: 'field required', type: 'value_error' }] },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    let caught: unknown;
+    try {
+      await provider.send([userMessage('hi')], {});
+    } catch (error) {
+      caught = error;
+    }
+
+    expect((caught as Error).message).to.contain('field required');
+  });
+
+  it('carries the parsed body on the error, for a consumer that wants e.g. a retry_after', async () => {
+    const { fetch } = fakeFetch(null, {
+      status: 429,
+      json: { error: { message: 'slow down', code: 'rate_limit_exceeded', retry_after: 30 } },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    let caught: unknown;
+    try {
+      await provider.send([userMessage('hi')], {});
+    } catch (error) {
+      caught = error;
+    }
+
+    const body = (caught as HttpAgentError).body as { error: { retry_after: number } };
+    expect(body.error.retry_after).to.equal(30);
+  });
+
+  it('does not hang awaiting .json() on a non-JSON, still-open error body', async () => {
+    // Measured: a 500 with content-type: text/event-stream that writes one
+    // frame and never closes left `errorFromResponse`'s `.json()` pending
+    // indefinitely, which left `send()` pending indefinitely too.
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('data: still going\n\n'));
+        // Deliberately never closed.
+      },
+    });
+    const { fetch } = fakeFetch(body, {
+      status: 500,
+      headers: { 'content-type': 'text/event-stream' },
+    });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    let caught: unknown;
+    try {
+      await provider.send([userMessage('hi')], {});
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).to.be.instanceOf(HttpAgentError);
+    expect((caught as HttpAgentError).status).to.equal(500);
+  });
+
+  it('sets code "http" for a non-2xx response', async () => {
+    const { fetch } = fakeFetch(null, { status: 503, json: { message: 'upstream busy' } });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    let caught: unknown;
+    try {
+      await provider.send([userMessage('hi')], {});
+    } catch (error) {
+      caught = error;
+    }
+
+    expect((caught as HttpAgentError).code).to.equal('http');
+  });
+
+  it('sets code "no_body" when the response has no body', async () => {
+    const { fetch } = fakeFetch(null, { status: 204 });
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    let caught: unknown;
+    try {
+      await provider.send([userMessage('hi')], {});
+    } catch (error) {
+      caught = error;
+    }
+
+    expect((caught as HttpAgentError).code).to.equal('no_body');
+  });
 });
 
 describe('cancellation', () => {

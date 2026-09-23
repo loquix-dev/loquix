@@ -33,10 +33,26 @@ export interface FakeFetchResult {
 
 export function fakeFetch(
   body: ReadableStream<Uint8Array> | null | (() => ReadableStream<Uint8Array>),
-  init: { status?: number; json?: unknown; headers?: Record<string, string> } = {},
+  init: {
+    status?: number;
+    json?: unknown;
+    headers?: Record<string, string>;
+    /** Simulates a response reached via a redirect, for the redirect-vs-mismatch tests. */
+    redirected?: boolean;
+    /** The final URL to report, when `redirected` is set. */
+    url?: string;
+  } = {},
 ): FakeFetchResult {
   const calls: Array<{ url: string; init: RequestInit }> = [];
   const status = init.status ?? 200;
+  // `redirected` and `url` are read-only getters on a real Response and can't
+  // be set through its constructor; override them on the instance so tests can
+  // simulate a redirected response without a real network round trip.
+  const applyRedirectState = (response: Response): Response => {
+    if (init.redirected) Object.defineProperty(response, 'redirected', { value: true });
+    if (init.url !== undefined) Object.defineProperty(response, 'url', { value: init.url });
+    return response;
+  };
   // A real server hands every request its own response body. A test that sends
   // twice through one provider must therefore pass a factory: the decoder locks
   // whatever stream it reads the instant it starts pulling, even if the caller
@@ -47,7 +63,11 @@ export function fakeFetch(
   const impl = (async (url: string, requestInit: RequestInit) => {
     calls.push({ url, init: requestInit });
     if (init.json !== undefined) {
-      return new Response(JSON.stringify(init.json), { status, headers: init.headers });
+      // A JSON error body implies a JSON content-type unless the test says
+      // otherwise — real servers reporting a structured error set this too,
+      // and errorFromResponse now only attempts `.json()` when it's present.
+      const headers = { 'content-type': 'application/json', ...init.headers };
+      return applyRedirectState(new Response(JSON.stringify(init.json), { status, headers }));
     }
 
     const out = typeof body === 'function' ? body() : body;
@@ -63,7 +83,7 @@ export function fakeFetch(
         ? out.pipeThrough(new TransformStream(), { signal: requestInit.signal })
         : out;
 
-    return new Response(wired, { status, headers: init.headers });
+    return applyRedirectState(new Response(wired, { status, headers: init.headers }));
   }) as unknown as typeof globalThis.fetch;
 
   return { fetch: impl, calls };

@@ -3,20 +3,37 @@ import type { HttpTransport } from './types.js';
 
 const DONE = '[DONE]';
 
+/** The SSE frame metadata a `parse` hook can see, alongside the `data:` payload. */
+export interface SseFrameMeta {
+  event?: string;
+  id?: string;
+}
+
+interface SseFrame {
+  payload: string | null;
+  meta: SseFrameMeta;
+}
+
 /**
- * Turn one server-sent-events frame into text. A frame may carry several `data:`
- * lines, which the spec says to join with a newline, alongside `event:`, `id:`
- * and comment lines that must not reach the caller.
+ * Turn one server-sent-events frame into text plus its metadata. A frame may
+ * carry several `data:` lines, which the spec says to join with a newline,
+ * alongside `event:` and `id:` lines — surfaced here so a `parse` hook can see
+ * them (a server like LangServe puts its only failure discriminator in
+ * `event:`, never in the payload) — and comment lines, which never reach the
+ * caller.
  */
-function readSseFrame(frame: string): string | null {
+function readSseFrame(frame: string): SseFrame {
   const data: string[] = [];
+  const meta: SseFrameMeta = {};
 
   for (const line of frame.split(/\r?\n/)) {
     if (!line || line.startsWith(':')) continue;
     if (line.startsWith('data:')) data.push(line.slice(5).replace(/^ /, ''));
+    else if (line.startsWith('event:')) meta.event = line.slice(6).replace(/^ /, '');
+    else if (line.startsWith('id:')) meta.id = line.slice(3).replace(/^ /, '');
   }
 
-  return data.length ? data.join('\n') : null;
+  return { payload: data.length ? data.join('\n') : null, meta };
 }
 
 function defaultParse(payload: string, transport: HttpTransport): string | null {
@@ -67,12 +84,31 @@ export interface DecodeMeta {
   /** The response's real HTTP status, carried into a mismatch error rather than a fabricated one. */
   status: number;
   contentType?: string | null;
+  /** Whether `fetch` followed a redirect to get here — see the redirect note below. */
+  redirected?: boolean;
+  /** The final URL, once redirected — named in the mismatch error instead of blaming `transport`. */
+  url?: string;
+}
+
+/**
+ * A `parse` hook is typed to return `string | null`, but nothing stops a
+ * misbehaving one from returning something else (`parse: () => 42`). Enqueuing
+ * that value as-is would put a non-string into a `ReadableStream<string>` and
+ * break every consumer downstream that assumes string chunks. We coerce with
+ * `String(...)` rather than silently dropping it: a hook that produced *some*
+ * value clearly meant to emit something, and dropping it would turn a visible
+ * bug (wrong-looking text in the chat) into an invisible one (text silently
+ * missing).
+ */
+function normalizeParsedText(value: string | null | unknown): string | null {
+  if (value === null || value === undefined) return null;
+  return typeof value === 'string' ? value : String(value);
 }
 
 export function decode(
   body: ReadableStream<Uint8Array>,
   transport: HttpTransport,
-  parse: ((chunk: string) => string | null) | undefined,
+  parse: ((chunk: string, frame?: SseFrameMeta) => string | null) | undefined,
   meta: DecodeMeta,
 ): ReadableStream<string> {
   const reader = body.getReader();
@@ -80,15 +116,24 @@ export function decode(
   const separator = transport === 'sse' ? /\r?\n\r?\n/ : /\r?\n/;
   let buffer = '';
   let finished = false;
-  // A transport mismatch (SSE read as ndjson, a 200 whose body is a bare JSON
-  // error object, ...) parses cleanly to nothing every time, which otherwise
-  // closes as an ordinary empty stream — a blank assistant message with no
-  // diagnostic. But "produced no chunk" is not itself the signal: a heartbeat
-  // frame, a metadata-only ndjson object, or `{"text":null}` are all
-  // correctly-framed and legitimately carry no text. The signal is whether
-  // the decoder ever recognized a single frame of the *configured shape* —
-  // that is what actually distinguishes "nothing to say this turn" from
-  // "this isn't sse/ndjson at all".
+  // A transport mismatch — SSE read as ndjson, or, under sse specifically, a
+  // 200 whose body is a bare JSON error object with no `data:` line at all —
+  // parses cleanly to nothing every time, which otherwise closes as an
+  // ordinary empty stream — a blank assistant message with no diagnostic. But
+  // "produced no chunk" is not itself the signal: a heartbeat frame, a
+  // metadata-only ndjson object, or `{"text":null}` are all correctly-framed
+  // and legitimately carry no text. The signal is whether the decoder ever
+  // recognized a single frame of the *configured shape* — that is what
+  // actually distinguishes "nothing to say this turn" from "this isn't
+  // sse/ndjson at all".
+  //
+  // Honest limit: under ndjson, a bare `{"error":"..."}` body *is* well-formed
+  // JSON, so it is recognized and this check cannot catch it — it silently
+  // closes blank rather than erroring. We do not special-case a top-level
+  // `error` field to catch it: an earlier version of this check did exactly
+  // that and it took two rounds to remove, because it false-positived on
+  // legitimate responses whose own protocol has a per-item `error` field. Bare
+  // JSON error objects are an sse-only diagnostic, not an ndjson one.
   let receivedBytes = false;
   let enqueuedAny = false;
   let recognizedAny = false;
@@ -101,10 +146,25 @@ export function decode(
   let sawDone = false;
 
   const toText = (frame: string): string | null => {
-    const payload = transport === 'sse' ? readSseFrame(frame) : frame;
+    let payload: string | null;
+    let frameMeta: SseFrameMeta | undefined;
+
+    if (transport === 'sse') {
+      const sse = readSseFrame(frame);
+      payload = sse.payload;
+      frameMeta = sse.meta;
+    } else {
+      payload = frame;
+    }
+
     if (payload === null) return null;
-    if (payload === DONE) return DONE;
-    return parse ? parse(payload) : defaultParse(payload, transport);
+    // Compare trimmed: `data: [DONE] \n\n` (trailing whitespace, seen from real
+    // servers) must still be recognized as the sentinel rather than leaking
+    // into the chat as content and leaving the stream open past the real end.
+    if (payload.trim() === DONE) return DONE;
+    return normalizeParsedText(
+      parse ? parse(payload, frameMeta) : defaultParse(payload, transport),
+    );
   };
 
   const classify = (frame: string): void => {
@@ -117,12 +177,23 @@ export function decode(
   const failIfMismatched = (controller: ReadableStreamDefaultController<string>): boolean => {
     if (!receivedBytes || enqueuedAny || parse || sawDone) return false;
     if (!sawUnrecognized || recognizedAny) return false;
+    // A redirect (a 301 turning the original POST into a GET, landing on an
+    // HTML login page the framework happily serves as 200) produces exactly
+    // this same symptom — a body that never matches the configured transport
+    // — but the transport option was never the problem. Name the real cause
+    // instead of sending the developer to change a setting that is already
+    // correct.
+    const redirectNote = meta.redirected
+      ? ` The request was redirected to ${meta.url}, which is the more likely cause than a wrong ` +
+        `"transport" option — e.g. a POST redirected to a GET login or HTML error page.`
+      : '';
     controller.error(
       new HttpAgentError(
         meta.status,
         `HTTP ${meta.status}: the response body never produced a chunk for transport "${transport}" ` +
           `(content-type: ${meta.contentType ?? 'unknown'}). This usually means the transport option ` +
-          `doesn't match what the server actually sent.`,
+          `doesn't match what the server actually sent.${redirectNote}`,
+        'transport_mismatch',
       ),
     );
     return true;
@@ -141,7 +212,7 @@ export function decode(
 
           if (transport === 'text') {
             if (buffer) {
-              const text = parse ? parse(buffer) : buffer;
+              const text = parse ? normalizeParsedText(parse(buffer)) : buffer;
               if (text) {
                 controller.enqueue(text);
                 enqueuedAny = true;
@@ -176,7 +247,7 @@ export function decode(
           if (buffer) {
             const chunk = buffer;
             buffer = '';
-            const text = parse ? parse(chunk) : chunk;
+            const text = parse ? normalizeParsedText(parse(chunk)) : chunk;
             if (text) {
               controller.enqueue(text);
               enqueuedAny = true;
