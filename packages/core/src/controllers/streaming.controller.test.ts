@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import type { ReactiveControllerHost } from 'lit';
-import { StreamingController } from './streaming.controller.js';
+import { StreamingController, sanitizeTimeoutMs } from './streaming.controller.js';
 
 // Minimal mock host
 function createMockHost(): ReactiveControllerHost {
@@ -314,5 +314,211 @@ describe('StreamingController', () => {
     // getReader() on a locked stream throws — should be caught and reported
     expect(ctrl.state).to.equal('error');
     expect(errorMsg).to.not.be.empty;
+  });
+
+  // === streamIdleTimeout ===
+
+  it('sanitizeTimeoutMs: undefined/NaN use the default; 0/negative/±Infinity disable', () => {
+    expect(sanitizeTimeoutMs(undefined, 60_000)).to.equal(60_000);
+    expect(sanitizeTimeoutMs(5_000, 60_000)).to.equal(5_000);
+    expect(sanitizeTimeoutMs(0, 60_000)).to.equal(0);
+    expect(sanitizeTimeoutMs(-1, 60_000)).to.equal(0);
+    // NaN's likely cause is arithmetic on a missing config value, so it falls
+    // back to the default rather than silently disabling the guard.
+    expect(sanitizeTimeoutMs(NaN, 60_000)).to.equal(60_000);
+    // Unlike NaN, ±Infinity is a deliberate "no timeout" and is honoured as
+    // disabled (0) rather than folded into the default — this is what makes
+    // `Infinity` the natural way to spell "no timeout" for these options,
+    // unlike UploadController's `_sanitizeInt`, where Infinity is meaningless
+    // for a concurrency/retry count and falls back to the default like NaN.
+    expect(sanitizeTimeoutMs(Infinity, 60_000)).to.equal(0);
+    expect(sanitizeTimeoutMs(-Infinity, 60_000)).to.equal(0);
+  });
+
+  it('sanitizeTimeoutMs clamps a finite value above the 32-bit signed int max instead of passing it through', () => {
+    // setTimeout takes a 32-bit signed integer; a delay above 2_147_483_647
+    // overflows and fires almost immediately (measured: 1ms for 2_147_483_648)
+    // instead of after the huge delay the caller asked for — the opposite of
+    // what "a very long timeout" is supposed to mean. Clamping to the 32-bit
+    // max keeps it closest to the caller's intent; `±Infinity` remains the
+    // explicit way to disable the timeout entirely.
+    expect(sanitizeTimeoutMs(2_147_483_647, 60_000)).to.equal(2_147_483_647);
+    expect(sanitizeTimeoutMs(2_147_483_648, 60_000)).to.equal(2_147_483_647);
+  });
+
+  it('aborts with a TimeoutError when no chunk arrives within idleTimeout', async () => {
+    const host = createMockHost();
+    let errorName = '';
+    let errorMsg = '';
+    const ctrl = new StreamingController(host, {
+      onError: err => {
+        errorName = err.name;
+        errorMsg = err.message;
+      },
+    });
+
+    // A stream that emits one chunk and then never closes or emits again.
+    const stream = new ReadableStream<string>({
+      start(controller) {
+        controller.enqueue('hello');
+        // ...then silence forever.
+      },
+    });
+
+    await ctrl.connect(stream, { idleTimeout: 100 });
+
+    expect(ctrl.state).to.equal('error');
+    expect(errorName).to.equal('TimeoutError');
+    expect(errorMsg).to.not.be.empty;
+    expect(ctrl.text).to.equal('hello');
+  });
+
+  it('does not trip idleTimeout while chunks keep arriving', async () => {
+    const host = createMockHost();
+    let errored = false;
+    const ctrl = new StreamingController(host, {
+      onError: () => {
+        errored = true;
+      },
+    });
+
+    // 5 chunks, 40ms apart — each gap is well under idleTimeout (150ms), but
+    // the total stream duration (~200ms) exceeds it.
+    const stream = createStream(['a', 'b', 'c', 'd', 'e']);
+    await ctrl.connect(stream, { idleTimeout: 150 });
+
+    expect(errored).to.be.false;
+    expect(ctrl.state).to.equal('complete');
+    expect(ctrl.text).to.equal('abcde');
+  });
+
+  it('idleTimeout: 0 disables idle detection', async () => {
+    const host = createMockHost();
+    let errored = false;
+    const ctrl = new StreamingController(host, {
+      onError: () => {
+        errored = true;
+      },
+    });
+
+    let enqueue!: (v: string) => void;
+    let close!: () => void;
+    const stream = new ReadableStream<string>({
+      start(controller) {
+        enqueue = v => controller.enqueue(v);
+        close = () => controller.close();
+      },
+    });
+
+    const connectPromise = ctrl.connect(stream, { idleTimeout: 0 });
+    await new Promise(r => setTimeout(r, 20));
+    enqueue('first');
+
+    // Silence well past what any small idleTimeout would tolerate.
+    await new Promise(r => setTimeout(r, 300));
+    expect(ctrl.state).to.equal('streaming');
+    expect(errored).to.be.false;
+
+    close();
+    await connectPromise;
+    expect(ctrl.state).to.equal('complete');
+  });
+
+  it('a paused stream does not trip idleTimeout', async () => {
+    const host = createMockHost();
+    let errored = false;
+    const ctrl = new StreamingController(host, {
+      onError: () => {
+        errored = true;
+      },
+    });
+
+    let enqueue!: (v: string) => void;
+    let close!: () => void;
+    const stream = new ReadableStream<string>({
+      start(controller) {
+        enqueue = v => controller.enqueue(v);
+        close = () => controller.close();
+      },
+    });
+
+    const connectPromise = ctrl.connect(stream, { idleTimeout: 120 });
+    await new Promise(r => setTimeout(r, 20));
+    enqueue('A');
+    await new Promise(r => setTimeout(r, 20));
+
+    ctrl.pause();
+    expect(ctrl.state).to.equal('paused');
+
+    // Silence for well longer than idleTimeout while paused — must not trip.
+    await new Promise(r => setTimeout(r, 300));
+    expect(ctrl.state).to.equal('paused');
+    expect(errored).to.be.false;
+
+    ctrl.resume();
+    enqueue('B');
+    close();
+    await connectPromise;
+
+    expect(ctrl.state).to.equal('complete');
+    expect(ctrl.text).to.equal('AB');
+    expect(errored).to.be.false;
+  });
+
+  // === connect()'s own default (bare `connect(stream)`, no options) ===
+
+  it('connect() called with no options arms no idle timer at all — every pre-existing direct caller must see unchanged behavior', async () => {
+    // `StreamingController` is a public export used directly by host
+    // applications (per its own class doc). Before `streamIdleTimeout` was
+    // added to `AgentController`, `connect()`'s only default was 60_000, so a
+    // bare `connect(stream)` — every call that existed before that feature —
+    // would silently start arming a 60s idle abort it never had. `connect()`
+    // must default to disabled (0); only `AgentController` opts into the
+    // 60s default, and does so explicitly at its own call site.
+    const host = createMockHost();
+    const ctrl = new StreamingController(host);
+
+    const realSetTimeout = globalThis.setTimeout;
+    let timeoutCallCount = 0;
+    (globalThis as unknown as { setTimeout: typeof setTimeout }).setTimeout = ((
+      handler: TimerHandler,
+      timeout?: number,
+      ...args: unknown[]
+    ) => {
+      timeoutCallCount++;
+      return (realSetTimeout as (...a: unknown[]) => ReturnType<typeof setTimeout>)(
+        handler,
+        timeout,
+        ...args,
+      );
+    }) as typeof setTimeout;
+
+    let enqueue!: (v: string) => void;
+    let close!: () => void;
+    const stream = new ReadableStream<string>({
+      start(controller) {
+        enqueue = v => controller.enqueue(v);
+        close = () => controller.close();
+      },
+    });
+
+    try {
+      // No second argument at all — the exact shape of every call that
+      // existed before `streamIdleTimeout`/`idleTimeout` were introduced.
+      const connectPromise = ctrl.connect(stream);
+      await new Promise(r => realSetTimeout(r, 20));
+      enqueue('a');
+      await new Promise(r => realSetTimeout(r, 20));
+      close();
+      await connectPromise;
+    } finally {
+      globalThis.setTimeout = realSetTimeout;
+    }
+
+    expect(ctrl.state).to.equal('complete');
+    expect(
+      timeoutCallCount,
+      'connect() with no options must never call setTimeout for an idle timer',
+    ).to.equal(0);
   });
 });

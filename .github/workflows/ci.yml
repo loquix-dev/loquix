@@ -48,6 +48,9 @@ jobs:
       - name: Build React wrappers
         run: pnpm --filter @loquix/react build
 
+      - name: Build HTTP adapter
+        run: pnpm --filter @loquix/adapter-http build
+
       - name: Run tests with coverage
         run: pnpm test:coverage
 
@@ -57,6 +60,14 @@ jobs:
         with:
           directory: packages/core/coverage
           flags: core
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload adapter-http coverage to Codecov
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: codecov/codecov-action@v5
+        with:
+          directory: packages/adapter-http/coverage
+          flags: adapter-http
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build CDN bundle
