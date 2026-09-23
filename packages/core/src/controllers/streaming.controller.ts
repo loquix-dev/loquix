@@ -36,9 +36,13 @@ export interface StreamingConnectOptions {
  * - a finite positive number → returned as-is
  */
 export function sanitizeTimeoutMs(value: number | undefined, defaultValue: number): number {
+  // Matches UploadController's own option sanitizing: a value that is not a
+  // finite number falls back to the default rather than silently removing the
+  // guard, because the usual source of NaN here is arithmetic on a missing
+  // config value. An explicit zero or negative means "off", as it always has.
   if (value === undefined) return defaultValue;
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return 0;
-  return value;
+  if (typeof value !== 'number' || !Number.isFinite(value)) return defaultValue;
+  return value <= 0 ? 0 : value;
 }
 
 /**

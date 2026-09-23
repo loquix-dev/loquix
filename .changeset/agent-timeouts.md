@@ -17,8 +17,10 @@ normally.**
 `sendTimeout` now bounds only the wait for `provider.send()` to resolve with
 a stream, matching its documented intent. Once that promise settles, the
 timeout is cleared and has no further effect — a stream can now run as long
-as it needs to. A non-finite or negative `sendTimeout` (e.g. `-1`) no longer
-throws a `RangeError`; it's treated as disabled, same as `0`.
+as it needs to. A negative `sendTimeout` (e.g. `-1`) no longer throws a `RangeError`; it is
+treated as disabled, the same as `0`, and a non-finite one falls back to the
+default rather than silently removing the guard — the same rule
+`UploadController` already applies to its own numeric options.
 
 To fill the gap this leaves — a server that returns headers and then goes
 quiet forever — there's a new `streamIdleTimeout` option (default 60_000,
@@ -30,3 +32,6 @@ suspends idle detection for as long as it's paused.
 Because `@loquix/react` is linked with `@loquix/core` in this repo's
 changesets config, it receives the same version bump even though none of its
 own code changed.
+
+`StreamingController.connect()` takes an optional second argument carrying
+that timeout. The parameter is optional, so existing calls are unaffected.

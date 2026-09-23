@@ -318,14 +318,14 @@ describe('StreamingController', () => {
 
   // === streamIdleTimeout ===
 
-  it('sanitizeTimeoutMs: undefined uses the default, 0/negative/non-finite disable', () => {
+  it('sanitizeTimeoutMs: undefined and non-finite use the default, 0/negative disable', () => {
     expect(sanitizeTimeoutMs(undefined, 60_000)).to.equal(60_000);
     expect(sanitizeTimeoutMs(5_000, 60_000)).to.equal(5_000);
     expect(sanitizeTimeoutMs(0, 60_000)).to.equal(0);
     expect(sanitizeTimeoutMs(-1, 60_000)).to.equal(0);
-    expect(sanitizeTimeoutMs(NaN, 60_000)).to.equal(0);
-    expect(sanitizeTimeoutMs(Infinity, 60_000)).to.equal(0);
-    expect(sanitizeTimeoutMs(-Infinity, 60_000)).to.equal(0);
+    expect(sanitizeTimeoutMs(NaN, 60_000)).to.equal(60_000);
+    expect(sanitizeTimeoutMs(Infinity, 60_000)).to.equal(60_000);
+    expect(sanitizeTimeoutMs(-Infinity, 60_000)).to.equal(60_000);
   });
 
   it('aborts with a TimeoutError when no chunk arrives within idleTimeout', async () => {
