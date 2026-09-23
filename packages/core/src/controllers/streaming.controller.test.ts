@@ -453,4 +453,61 @@ describe('StreamingController', () => {
     expect(ctrl.text).to.equal('AB');
     expect(errored).to.be.false;
   });
+
+  // === connect()'s own default (bare `connect(stream)`, no options) ===
+
+  it('connect() called with no options arms no idle timer at all — every pre-existing direct caller must see unchanged behavior', async () => {
+    // `StreamingController` is a public export used directly by host
+    // applications (per its own class doc). Before `streamIdleTimeout` was
+    // added to `AgentController`, `connect()`'s only default was 60_000, so a
+    // bare `connect(stream)` — every call that existed before that feature —
+    // would silently start arming a 60s idle abort it never had. `connect()`
+    // must default to disabled (0); only `AgentController` opts into the
+    // 60s default, and does so explicitly at its own call site.
+    const host = createMockHost();
+    const ctrl = new StreamingController(host);
+
+    const realSetTimeout = globalThis.setTimeout;
+    let timeoutCallCount = 0;
+    (globalThis as unknown as { setTimeout: typeof setTimeout }).setTimeout = ((
+      handler: TimerHandler,
+      timeout?: number,
+      ...args: unknown[]
+    ) => {
+      timeoutCallCount++;
+      return (realSetTimeout as (...a: unknown[]) => ReturnType<typeof setTimeout>)(
+        handler,
+        timeout,
+        ...args,
+      );
+    }) as typeof setTimeout;
+
+    let enqueue!: (v: string) => void;
+    let close!: () => void;
+    const stream = new ReadableStream<string>({
+      start(controller) {
+        enqueue = v => controller.enqueue(v);
+        close = () => controller.close();
+      },
+    });
+
+    try {
+      // No second argument at all — the exact shape of every call that
+      // existed before `streamIdleTimeout`/`idleTimeout` were introduced.
+      const connectPromise = ctrl.connect(stream);
+      await new Promise(r => realSetTimeout(r, 20));
+      enqueue('a');
+      await new Promise(r => realSetTimeout(r, 20));
+      close();
+      await connectPromise;
+    } finally {
+      globalThis.setTimeout = realSetTimeout;
+    }
+
+    expect(ctrl.state).to.equal('complete');
+    expect(
+      timeoutCallCount,
+      'connect() with no options must never call setTimeout for an idle timer',
+    ).to.equal(0);
+  });
 });

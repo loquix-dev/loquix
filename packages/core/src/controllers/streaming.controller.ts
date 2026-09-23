@@ -17,7 +17,13 @@ export interface StreamingControllerOptions {
 export interface StreamingConnectOptions {
   /**
    * Abort the stream if no chunk arrives within this many ms. Resets on every
-   * chunk. Default: 60_000. Set 0 to disable.
+   * chunk. Default: `0` (disabled) — a bare `connect(stream)` call, with no
+   * second argument, arms no idle timer at all, so every caller that existed
+   * before this option was added keeps its exact prior behavior.
+   *
+   * `AgentController` is the one exception: it resolves its own 60_000
+   * default and passes it explicitly here, so its documented
+   * `streamIdleTimeout` default is unaffected by `connect()`'s own default.
    *
    * Suspended while the stream is `paused` — a consumer that paused is not a
    * stalled server, so idle time spent paused never counts against it.
@@ -110,7 +116,7 @@ export class StreamingController implements ReactiveController {
     this._chunks = [];
     this._pendingChunks = [];
     this._paused = false;
-    this._idleTimeoutMs = sanitizeTimeoutMs(options?.idleTimeout, 60_000);
+    this._idleTimeoutMs = sanitizeTimeoutMs(options?.idleTimeout, 0);
     this._setState('connecting');
 
     try {

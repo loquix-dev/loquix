@@ -34,7 +34,13 @@ changesets config, it receives the same version bump even though none of its
 own code changed.
 
 `StreamingController.connect()` takes an optional second argument carrying
-that timeout. The parameter is optional, so existing calls are unaffected.
+that timeout. `connect()` itself defaults it to `0` (disabled), so a bare
+`connect(stream)` — every call that existed before this option was added —
+arms no idle timer and is genuinely unaffected. `AgentController` is the one
+caller that opts into the 60s default described above; it resolves that
+default itself before calling `connect()`, so its own behavior (unlike a
+direct `connect()` call) does change from 0.5.0 in exactly the way the rest
+of this note describes.
 
 **If you previously set `sendTimeout: 0` to disable timeouts entirely, you
 must now also set `streamIdleTimeout: 0`.** `streamIdleTimeout` is a new
