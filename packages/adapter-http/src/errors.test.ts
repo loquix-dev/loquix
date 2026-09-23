@@ -262,6 +262,46 @@ describe('parse hook', () => {
     expect(await readAll(response.stream)).to.equal('x');
   });
 
+  it("delivers a throwing hook's error even when the source's cancel() never settles", async () => {
+    // The cancel is deliberately not awaited. A source whose cancellation
+    // promise hangs — a socket the platform never finishes tearing down —
+    // would otherwise swallow the consumer's own error entirely: the read
+    // stays pending forever instead of rejecting with what the hook threw.
+    let cancelled = 0;
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('data: anything\n\n'));
+      },
+      cancel() {
+        cancelled += 1;
+        return new Promise<void>(() => {});
+      },
+    });
+    const boom = new Error('consumer parse hook exploded');
+    const { fetch } = fakeFetch(body);
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: () => {
+        throw boom;
+      },
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+    const reader = response.stream.getReader();
+
+    const outcome = await Promise.race([
+      reader.read().then(
+        () => 'resolved',
+        (error: unknown) => error,
+      ),
+      new Promise(resolve => setTimeout(() => resolve('still pending'), 250)),
+    ]);
+
+    expect(outcome, 'the hook error must arrive without waiting on cancel()').to.equal(boom);
+    expect(cancelled).to.equal(1);
+  });
+
   it('errors the stream with the exact error a throwing hook raises, and cancels the source body', async () => {
     // Deliberately never closed, like the "server left it open" tests above:
     // an SSE connection a throwing parse hook leaves dangling still occupies

@@ -335,7 +335,10 @@ export function decode(
         // unchanged — the consumer must still see their own error, since
         // that is the documented contract for a throwing `parse` hook.
         finished = true;
-        await reader.cancel().catch(() => {});
+        // Do not await this. A source whose cancel() never settles would
+        // otherwise swallow the consumer's own error: the read stays pending
+        // forever instead of rejecting with what the hook threw.
+        void reader.cancel().catch(() => {});
         throw err;
       }
     },
