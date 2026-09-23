@@ -465,6 +465,35 @@ describe('parse frame metadata', () => {
     expect(frameSeen).to.equal(undefined);
   });
 
+  it('never calls parse for a frame with no data: line at all — only event:/id: lines', async () => {
+    // Documents a real gap, deliberately left unclosed: `parse` is only ever
+    // called with a `data:` payload, so a frame made of nothing but
+    // `event:`/`id:` lines is invisible to it. Calling `parse('', frame)` for
+    // such a frame was considered and rejected — a hook doing
+    // `JSON.parse(payload)` would throw on the empty string and error the
+    // whole stream over a frame shape real-world sources (LangServe
+    // included) don't actually send bare.
+    let calls = 0;
+    const { fetch } = fakeFetch(
+      textBody('event: error\nid: 1\n\n', 'event: message\ndata: {"text":"hi"}\n\n'),
+    );
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: (payload, frame) => {
+        calls += 1;
+        if (frame?.event === 'error') return null;
+        return (JSON.parse(payload) as { text?: string }).text ?? null;
+      },
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('hi');
+    // Only the second frame (which carries a data: line) ever reaches parse.
+    expect(calls).to.equal(1);
+  });
+
   it('never runs the hook on a [DONE] frame, even one a hook would otherwise see', async () => {
     let calls = 0;
     const { fetch } = fakeFetch(sseBody('first', '[DONE]'));
@@ -500,12 +529,12 @@ describe('[DONE] with trailing whitespace', () => {
 });
 
 describe('non-string parse hook return', () => {
-  it('coerces a non-string, non-null return value with String(...) rather than enqueuing it as-is', async () => {
+  it('coerces a non-string, non-null return value with JSON.stringify rather than enqueuing it as-is', async () => {
     // Measured: `parse: () => 42` enqueues the number 42 as-is into a
     // ReadableStream<string>, which breaks any consumer that assumes string
     // chunks. We coerce rather than drop: the hook clearly meant to emit
     // something, so treating that as silently-dropped text would hide the bug
-    // rather than surface it.
+    // rather than surface it. JSON.stringify(42) and String(42) agree here.
     const { fetch } = fakeFetch(sseBody('anything'));
     const provider = createHttpAgentProvider({
       url: '/api/chat',
@@ -516,5 +545,36 @@ describe('non-string parse hook return', () => {
     const response = await provider.send([userMessage('hi')], {});
 
     expect(await readAll(response.stream)).to.equal('42');
+  });
+
+  it('renders the likeliest mistake (forgetting .text on a parsed object) as JSON, not "[object Object]"', async () => {
+    // Measured: `parse: c => JSON.parse(c)` — forgetting the `.text` that
+    // turns the parsed object into a string — used to render
+    // "[object Object]" via a bare String(...) coercion, which carries no
+    // information about its own cause. JSON.stringify instead renders the
+    // object itself, naming the missing `.text` for whoever sees it in chat.
+    const { fetch } = fakeFetch(sseBody('{"text":"Hel"}'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: (c => JSON.parse(c)) as unknown as (chunk: string) => string | null,
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('{"text":"Hel"}');
+  });
+
+  it('drops undefined rather than coercing it, since that is a bare/missing return, not a mistake', async () => {
+    const { fetch } = fakeFetch(sseBody('anything'));
+    const provider = createHttpAgentProvider({
+      url: '/api/chat',
+      fetch,
+      parse: (() => undefined) as unknown as (chunk: string) => string | null,
+    });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('');
   });
 });

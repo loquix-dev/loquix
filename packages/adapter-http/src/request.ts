@@ -36,7 +36,12 @@ export type HttpAgentErrorCode = 'http' | 'no_body' | 'transport_mismatch';
 export class HttpAgentError extends Error {
   readonly status: number;
   readonly code: HttpAgentErrorCode;
-  /** The parsed JSON error body, when the response had one (`code: 'http'` only). */
+  /**
+   * The parsed JSON error body, when the response had one (`code: 'http'`
+   * only). The constructor always assigns this field, so `'body' in err` is
+   * `true` even when there was no body to parse — check `err.body !==
+   * undefined` instead.
+   */
   readonly body?: unknown;
 
   constructor(status: number, message: string, code: HttpAgentErrorCode = 'http', body?: unknown) {
@@ -82,8 +87,11 @@ export async function errorFromResponse(response: Response): Promise<HttpAgentEr
 
   // Only attempt to read the body as JSON when the content-type says it is.
   // Awaiting `.json()` on an SSE/streaming error body (a 500 that opens
-  // `content-type: text/event-stream` and never closes) otherwise hangs this
-  // promise forever, since `.json()` waits for the stream to end.
+  // `content-type: text/event-stream` and never closes) hangs this promise
+  // forever for a non-JSON body, since `.json()` waits for the stream to
+  // end. This gate only fixes that one case — a body that *does* declare
+  // `application/json` but never closes still hangs here until the caller's
+  // own signal aborts it.
   const contentType = response.headers.get('content-type') ?? '';
   if (contentType.includes('json')) {
     try {

@@ -57,13 +57,25 @@ export interface HttpAgentProviderOptions {
    * Transforms a decoded payload into the text to enqueue, or `null` to skip
    * it (e.g. to drop a tool-call/metadata/heartbeat frame). Called with the
    * `data:` payload for `sse`, the raw line for `ndjson`; for `sse` the
-   * frame's `event:` and `id:` lines are also passed as `frame` — the only
-   * way to see a discriminator some backends (e.g. LangServe) put only in
-   * `event:` and never in the payload itself, such as `event: error` framing
-   * a failure that would otherwise render as ordinary assistant text.
+   * frame's `event:` and `id:` lines are also passed as `frame` — useful when
+   * a backend (e.g. LangServe) discriminates a frame's kind with `event:`
+   * rather than inside the payload, such as an `event: error` frame whose
+   * `data:` line carries the error body.
    *
-   * A return value that isn't a string or `null` (a hook returning a number,
-   * for instance) is coerced with `String(...)` rather than silently dropped.
+   * Only called for a frame that carries at least one `data:` line. A frame
+   * made up of only `event:`/`id:` lines — `event: error` with no `data:` at
+   * all — has no payload to call `parse` with, so it's skipped entirely and
+   * `parse` never sees it. Widening this would mean calling `parse('', frame)`,
+   * and a hook doing `JSON.parse(payload)` would throw on the empty string
+   * and error the whole stream over what both real-world sources of this
+   * shape (LangServe included) always pair with a `data:` line anyway.
+   *
+   * A return value that isn't a string, `null`, or `undefined` (a hook
+   * returning a number, for instance, or forgetting `.text` on a parsed
+   * object) is coerced with `JSON.stringify` — falling back to `String(...)`
+   * only if that throws — rather than silently dropped. `undefined` alone (a
+   * bare `return;`, or a missing `return`) is dropped, since that's the
+   * ordinary shape of "nothing to emit this turn," not a mistake.
    *
    * Not called for a payload of exactly `[DONE]` (after trimming whitespace):
    * that sentinel is intercepted before `parse` runs and always ends the

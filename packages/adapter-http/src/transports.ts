@@ -92,17 +92,38 @@ export interface DecodeMeta {
 
 /**
  * A `parse` hook is typed to return `string | null`, but nothing stops a
- * misbehaving one from returning something else (`parse: () => 42`). Enqueuing
- * that value as-is would put a non-string into a `ReadableStream<string>` and
- * break every consumer downstream that assumes string chunks. We coerce with
- * `String(...)` rather than silently dropping it: a hook that produced *some*
- * value clearly meant to emit something, and dropping it would turn a visible
- * bug (wrong-looking text in the chat) into an invisible one (text silently
- * missing).
+ * misbehaving one from returning something else — most likely
+ * `parse: c => JSON.parse(c)`, forgetting the `.text` (or `.content`/
+ * `.delta`) that turns the parsed object into the string the hook meant to
+ * return. Enqueuing that value as-is would put a non-string into a
+ * `ReadableStream<string>` and break every consumer downstream that assumes
+ * string chunks.
+ *
+ * We coerce with `JSON.stringify` — falling back to `String(...)` only if
+ * that throws, e.g. a circular structure — rather than silently dropping it:
+ * a hook that produced *some* value clearly meant to emit something, and
+ * dropping it would turn a visible bug (wrong-looking text in the chat) into
+ * an invisible one (text silently missing). Plain `String(...)` was tried
+ * first and rejected: it renders the likeliest mistake above as
+ * `"[object Object]"`, which carries no information about its own cause.
+ * `JSON.stringify` instead renders `{"text":"Hel"}`, which points straight at
+ * the missing `.text`. This mirrors `stringifyMessage` in `request.ts`,
+ * which makes the same choice for the same reason.
+ *
+ * `undefined` is the one exception, handled above before this function's
+ * `String`/`JSON.stringify` branch is ever reached: it is dropped (returns
+ * `null`), not coerced, because it's what a hook returns from a bare
+ * `return;` or a missing `return` — the ordinary shape of "nothing to emit
+ * this turn," not a mistake to surface.
  */
 function normalizeParsedText(value: string | null | unknown): string | null {
   if (value === null || value === undefined) return null;
-  return typeof value === 'string' ? value : String(value);
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value) ?? String(value);
+  } catch {
+    return String(value);
+  }
 }
 
 export function decode(
