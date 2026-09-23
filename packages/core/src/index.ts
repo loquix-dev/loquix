@@ -156,10 +156,11 @@ export type { AutoScrollControllerOptions } from './controllers/autoscroll.contr
 export { KeyboardController } from './controllers/keyboard.controller.js';
 export type { KeyBinding } from './controllers/keyboard.controller.js';
 export { ResizeController } from './controllers/resize.controller.js';
-export { StreamingController } from './controllers/streaming.controller.js';
+export { StreamingController, sanitizeTimeoutMs } from './controllers/streaming.controller.js';
 export type {
   StreamingState,
   StreamingControllerOptions,
+  StreamingConnectOptions,
 } from './controllers/streaming.controller.js';
 export { UploadController } from './controllers/upload.controller.js';
 export type { UploadState, UploadControllerOptions } from './controllers/upload.controller.js';

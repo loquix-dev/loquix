@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import type { ReactiveControllerHost } from 'lit';
-import { StreamingController } from './streaming.controller.js';
+import { StreamingController, sanitizeTimeoutMs } from './streaming.controller.js';
 
 // Minimal mock host
 function createMockHost(): ReactiveControllerHost {
@@ -314,5 +314,136 @@ describe('StreamingController', () => {
     // getReader() on a locked stream throws — should be caught and reported
     expect(ctrl.state).to.equal('error');
     expect(errorMsg).to.not.be.empty;
+  });
+
+  // === streamIdleTimeout ===
+
+  it('sanitizeTimeoutMs: undefined uses the default, 0/negative/non-finite disable', () => {
+    expect(sanitizeTimeoutMs(undefined, 60_000)).to.equal(60_000);
+    expect(sanitizeTimeoutMs(5_000, 60_000)).to.equal(5_000);
+    expect(sanitizeTimeoutMs(0, 60_000)).to.equal(0);
+    expect(sanitizeTimeoutMs(-1, 60_000)).to.equal(0);
+    expect(sanitizeTimeoutMs(NaN, 60_000)).to.equal(0);
+    expect(sanitizeTimeoutMs(Infinity, 60_000)).to.equal(0);
+    expect(sanitizeTimeoutMs(-Infinity, 60_000)).to.equal(0);
+  });
+
+  it('aborts with a TimeoutError when no chunk arrives within idleTimeout', async () => {
+    const host = createMockHost();
+    let errorName = '';
+    let errorMsg = '';
+    const ctrl = new StreamingController(host, {
+      onError: err => {
+        errorName = err.name;
+        errorMsg = err.message;
+      },
+    });
+
+    // A stream that emits one chunk and then never closes or emits again.
+    const stream = new ReadableStream<string>({
+      start(controller) {
+        controller.enqueue('hello');
+        // ...then silence forever.
+      },
+    });
+
+    await ctrl.connect(stream, { idleTimeout: 100 });
+
+    expect(ctrl.state).to.equal('error');
+    expect(errorName).to.equal('TimeoutError');
+    expect(errorMsg).to.not.be.empty;
+    expect(ctrl.text).to.equal('hello');
+  });
+
+  it('does not trip idleTimeout while chunks keep arriving', async () => {
+    const host = createMockHost();
+    let errored = false;
+    const ctrl = new StreamingController(host, {
+      onError: () => {
+        errored = true;
+      },
+    });
+
+    // 5 chunks, 40ms apart — each gap is well under idleTimeout (150ms), but
+    // the total stream duration (~200ms) exceeds it.
+    const stream = createStream(['a', 'b', 'c', 'd', 'e']);
+    await ctrl.connect(stream, { idleTimeout: 150 });
+
+    expect(errored).to.be.false;
+    expect(ctrl.state).to.equal('complete');
+    expect(ctrl.text).to.equal('abcde');
+  });
+
+  it('idleTimeout: 0 disables idle detection', async () => {
+    const host = createMockHost();
+    let errored = false;
+    const ctrl = new StreamingController(host, {
+      onError: () => {
+        errored = true;
+      },
+    });
+
+    let enqueue!: (v: string) => void;
+    let close!: () => void;
+    const stream = new ReadableStream<string>({
+      start(controller) {
+        enqueue = v => controller.enqueue(v);
+        close = () => controller.close();
+      },
+    });
+
+    const connectPromise = ctrl.connect(stream, { idleTimeout: 0 });
+    await new Promise(r => setTimeout(r, 20));
+    enqueue('first');
+
+    // Silence well past what any small idleTimeout would tolerate.
+    await new Promise(r => setTimeout(r, 300));
+    expect(ctrl.state).to.equal('streaming');
+    expect(errored).to.be.false;
+
+    close();
+    await connectPromise;
+    expect(ctrl.state).to.equal('complete');
+  });
+
+  it('a paused stream does not trip idleTimeout', async () => {
+    const host = createMockHost();
+    let errored = false;
+    const ctrl = new StreamingController(host, {
+      onError: () => {
+        errored = true;
+      },
+    });
+
+    let enqueue!: (v: string) => void;
+    let close!: () => void;
+    const stream = new ReadableStream<string>({
+      start(controller) {
+        enqueue = v => controller.enqueue(v);
+        close = () => controller.close();
+      },
+    });
+
+    const connectPromise = ctrl.connect(stream, { idleTimeout: 120 });
+    await new Promise(r => setTimeout(r, 20));
+    enqueue('A');
+    await new Promise(r => setTimeout(r, 20));
+
+    ctrl.pause();
+    expect(ctrl.state).to.equal('paused');
+
+    // Silence for well longer than idleTimeout while paused — must not trip.
+    await new Promise(r => setTimeout(r, 300));
+    expect(ctrl.state).to.equal('paused');
+    expect(errored).to.be.false;
+
+    ctrl.resume();
+    enqueue('B');
+    close();
+    await connectPromise;
+
+    expect(ctrl.state).to.equal('complete');
+    expect(ctrl.text).to.equal('AB');
+    expect(errored).to.be.false;
   });
 });

@@ -1,5 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
-import { StreamingController } from './streaming.controller.js';
+import { StreamingController, sanitizeTimeoutMs } from './streaming.controller.js';
 import type {
   AgentProvider,
   AgentMessage,
@@ -20,8 +20,26 @@ export interface AgentControllerOptions {
   /**
    * Timeout for provider.send() promise resolution in ms. Default: 60_000.
    * This is the time until the ReadableStream is returned, NOT until first chunk.
+   *
+   * Once `provider.send()` resolves, this timeout has no further effect —
+   * it does NOT bound the total duration of the response stream. A stream
+   * that runs longer than `sendTimeout` after it has started is left alone;
+   * use `streamIdleTimeout` to bound silence within an already-started stream.
+   *
+   * Set 0 to disable. A non-finite or negative value also disables it rather
+   * than throwing.
    */
   sendTimeout?: number;
+
+  /**
+   * Abort the response stream if no chunk arrives within this many ms.
+   * Default: 60_000. Resets on every chunk, so a long but healthy stream is
+   * never punished — only silence is. A paused stream does not count as idle.
+   *
+   * Set 0 to disable. A non-finite or negative value also disables it rather
+   * than throwing.
+   */
+  streamIdleTimeout?: number;
 
   /** Maximum character length for a single message content. Default: 100_000 */
   maxMessageLength?: number;
@@ -93,6 +111,7 @@ export class AgentController implements ReactiveController {
     this._provider = provider;
     this._options = {
       sendTimeout: 60_000,
+      streamIdleTimeout: 60_000,
       maxMessageLength: 100_000,
       maxMessages: 200,
       ...options,
@@ -206,11 +225,28 @@ export class AgentController implements ReactiveController {
     const localSignal = this._abortController.signal;
     this._setState('sending');
 
+    // Bound only the wait for provider.send() to resolve with a stream — NOT
+    // the stream itself. Built from an own AbortController + setTimeout
+    // (rather than AbortSignal.timeout) so the timer can be cleared the
+    // instant provider.send() settles, leaving no lingering effect on
+    // whatever the returned stream goes on to do.
+    const sendTimeoutMs = sanitizeTimeoutMs(this._options.sendTimeout, 60_000);
+    let sendTimeoutId: ReturnType<typeof setTimeout> | undefined;
+
     try {
       // Compose timeout signal with user abort signal
       const signals: AbortSignal[] = [localSignal];
-      if (this._options.sendTimeout) {
-        signals.push(AbortSignal.timeout(this._options.sendTimeout));
+      if (sendTimeoutMs > 0) {
+        const sendTimeoutController = new AbortController();
+        sendTimeoutId = setTimeout(() => {
+          sendTimeoutController.abort(
+            new DOMException(
+              'AgentController: sendTimeout exceeded before provider.send() resolved',
+              'TimeoutError',
+            ),
+          );
+        }, sendTimeoutMs);
+        signals.push(sendTimeoutController.signal);
       }
       const composedSignal = AbortSignal.any(signals);
 
@@ -221,6 +257,9 @@ export class AgentController implements ReactiveController {
         params: this._options.params,
         systemPrompt: this._options.systemPrompt,
       });
+
+      // provider.send() has resolved — sendTimeout no longer applies.
+      clearTimeout(sendTimeoutId);
 
       // If aborted while awaiting send(), bail out
       if (localSignal.aborted) {
@@ -236,8 +275,10 @@ export class AgentController implements ReactiveController {
       // Delegate stream consumption to StreamingController
       // Note: connect() is async and runs the read loop, but we don't await it here.
       // StreamingController manages its own lifecycle via callbacks.
-      this._streaming.connect(response.stream);
+      this._streaming.connect(response.stream, { idleTimeout: this._options.streamIdleTimeout });
     } catch (error) {
+      clearTimeout(sendTimeoutId);
+
       // If aborted, silently return to idle (abort() already set state)
       if (localSignal.aborted) {
         // abort() already set state to 'idle', so just return
