@@ -37,7 +37,7 @@
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "@loquix/core": ">=0.5.0"
+    "@loquix/core": ">=0.6.0"
   },
   "devDependencies": {
     "@loquix/core": "workspace:*",
