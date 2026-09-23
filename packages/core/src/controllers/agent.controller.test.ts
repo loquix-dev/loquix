@@ -784,10 +784,12 @@ describe('AgentController', () => {
     expect(errorMsg).to.be.null;
   });
 
-  it('pathological sendTimeout values never throw: negative disables, non-finite falls back to the default', async () => {
+  it('pathological sendTimeout values (negative, NaN, ±Infinity) never throw and the send completes normally', async () => {
     // Either way the send must succeed here — the point is that no value throws
     // the way AbortSignal.timeout(-1) used to. sanitizeTimeoutMs owns which of
-    // the two each value maps to, and asserts it directly.
+    // these disables the timeout vs falls back to the default, and asserts
+    // that distinction directly — this test only needs "none of them break
+    // a send".
     for (const badValue of [-1, NaN, Infinity, -Infinity]) {
       const host = createMockHost();
       const provider = new MockProvider();
@@ -895,7 +897,7 @@ describe('AgentController', () => {
     expect(ctrl.messages[1].content).to.equal('firstsecond');
   });
 
-  it('pathological streamIdleTimeout values never throw: negative disables, non-finite falls back to the default', async () => {
+  it('a negative streamIdleTimeout disables it instead of throwing', async () => {
     const host = createMockHost();
     const provider = new MockProvider();
     const { stream, enqueue, close } = createControllableStream();

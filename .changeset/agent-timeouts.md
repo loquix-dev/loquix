@@ -18,9 +18,10 @@ normally.**
 a stream, matching its documented intent. Once that promise settles, the
 timeout is cleared and has no further effect — a stream can now run as long
 as it needs to. A negative `sendTimeout` (e.g. `-1`) no longer throws a `RangeError`; it is
-treated as disabled, the same as `0`, and a non-finite one falls back to the
-default rather than silently removing the guard — the same rule
-`UploadController` already applies to its own numeric options.
+treated as disabled, the same as `0`, and `NaN` falls back to the default
+rather than silently removing the guard — the same rule `UploadController`
+already applies to its own numeric options. (`±Infinity` is handled
+differently — see below.)
 
 To fill the gap this leaves — a server that returns headers and then goes
 quiet forever — there's a new `streamIdleTimeout` option (default 60_000,
@@ -60,3 +61,11 @@ explicit "no timeout" (equivalent to `0`) rather than falling back to the
 default — see `sanitizeTimeoutMs`'s own doc comment for the reasoning. Only
 `NaN` (and other non-finite-but-not-infinite garbage) still falls back to the
 default.
+
+`sanitizeTimeoutMs` also now clamps a finite value above `2_147_483_647` (the
+32-bit signed integer `setTimeout` actually accepts) down to that max, instead
+of passing it straight through. Measured: `setTimeout(fn, 2_147_483_648)`
+fires after 1ms, not after the enormous delay the caller asked for — the
+value silently overflows the 32-bit argument, so a very long `sendTimeout` or
+`streamIdleTimeout` used to fail almost instantly instead of effectively never.
+`±Infinity` remains the explicit way to disable a timeout entirely.

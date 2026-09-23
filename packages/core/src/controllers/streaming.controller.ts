@@ -46,7 +46,15 @@ export interface StreamingConnectOptions {
  *   guarantees a pathological value can never reach
  *   `setTimeout`/`AbortSignal.timeout` and misbehave — negative values used
  *   to make `AbortSignal.timeout(-1)` throw a `RangeError`.
- * - a finite positive number → returned as-is
+ * - a finite positive number above `2_147_483_647` (the 32-bit signed int max
+ *   `setTimeout` actually accepts) → clamped to `2_147_483_647`. Measured:
+ *   `setTimeout(fn, 2_147_483_648)` fires after 1ms, not after the huge delay
+ *   the caller asked for, because the delay overflows to a small (sometimes
+ *   negative) 32-bit value. Clamping rather than disabling keeps the result
+ *   closest to the caller's intent — a value this large means "effectively
+ *   never" — while `±Infinity` remains the explicit way to disable the
+ *   timeout entirely.
+ * - any other finite positive number → returned as-is
  *
  * This deliberately differs from `UploadController`'s own `_sanitizeInt`,
  * which folds `Infinity` into the same "fall back to default" bucket as
@@ -54,11 +62,14 @@ export interface StreamingConnectOptions {
  * sensible meaning to honour. It has one here — "run forever" is a real
  * timeout policy — so the two sanitizers are allowed to disagree.
  */
+const MAX_SETTIMEOUT_MS = 2_147_483_647; // 32-bit signed int max; setTimeout's actual limit
+
 export function sanitizeTimeoutMs(value: number | undefined, defaultValue: number): number {
   if (value === undefined) return defaultValue;
   if (typeof value !== 'number' || Number.isNaN(value)) return defaultValue;
   if (!Number.isFinite(value)) return 0; // `±Infinity`: an explicit "no timeout"
-  return value <= 0 ? 0 : value;
+  if (value <= 0) return 0;
+  return value > MAX_SETTIMEOUT_MS ? MAX_SETTIMEOUT_MS : value;
 }
 
 /**

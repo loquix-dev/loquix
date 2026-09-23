@@ -335,6 +335,17 @@ describe('StreamingController', () => {
     expect(sanitizeTimeoutMs(-Infinity, 60_000)).to.equal(0);
   });
 
+  it('sanitizeTimeoutMs clamps a finite value above the 32-bit signed int max instead of passing it through', () => {
+    // setTimeout takes a 32-bit signed integer; a delay above 2_147_483_647
+    // overflows and fires almost immediately (measured: 1ms for 2_147_483_648)
+    // instead of after the huge delay the caller asked for — the opposite of
+    // what "a very long timeout" is supposed to mean. Clamping to the 32-bit
+    // max keeps it closest to the caller's intent; `±Infinity` remains the
+    // explicit way to disable the timeout entirely.
+    expect(sanitizeTimeoutMs(2_147_483_647, 60_000)).to.equal(2_147_483_647);
+    expect(sanitizeTimeoutMs(2_147_483_648, 60_000)).to.equal(2_147_483_647);
+  });
+
   it('aborts with a TimeoutError when no chunk arrives within idleTimeout', async () => {
     const host = createMockHost();
     let errorName = '';
