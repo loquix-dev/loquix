@@ -1,5 +1,12 @@
 # @loquix/react
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [a4b5156]
+  - @loquix/core@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes
