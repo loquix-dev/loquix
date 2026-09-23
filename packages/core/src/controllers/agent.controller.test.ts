@@ -922,6 +922,68 @@ describe('AgentController', () => {
     expect(errorMsg).to.be.null;
   });
 
+  it("AgentController resolves its own 60s streamIdleTimeout default explicitly, independent of connect()'s own default", async () => {
+    // `StreamingController.connect()` itself defaults its idle timeout to
+    // disabled (0) — only a direct caller of `connect()` should see that.
+    // `AgentController` must resolve its documented 60_000 default itself
+    // and pass it explicitly, so its own behavior never depends on — or
+    // regresses with — whatever `connect()`'s own default happens to be.
+    //
+    // `streamIdleTimeout: undefined` here is deliberate: it's what a caller
+    // gets by spreading an optional value that happens to be unset (e.g.
+    // `{ streamIdleTimeout: someConfig.idleTimeout }`), which overwrites the
+    // constructor's own `streamIdleTimeout: 60_000` default with a literal
+    // `undefined` — the one case where `AgentController` can't rely on its
+    // constructor-time merge alone and must re-resolve the default at the
+    // `connect()` call site.
+    const host = createMockHost();
+    const provider = new MockProvider();
+    const { stream, enqueue, close } = createControllableStream();
+    provider.send = async () => ({ id: 'resp-default-idle', stream });
+
+    const realSetTimeout = globalThis.setTimeout;
+    const idleTimerDelays: number[] = [];
+    (globalThis as unknown as { setTimeout: typeof setTimeout }).setTimeout = ((
+      handler: TimerHandler,
+      timeout?: number,
+      ...args: unknown[]
+    ) => {
+      if (typeof timeout === 'number') idleTimerDelays.push(timeout);
+      return (realSetTimeout as (...a: unknown[]) => ReturnType<typeof setTimeout>)(
+        handler,
+        timeout,
+        ...args,
+      );
+    }) as typeof setTimeout;
+
+    let errorName = '';
+    const ctrl = new AgentController(host, provider, {
+      sendTimeout: 0, // isolate the idle timer from sendTimeout's own 60_000 default
+      streamIdleTimeout: undefined,
+      onError: err => {
+        errorName = err.name;
+      },
+    });
+
+    try {
+      await ctrl.send('test');
+    } finally {
+      globalThis.setTimeout = realSetTimeout;
+    }
+
+    expect(
+      idleTimerDelays,
+      "the idle timer must still be armed at AgentController's 60s default",
+    ).to.include(60_000);
+
+    // Clean up: this test only needs to observe which timer got armed, not
+    // wait 60s for it to fire.
+    enqueue('x');
+    close();
+    await wait(50);
+    expect(errorName).to.equal('');
+  });
+
   it('a paused stream does not trip streamIdleTimeout', async () => {
     const host = createMockHost();
     const provider = new MockProvider();
@@ -1048,5 +1110,43 @@ describe('AgentController', () => {
     // already dead, and no assistant message is ever appended.
     expect(onResponseStartCalled).to.be.false;
     expect(ctrl.messages).to.have.lengthOf(1);
+  });
+
+  // === sendTimeout survives a same-tick abort(); send() ===
+
+  it('abort(); send() in the same tick still arms sendTimeout for the second send', async () => {
+    // HangingProvider only settles (by rejecting) when the composed signal it
+    // was given aborts — exactly like a real fetch-based provider that
+    // forwards the signal. Cycle 1 is aborted via ctrl.abort(); cycle 2 is
+    // started synchronously afterwards, in the same tick, before cycle 1's
+    // abort rejection has landed as a microtask. Cycle 1's rejection handling
+    // (in send()'s catch block) must not clear cycle 2's sendTimeout timer,
+    // which was written to the same `_sendTimeoutId` field cycle 1 also uses.
+    const host = createMockHost();
+    const provider = new HangingProvider();
+
+    let errorName = '';
+    const ctrl = new AgentController(host, provider, {
+      sendTimeout: 100,
+      onError: err => {
+        errorName = err.name;
+      },
+    });
+
+    void ctrl.send('first'); // cycle 1: arms its own sendTimeout, never settles on its own
+    ctrl.abort(); // rejects cycle 1's provider.send() promise (settles as a later microtask)
+    void ctrl.send('second'); // cycle 2: armed in the same tick, before that microtask runs
+
+    // Long enough for cycle 2's own sendTimeout (100ms) to fire, but nothing
+    // else in this scenario ever resolves or rejects cycle 2 on its own.
+    await wait(180);
+
+    expect(ctrl.state, 'cycle 2 must still time out via its own sendTimeout').to.equal('error');
+    expect(errorName).to.equal('TimeoutError');
+    // Only the two user messages ("first", "second") — neither ever got a
+    // response appended.
+    expect(ctrl.messages).to.have.lengthOf(2);
+    expect(ctrl.messages[0].content).to.equal('first');
+    expect(ctrl.messages[1].content).to.equal('second');
   });
 });

@@ -111,12 +111,20 @@ export class AgentController implements ReactiveController {
   private _currentResponse: AgentResponse | null = null;
   /**
    * The `sendTimeout` timer for the in-flight `send()` cycle, if any. A
-   * private field rather than a `send()` local so `abort()` (and `reset()`/
-   * `hostDisconnected()`, which both route through it) can clear it even
-   * though it's only otherwise cleared once the provider's promise settles —
-   * a provider that ignores its abort signal and never resolves would
-   * otherwise leave this pending for the full duration, keeping a discarded
-   * controller (and, in Node/SSR, the event loop) alive.
+   * field (mirroring a `send()` local of the same name) rather than a
+   * `send()` local alone, so `abort()` (and `reset()`/`hostDisconnected()`,
+   * which both route through it) can clear it even though it's only
+   * otherwise cleared once the provider's promise settles — a provider that
+   * ignores its abort signal and never resolves would otherwise leave this
+   * pending for the full duration, keeping a discarded controller (and, in
+   * Node/SSR, the event loop) alive.
+   *
+   * Because it's shared, `send()`'s own settle paths must not clear it
+   * unconditionally: if this cycle settles late — its abort rejection lands
+   * as a microtask after `abort()` already returned — a *later* `send()`
+   * cycle may have already armed its own timer and written it here first.
+   * Each settle path clears its own local timer id unconditionally, and
+   * only nulls this field when it still points at that same id.
    */
   private _sendTimeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
 
@@ -249,14 +257,22 @@ export class AgentController implements ReactiveController {
     // instant provider.send() settles, leaving no lingering effect on
     // whatever the returned stream goes on to do.
     const sendTimeoutMs = sanitizeTimeoutMs(this._options.sendTimeout, 60_000);
-    this._sendTimeoutId = undefined;
+    // Local to this send() cycle — `this._sendTimeoutId` is a shared field so
+    // abort() can clear a still-pending timer from outside, but if THIS
+    // cycle settles late (its own abort rejection lands as a microtask after
+    // abort() has already returned) after a *later* send() cycle has already
+    // armed its own timer and written it to the field, clearing the field
+    // unconditionally here would disarm that later cycle's timer instead of
+    // this one. Clear the local unconditionally, but only touch the shared
+    // field when it still points at this cycle's own timer.
+    let sendTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
     try {
       // Compose timeout signal with user abort signal
       const signals: AbortSignal[] = [localSignal];
       if (sendTimeoutMs > 0) {
         const sendTimeoutController = new AbortController();
-        this._sendTimeoutId = setTimeout(() => {
+        sendTimeoutId = setTimeout(() => {
           sendTimeoutController.abort(
             new DOMException(
               'AgentController: sendTimeout exceeded before provider.send() resolved',
@@ -264,6 +280,7 @@ export class AgentController implements ReactiveController {
             ),
           );
         }, sendTimeoutMs);
+        this._sendTimeoutId = sendTimeoutId;
         signals.push(sendTimeoutController.signal);
       }
       const composedSignal = AbortSignal.any(signals);
@@ -277,8 +294,10 @@ export class AgentController implements ReactiveController {
       });
 
       // provider.send() has resolved — sendTimeout no longer applies.
-      clearTimeout(this._sendTimeoutId);
-      this._sendTimeoutId = undefined;
+      clearTimeout(sendTimeoutId);
+      if (this._sendTimeoutId === sendTimeoutId) {
+        this._sendTimeoutId = undefined;
+      }
 
       // The provider settled at (or after) the same instant sendTimeout
       // fired: composedSignal is aborted for the timeout reason even though
@@ -305,10 +324,20 @@ export class AgentController implements ReactiveController {
       // Delegate stream consumption to StreamingController
       // Note: connect() is async and runs the read loop, but we don't await it here.
       // StreamingController manages its own lifecycle via callbacks.
-      this._streaming.connect(response.stream, { idleTimeout: this._options.streamIdleTimeout });
+      this._streaming.connect(response.stream, {
+        // `StreamingController.connect()` itself defaults to no idle timeout
+        // (0) — only `AgentController` opts into a 60s default, and it must
+        // resolve that default here rather than lean on connect()'s own,
+        // since `this._options.streamIdleTimeout` can be a literal
+        // `undefined` (e.g. a caller spreading in an unset config value)
+        // even though the constructor merge normally fills it in.
+        idleTimeout: sanitizeTimeoutMs(this._options.streamIdleTimeout, 60_000),
+      });
     } catch (error) {
-      clearTimeout(this._sendTimeoutId);
-      this._sendTimeoutId = undefined;
+      clearTimeout(sendTimeoutId);
+      if (this._sendTimeoutId === sendTimeoutId) {
+        this._sendTimeoutId = undefined;
+      }
 
       // If aborted, silently return to idle (abort() already set state)
       if (localSignal.aborted) {
