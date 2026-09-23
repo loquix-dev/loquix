@@ -80,6 +80,42 @@ describe('sse transport', () => {
     expect(await readAll(response.stream)).to.equal('a');
   });
 
+  it('accepts a lone CR as a line ending, alongside CRLF and LF', async () => {
+    // The SSE spec terminates a line with CRLF, CR, *or* LF. A server that
+    // sends bare CR (some older or embedded HTTP stacks do) must decode the
+    // same as CRLF — this must not become one malformed payload.
+    const { fetch } = fakeFetch(textBody('data: a\r\rdata: [DONE]\r\r'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('a');
+  });
+
+  it('joins several data lines in one frame under lone-CR line endings', async () => {
+    // Same as "joins several data lines in one frame" above, but with the
+    // lines and the frame terminator both using a bare CR instead of LF.
+    const { fetch } = fakeFetch(textBody('data: a\rdata: b\r\r'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('a\nb');
+  });
+
+  it('does not treat a CRLF pair as two separate line endings', async () => {
+    // A naive lone-CR fix (matching `\r` and `\n` independently instead of
+    // preferring the two-character `\r\n` sequence) would see a single CRLF
+    // frame terminator as *two* line endings on its own, turning a normal
+    // single-frame body into a spurious empty frame before the real one.
+    const { fetch } = fakeFetch(textBody('data: a\r\ndata: b\r\n\r\n'));
+    const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
+
+    const response = await provider.send([userMessage('hi')], {});
+
+    expect(await readAll(response.stream)).to.equal('a\nb');
+  });
+
   it('emits the last frame when the body ends without a separator', async () => {
     const { fetch } = fakeFetch(textBody('data: a\n\ndata: b'));
     const provider = createHttpAgentProvider({ url: '/api/chat', fetch });
@@ -557,7 +593,7 @@ describe('non-string parse hook return', () => {
     const provider = createHttpAgentProvider({
       url: '/api/chat',
       fetch,
-      parse: (c => JSON.parse(c)) as unknown as (chunk: string) => string | null,
+      parse: c => JSON.parse(c),
     });
 
     const response = await provider.send([userMessage('hi')], {});
@@ -570,7 +606,7 @@ describe('non-string parse hook return', () => {
     const provider = createHttpAgentProvider({
       url: '/api/chat',
       fetch,
-      parse: (() => undefined) as unknown as (chunk: string) => string | null,
+      parse: () => undefined,
     });
 
     const response = await provider.send([userMessage('hi')], {});

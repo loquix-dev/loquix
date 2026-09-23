@@ -3,6 +3,21 @@ import type { HttpTransport } from './types.js';
 
 const DONE = '[DONE]';
 
+// The SSE spec terminates a line with CRLF, CR, *or* LF — not just LF/CRLF.
+// Listing `\r\n` before the lone `\r`/`\n` alternatives is not enough on its
+// own to keep a real CRLF pair from being read as two one-character line
+// endings: `SSE_FRAME_SEPARATOR` below repeats this group exactly twice, and
+// if the engine ever needs to backtrack to make that count work out, it will
+// happily re-split a `\r\n` it already matched into a lone `\r` + a lone
+// `\n` to get there — which turns a single ordinary CRLF line ending into a
+// false blank line. `\r(?!\n)` closes that off: a `\r` that is followed by
+// `\n` can *only* be consumed as part of the `\r\n` alternative, never on
+// its own, so there is no split left for backtracking to fall back to.
+const SSE_LINE_ENDING = /\r\n|\r(?!\n)|\n/;
+// A blank line — two consecutive line endings, in any combination of CRLF/CR/LF —
+// is what separates one SSE frame from the next.
+const SSE_FRAME_SEPARATOR = /(?:\r\n|\r(?!\n)|\n){2}/;
+
 /** The SSE frame metadata a `parse` hook can see, alongside the `data:` payload. */
 export interface SseFrameMeta {
   event?: string;
@@ -26,7 +41,7 @@ function readSseFrame(frame: string): SseFrame {
   const data: string[] = [];
   const meta: SseFrameMeta = {};
 
-  for (const line of frame.split(/\r?\n/)) {
+  for (const line of frame.split(SSE_LINE_ENDING)) {
     if (!line || line.startsWith(':')) continue;
     if (line.startsWith('data:')) data.push(line.slice(5).replace(/^ /, ''));
     else if (line.startsWith('event:')) meta.event = line.slice(6).replace(/^ /, '');
@@ -63,7 +78,7 @@ type FrameShape = 'ignorable' | 'recognized' | 'unrecognized';
  */
 function classifyFrame(frame: string, transport: HttpTransport): FrameShape {
   if (transport === 'sse') {
-    const lines = frame.split(/\r?\n/).filter(line => line.length > 0);
+    const lines = frame.split(SSE_LINE_ENDING).filter(line => line.length > 0);
     if (lines.length === 0) return 'ignorable';
     return lines.some(line => SSE_LINE_PREFIXES.some(prefix => line.startsWith(prefix)))
       ? 'recognized'
@@ -129,12 +144,12 @@ function normalizeParsedText(value: string | null | unknown): string | null {
 export function decode(
   body: ReadableStream<Uint8Array>,
   transport: HttpTransport,
-  parse: ((chunk: string, frame?: SseFrameMeta) => string | null) | undefined,
+  parse: ((chunk: string, frame?: SseFrameMeta) => string | null | undefined) | undefined,
   meta: DecodeMeta,
 ): ReadableStream<string> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
-  const separator = transport === 'sse' ? /\r?\n\r?\n/ : /\r?\n/;
+  const separator = transport === 'sse' ? SSE_FRAME_SEPARATOR : /\r?\n/;
   let buffer = '';
   let finished = false;
   // A transport mismatch — SSE read as ndjson, or, under sse specifically, a
@@ -222,90 +237,106 @@ export function decode(
 
   return new ReadableStream<string>({
     async pull(controller) {
-      while (!finished) {
-        const { value, done } = await reader.read();
+      try {
+        while (!finished) {
+          const { value, done } = await reader.read();
 
-        if (done) {
-          finished = true;
-          // Flush both the decoder's pending bytes and the last frame, which a
-          // server that closes without a trailing separator never terminated.
-          buffer += decoder.decode();
+          if (done) {
+            finished = true;
+            // Flush both the decoder's pending bytes and the last frame, which a
+            // server that closes without a trailing separator never terminated.
+            buffer += decoder.decode();
 
-          if (transport === 'text') {
-            if (buffer) {
-              const text = parse ? normalizeParsedText(parse(buffer)) : buffer;
-              if (text) {
+            if (transport === 'text') {
+              if (buffer) {
+                const text = parse ? normalizeParsedText(parse(buffer)) : buffer;
+                if (text) {
+                  controller.enqueue(text);
+                  enqueuedAny = true;
+                }
+              }
+            } else if (buffer.trim()) {
+              classify(buffer);
+              const text = toText(buffer);
+              if (text === DONE) {
+                sawDone = true;
+              } else if (text) {
                 controller.enqueue(text);
                 enqueuedAny = true;
               }
             }
-          } else if (buffer.trim()) {
-            classify(buffer);
-            const text = toText(buffer);
-            if (text === DONE) {
-              sawDone = true;
-            } else if (text) {
-              controller.enqueue(text);
-              enqueuedAny = true;
-            }
-          }
 
-          if (failIfMismatched(controller)) return;
+            if (failIfMismatched(controller)) return;
 
-          controller.close();
-          return;
-        }
-
-        if (value.length > 0) receivedBytes = true;
-        buffer += decoder.decode(value, { stream: true });
-
-        if (transport === 'text') {
-          // A chunk can decode to nothing (an empty body part, or the first
-          // half of a multibyte character), and a parse hook can likewise
-          // reduce a chunk to ''. Neither should reach the consumer as a
-          // phantom empty chunk, so both are filtered the same way the
-          // sse/ndjson path filters an empty payload.
-          if (buffer) {
-            const chunk = buffer;
-            buffer = '';
-            const text = parse ? normalizeParsedText(parse(chunk)) : chunk;
-            if (text) {
-              controller.enqueue(text);
-              enqueuedAny = true;
-              return;
-            }
-          }
-          continue;
-        }
-
-        let emitted = false;
-        let match = separator.exec(buffer);
-
-        while (match) {
-          const frame = buffer.slice(0, match.index);
-          buffer = buffer.slice(match.index + match[0].length);
-
-          classify(frame);
-          const text = toText(frame);
-
-          if (text === DONE) {
-            sawDone = true;
-            finished = true;
             controller.close();
-            void reader.cancel().catch(() => {});
             return;
           }
 
-          if (text) {
-            controller.enqueue(text);
-            enqueuedAny = true;
-            emitted = true;
+          if (value.length > 0) receivedBytes = true;
+          buffer += decoder.decode(value, { stream: true });
+
+          if (transport === 'text') {
+            // A chunk can decode to nothing (an empty body part, or the first
+            // half of a multibyte character), and a parse hook can likewise
+            // reduce a chunk to ''. Neither should reach the consumer as a
+            // phantom empty chunk, so both are filtered the same way the
+            // sse/ndjson path filters an empty payload.
+            if (buffer) {
+              const chunk = buffer;
+              buffer = '';
+              const text = parse ? normalizeParsedText(parse(chunk)) : chunk;
+              if (text) {
+                controller.enqueue(text);
+                enqueuedAny = true;
+                return;
+              }
+            }
+            continue;
           }
 
-          match = separator.exec(buffer);
-        }
+          let emitted = false;
+          let match = separator.exec(buffer);
 
-        if (emitted) return;
+          while (match) {
+            const frame = buffer.slice(0, match.index);
+            buffer = buffer.slice(match.index + match[0].length);
+
+            classify(frame);
+            const text = toText(frame);
+
+            if (text === DONE) {
+              sawDone = true;
+              finished = true;
+              controller.close();
+              void reader.cancel().catch(() => {});
+              return;
+            }
+
+            if (text) {
+              controller.enqueue(text);
+              enqueuedAny = true;
+              emitted = true;
+            }
+
+            match = separator.exec(buffer);
+          }
+
+          if (emitted) return;
+        }
+      } catch (err) {
+        // A throwing `parse` hook (or any other unexpected failure while
+        // decoding a frame) rejects this `pull()` call, which errors the
+        // wrapper stream automatically — but per the Streams spec, a rejected
+        // `pull()` does NOT by itself invoke the source's cancel algorithm.
+        // Left alone, that leaves the underlying body (an open SSE
+        // connection, for instance) consuming a browser connection slot and
+        // server resources for as long as the server keeps it open. Cancel
+        // the source explicitly, then rethrow the original exception
+        // unchanged — the consumer must still see their own error, since
+        // that is the documented contract for a throwing `parse` hook.
+        finished = true;
+        await reader.cancel().catch(() => {});
+        throw err;
       }
     },
     cancel(reason) {

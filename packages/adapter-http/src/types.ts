@@ -54,8 +54,8 @@ export interface HttpAgentProviderOptions {
   body?: (messages: AgentMessage[], options: AgentSendOptions) => unknown;
 
   /**
-   * Transforms a decoded payload into the text to enqueue, or `null` to skip
-   * it (e.g. to drop a tool-call/metadata/heartbeat frame). Called with the
+   * Transforms a decoded payload into the text to enqueue, or `null`/`undefined`
+   * to skip it (e.g. to drop a tool-call/metadata/heartbeat frame). Called with the
    * `data:` payload for `sse`, the raw line for `ndjson`; for `sse` the
    * frame's `event:` and `id:` lines are also passed as `frame` — useful when
    * a backend (e.g. LangServe) discriminates a frame's kind with `event:`
@@ -87,7 +87,7 @@ export interface HttpAgentProviderOptions {
    * split differently across requests, making `parse`'s output not
    * reproducible. Passing both throws at construction time.
    */
-  parse?: (chunk: string, frame?: SseFrameMeta) => string | null;
+  parse?: (chunk: string, frame?: SseFrameMeta) => string | null | undefined;
 
   /** Overrides `globalThis.fetch`, e.g. to inject a test double or a wrapped client. */
   fetch?: typeof globalThis.fetch;

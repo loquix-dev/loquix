@@ -262,9 +262,24 @@ describe('parse hook', () => {
     expect(await readAll(response.stream)).to.equal('x');
   });
 
-  it('errors the stream with the exact error a throwing hook raises', async () => {
-    const { fetch } = fakeFetch(sseBody('anything'));
+  it('errors the stream with the exact error a throwing hook raises, and cancels the source body', async () => {
+    // Deliberately never closed, like the "server left it open" tests above:
+    // an SSE connection a throwing parse hook leaves dangling still occupies
+    // a browser connection slot and server resources unless the decoder
+    // cancels the source reader itself. A stream that closes on its own
+    // wouldn't tell us anything here — cancel() on an already-closed stream
+    // is a no-op that would pass even without the fix.
+    let cancelled = 0;
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('data: anything\n\n'));
+      },
+      cancel() {
+        cancelled += 1;
+      },
+    });
     const boom = new Error('consumer parse hook exploded');
+    const { fetch } = fakeFetch(body);
     const provider = createHttpAgentProvider({
       url: '/api/chat',
       fetch,
@@ -287,5 +302,6 @@ describe('parse hook', () => {
     // consumer's own code, so its exception must come out unwrapped rather
     // than being treated like a parse failure and silently dropped.
     expect(caught).to.equal(boom);
+    expect(cancelled, 'a throwing parse hook must not leak the source connection').to.equal(1);
   });
 });
