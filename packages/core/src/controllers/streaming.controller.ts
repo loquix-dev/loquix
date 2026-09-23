@@ -29,19 +29,29 @@ export interface StreamingConnectOptions {
  * Sanitize a millisecond timeout option.
  *
  * - `undefined` → `defaultValue` (the feature is enabled with its default window)
- * - any non-finite or non-positive number (`NaN`, `±Infinity`, negative, or `0`)
- *   → `0`, meaning "disabled". This guarantees a pathological value can never
- *   reach `setTimeout`/`AbortSignal.timeout` and misbehave — notably, negative
- *   values used to make `AbortSignal.timeout(-1)` throw a `RangeError`.
+ * - `NaN` (or any other non-number) → `defaultValue`. The usual source of
+ *   `NaN` here is arithmetic on a missing config value, so silently
+ *   disabling the guard would be the wrong failure mode — a computation went
+ *   wrong, and falling back is safer than going unbounded.
+ * - `±Infinity` → `0`, meaning "disabled". Unlike `NaN`, this is not a
+ *   mistake to recover from: `Infinity` is the natural way to spell "no
+ *   timeout", so it's honoured as a deliberate choice.
+ * - zero or a negative number → `0` ("disabled"), as always. This also
+ *   guarantees a pathological value can never reach
+ *   `setTimeout`/`AbortSignal.timeout` and misbehave — negative values used
+ *   to make `AbortSignal.timeout(-1)` throw a `RangeError`.
  * - a finite positive number → returned as-is
+ *
+ * This deliberately differs from `UploadController`'s own `_sanitizeInt`,
+ * which folds `Infinity` into the same "fall back to default" bucket as
+ * `NaN`. That's correct there: `Infinity` concurrency or retries has no
+ * sensible meaning to honour. It has one here — "run forever" is a real
+ * timeout policy — so the two sanitizers are allowed to disagree.
  */
 export function sanitizeTimeoutMs(value: number | undefined, defaultValue: number): number {
-  // Matches UploadController's own option sanitizing: a value that is not a
-  // finite number falls back to the default rather than silently removing the
-  // guard, because the usual source of NaN here is arithmetic on a missing
-  // config value. An explicit zero or negative means "off", as it always has.
   if (value === undefined) return defaultValue;
-  if (typeof value !== 'number' || !Number.isFinite(value)) return defaultValue;
+  if (typeof value !== 'number' || Number.isNaN(value)) return defaultValue;
+  if (!Number.isFinite(value)) return 0; // `±Infinity`: an explicit "no timeout"
   return value <= 0 ? 0 : value;
 }
 

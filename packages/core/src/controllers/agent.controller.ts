@@ -26,8 +26,15 @@ export interface AgentControllerOptions {
    * that runs longer than `sendTimeout` after it has started is left alone;
    * use `streamIdleTimeout` to bound silence within an already-started stream.
    *
-   * Set 0 to disable. A non-finite or negative value also disables it rather
-   * than throwing.
+   * Enforced by aborting the signal passed to `provider.send()` — it is
+   * advisory, not a guarantee. A provider that ignores that signal (never
+   * checks it, never forwards it to whatever it wraps) simply resolves late;
+   * the timeout fires and has nothing left to enforce.
+   *
+   * Set 0 or `±Infinity` to disable. A negative value also disables it. A
+   * `NaN` value (the usual cause is arithmetic on a missing config value)
+   * falls back to the default instead — see `sanitizeTimeoutMs`. None of
+   * these throw.
    */
   sendTimeout?: number;
 
@@ -36,8 +43,9 @@ export interface AgentControllerOptions {
    * Default: 60_000. Resets on every chunk, so a long but healthy stream is
    * never punished — only silence is. A paused stream does not count as idle.
    *
-   * Set 0 to disable. A non-finite or negative value also disables it rather
-   * than throwing.
+   * Set 0 or `±Infinity` to disable. A negative value also disables it. A
+   * `NaN` value falls back to the default instead, for the same reason as
+   * `sendTimeout` above — see `sanitizeTimeoutMs`. None of these throw.
    */
   streamIdleTimeout?: number;
 
@@ -101,6 +109,16 @@ export class AgentController implements ReactiveController {
   private _abortController: AbortController | null = null;
   private _currentResponseId: string | null = null;
   private _currentResponse: AgentResponse | null = null;
+  /**
+   * The `sendTimeout` timer for the in-flight `send()` cycle, if any. A
+   * private field rather than a `send()` local so `abort()` (and `reset()`/
+   * `hostDisconnected()`, which both route through it) can clear it even
+   * though it's only otherwise cleared once the provider's promise settles —
+   * a provider that ignores its abort signal and never resolves would
+   * otherwise leave this pending for the full duration, keeping a discarded
+   * controller (and, in Node/SSR, the event loop) alive.
+   */
+  private _sendTimeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
 
   constructor(
     host: ReactiveControllerHost,
@@ -231,14 +249,14 @@ export class AgentController implements ReactiveController {
     // instant provider.send() settles, leaving no lingering effect on
     // whatever the returned stream goes on to do.
     const sendTimeoutMs = sanitizeTimeoutMs(this._options.sendTimeout, 60_000);
-    let sendTimeoutId: ReturnType<typeof setTimeout> | undefined;
+    this._sendTimeoutId = undefined;
 
     try {
       // Compose timeout signal with user abort signal
       const signals: AbortSignal[] = [localSignal];
       if (sendTimeoutMs > 0) {
         const sendTimeoutController = new AbortController();
-        sendTimeoutId = setTimeout(() => {
+        this._sendTimeoutId = setTimeout(() => {
           sendTimeoutController.abort(
             new DOMException(
               'AgentController: sendTimeout exceeded before provider.send() resolved',
@@ -259,7 +277,19 @@ export class AgentController implements ReactiveController {
       });
 
       // provider.send() has resolved — sendTimeout no longer applies.
-      clearTimeout(sendTimeoutId);
+      clearTimeout(this._sendTimeoutId);
+      this._sendTimeoutId = undefined;
+
+      // The provider settled at (or after) the same instant sendTimeout
+      // fired: composedSignal is aborted for the timeout reason even though
+      // provider.send() actually resolved (a provider that doesn't check its
+      // signal before returning has exactly this shape). Surface the
+      // timeout rather than a response that will never produce a byte — an
+      // app that opens a message bubble on onResponseStart would otherwise
+      // flash an empty one for a response that's already dead.
+      if (composedSignal.aborted && !localSignal.aborted) {
+        throw composedSignal.reason;
+      }
 
       // If aborted while awaiting send(), bail out
       if (localSignal.aborted) {
@@ -277,7 +307,8 @@ export class AgentController implements ReactiveController {
       // StreamingController manages its own lifecycle via callbacks.
       this._streaming.connect(response.stream, { idleTimeout: this._options.streamIdleTimeout });
     } catch (error) {
-      clearTimeout(sendTimeoutId);
+      clearTimeout(this._sendTimeoutId);
+      this._sendTimeoutId = undefined;
 
       // If aborted, silently return to idle (abort() already set state)
       if (localSignal.aborted) {
@@ -308,6 +339,14 @@ export class AgentController implements ReactiveController {
    * - During 'idle'/'complete': no-op
    */
   abort(): void {
+    // Clear the sendTimeout timer even if the provider's promise never
+    // settles on its own (a provider that ignores the abort signal has
+    // exactly this shape) — otherwise it fires up to `sendTimeout` later on
+    // a discarded controller. reset() and hostDisconnected() both route
+    // through abort() and inherit this.
+    clearTimeout(this._sendTimeoutId);
+    this._sendTimeoutId = undefined;
+
     // Signal the abort to cancel provider.send() if still in-flight
     this._abortController?.abort();
     this._abortController = null;

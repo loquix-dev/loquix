@@ -35,3 +35,22 @@ own code changed.
 
 `StreamingController.connect()` takes an optional second argument carrying
 that timeout. The parameter is optional, so existing calls are unaffected.
+
+**If you previously set `sendTimeout: 0` to disable timeouts entirely, you
+must now also set `streamIdleTimeout: 0`.** `streamIdleTimeout` is a new
+option and defaults to _on_ (60_000), so that exact 0.5.0 opt-out
+configuration no longer means "no timeouts" — it now arms a 60-second idle
+timer against the response stream it never used to touch. If your backend
+has a normal gap of more than 60s between chunks (a long-running tool call, a
+cold start, a slow retrieval hop), you will start seeing a new failure there:
+`onError` fires with a `DOMException` named `TimeoutError`
+(`"StreamingController: no chunk received within streamIdleTimeout"`), the
+controller moves to `error`, and whatever the stream had already produced is
+discarded rather than appended to `messages`. Set `streamIdleTimeout: 0`
+alongside `sendTimeout: 0` to restore the old "never times out" behavior.
+
+Separately, `sendTimeout`/`streamIdleTimeout` now treat `±Infinity` as an
+explicit "no timeout" (equivalent to `0`) rather than falling back to the
+default — see `sanitizeTimeoutMs`'s own doc comment for the reasoning. Only
+`NaN` (and other non-finite-but-not-infinite garbage) still falls back to the
+default.

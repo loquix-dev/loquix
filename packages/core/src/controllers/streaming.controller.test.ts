@@ -318,14 +318,21 @@ describe('StreamingController', () => {
 
   // === streamIdleTimeout ===
 
-  it('sanitizeTimeoutMs: undefined and non-finite use the default, 0/negative disable', () => {
+  it('sanitizeTimeoutMs: undefined/NaN use the default; 0/negative/±Infinity disable', () => {
     expect(sanitizeTimeoutMs(undefined, 60_000)).to.equal(60_000);
     expect(sanitizeTimeoutMs(5_000, 60_000)).to.equal(5_000);
     expect(sanitizeTimeoutMs(0, 60_000)).to.equal(0);
     expect(sanitizeTimeoutMs(-1, 60_000)).to.equal(0);
+    // NaN's likely cause is arithmetic on a missing config value, so it falls
+    // back to the default rather than silently disabling the guard.
     expect(sanitizeTimeoutMs(NaN, 60_000)).to.equal(60_000);
-    expect(sanitizeTimeoutMs(Infinity, 60_000)).to.equal(60_000);
-    expect(sanitizeTimeoutMs(-Infinity, 60_000)).to.equal(60_000);
+    // Unlike NaN, ±Infinity is a deliberate "no timeout" and is honoured as
+    // disabled (0) rather than folded into the default — this is what makes
+    // `Infinity` the natural way to spell "no timeout" for these options,
+    // unlike UploadController's `_sanitizeInt`, where Infinity is meaningless
+    // for a concurrency/retry count and falls back to the default like NaN.
+    expect(sanitizeTimeoutMs(Infinity, 60_000)).to.equal(0);
+    expect(sanitizeTimeoutMs(-Infinity, 60_000)).to.equal(0);
   });
 
   it('aborts with a TimeoutError when no chunk arrives within idleTimeout', async () => {

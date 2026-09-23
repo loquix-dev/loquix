@@ -108,6 +108,95 @@ class HangingProvider implements AgentProvider {
   }
 }
 
+/**
+ * Mock provider whose send() ignores the signal it's given entirely — it
+ * never resolves, never rejects, and never listens for 'abort'. Models a
+ * wrapped SDK client with no abort support. Used to prove the sendTimeout
+ * timer itself gets cleared by abort()/reset()/hostDisconnected() even when
+ * nothing about settling the provider promise would ever clear it.
+ */
+class DeafProvider implements AgentProvider {
+  readonly name = 'deaf-agent';
+
+  async send(): Promise<AgentResponse> {
+    return new Promise(() => {
+      /* never settles */
+    });
+  }
+}
+
+/**
+ * Mock provider that resolves the instant the signal it's given aborts —
+ * simulating a provider that doesn't check `signal.aborted` before returning
+ * and so resolves "successfully" exactly when sendTimeout fires, rather than
+ * rejecting like HangingProvider/DeafProvider would if they honoured it.
+ */
+class ResolvesOnAbortProvider implements AgentProvider {
+  readonly name = 'resolves-on-abort-agent';
+
+  async send(_messages: AgentMessage[], options: AgentSendOptions): Promise<AgentResponse> {
+    return new Promise(resolve => {
+      options.signal?.addEventListener('abort', () => {
+        resolve({
+          id: 'resp-race',
+          stream: createStream(['too late']),
+          metadata: {},
+        });
+      });
+    });
+  }
+}
+
+/**
+ * Tracks every `setTimeout` scheduled while active and every one cleared,
+ * so a test can assert "no timer is left pending" without fake timers (wtr
+ * runs real browsers, not vitest/jsdom). Restore synchronously once done.
+ */
+function trackTimers(): { pendingCount: () => number; restore: () => void } {
+  const pending = new Set<ReturnType<typeof setTimeout>>();
+  const realSetTimeout = globalThis.setTimeout;
+  const realClearTimeout = globalThis.clearTimeout;
+
+  (globalThis as unknown as { setTimeout: typeof setTimeout }).setTimeout = ((
+    handler: (...a: unknown[]) => void,
+    timeout?: number,
+    ...args: unknown[]
+  ) => {
+    // Wrap the handler so a timer that fires naturally (e.g. this file's own
+    // `wait()` helper) removes itself from `pending` too — only a timer that
+    // never fires and is never cleared should count as "still pending". A
+    // holder object sidesteps the forward-reference-before-assignment `let`
+    // that `wrapped` would otherwise need to capture its own id.
+    const holder: { id?: ReturnType<typeof setTimeout> } = {};
+    const wrapped = (...a: unknown[]) => {
+      if (holder.id !== undefined) pending.delete(holder.id);
+      handler(...a);
+    };
+    holder.id = (realSetTimeout as (...a: unknown[]) => ReturnType<typeof setTimeout>)(
+      wrapped,
+      timeout,
+      ...args,
+    );
+    pending.add(holder.id);
+    return holder.id;
+  }) as typeof setTimeout;
+
+  (globalThis as unknown as { clearTimeout: typeof clearTimeout }).clearTimeout = ((
+    id?: Parameters<typeof clearTimeout>[0],
+  ) => {
+    if (id !== undefined) pending.delete(id as ReturnType<typeof setTimeout>);
+    return realClearTimeout(id);
+  }) as typeof clearTimeout;
+
+  return {
+    pendingCount: () => pending.size,
+    restore: () => {
+      globalThis.setTimeout = realSetTimeout;
+      globalThis.clearTimeout = realClearTimeout;
+    },
+  };
+}
+
 // === Tests ===
 
 describe('AgentController', () => {
@@ -870,5 +959,94 @@ describe('AgentController', () => {
     expect(ctrl.state).to.equal('complete');
     expect(errorMsg).to.be.null;
     expect(ctrl.messages[1].content).to.equal('AB');
+  });
+
+  // === sendTimeout timer leak (abort/reset/hostDisconnected) ===
+
+  it('abort() clears the pending sendTimeout timer even when the provider ignores its signal', async () => {
+    const host = createMockHost();
+    const provider = new DeafProvider(); // never settles, never listens for 'abort'
+    const ctrl = new AgentController(host, provider, { sendTimeout: 60_000 });
+
+    const tracker = trackTimers();
+    try {
+      void ctrl.send('test');
+      await wait(10); // let send() schedule the sendTimeout timer
+      expect(tracker.pendingCount(), 'pending after send()').to.be.greaterThan(0);
+
+      ctrl.abort();
+      expect(tracker.pendingCount(), 'pending after abort()').to.equal(0);
+    } finally {
+      tracker.restore();
+    }
+  });
+
+  it('reset() clears the pending sendTimeout timer (routes through abort())', async () => {
+    const host = createMockHost();
+    const provider = new DeafProvider();
+    const ctrl = new AgentController(host, provider, { sendTimeout: 60_000 });
+
+    const tracker = trackTimers();
+    try {
+      void ctrl.send('test');
+      await wait(10);
+      expect(tracker.pendingCount(), 'pending after send()').to.be.greaterThan(0);
+
+      ctrl.reset();
+      expect(tracker.pendingCount(), 'pending after reset()').to.equal(0);
+    } finally {
+      tracker.restore();
+    }
+  });
+
+  it('hostDisconnected() clears the pending sendTimeout timer (routes through abort())', async () => {
+    const host = createMockHost();
+    const provider = new DeafProvider();
+    const ctrl = new AgentController(host, provider, { sendTimeout: 60_000 });
+
+    const tracker = trackTimers();
+    try {
+      void ctrl.send('test');
+      await wait(10);
+      expect(tracker.pendingCount(), 'pending after send()').to.be.greaterThan(0);
+
+      ctrl.hostDisconnected();
+      expect(tracker.pendingCount(), 'pending after hostDisconnected()').to.equal(0);
+    } finally {
+      tracker.restore();
+    }
+  });
+
+  // === composedSignal aborted but provider.send() still resolved ===
+
+  it('surfaces the TimeoutError instead of a response, when the provider resolves exactly as sendTimeout fires', async () => {
+    const host = createMockHost();
+    const provider = new ResolvesOnAbortProvider();
+
+    let onResponseStartCalled = false;
+    let errorName = '';
+    let errorMessage = '';
+    const ctrl = new AgentController(host, provider, {
+      sendTimeout: 30,
+      onResponseStart: () => {
+        onResponseStartCalled = true;
+      },
+      onError: err => {
+        errorName = err.name;
+        errorMessage = err.message;
+      },
+    });
+
+    await ctrl.send('test');
+    await wait(20);
+
+    expect(ctrl.state).to.equal('error');
+    expect(errorName).to.equal('TimeoutError');
+    expect(errorMessage).to.include('sendTimeout exceeded');
+    // The provider "resolved", but composedSignal was already aborted for the
+    // timeout reason — onResponseStart must never fire for a response that's
+    // already dead, and no assistant message is ever appended.
+    expect(onResponseStartCalled).to.be.false;
+    expect(ctrl.messages).to.have.lengthOf(1);
   });
 });
