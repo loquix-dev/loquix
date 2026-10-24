@@ -13,7 +13,7 @@
     "@storybook/addon-a11y": "^8.6.0",
     "@storybook/web-components": "^8.6.0",
     "@storybook/web-components-vite": "^8.6.0",
-    "storybook": "^8.6.0",
+    "storybook": "^8.6.19",
     "lit": "^3.2.0"
   }
 }
